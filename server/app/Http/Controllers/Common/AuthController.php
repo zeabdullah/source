@@ -56,6 +56,13 @@ class AuthController extends Controller
         ], 'Registration successful', 201);
     }
 
+    public function logout(Request $request): JsonResponse
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return $this->response(null, 'Logged out successfully');
+    }
+
     private function generateAuthToken(User $user): string
     {
         return $user->createToken('auth_token')->plainTextToken;
