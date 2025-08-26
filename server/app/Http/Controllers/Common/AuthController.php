@@ -20,13 +20,13 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (!auth()->attempt($credentials)) {
-            return $this->unauthorized(message: 'Invalid credentials');
+            return $this->unauthorizedResponse(message: 'Invalid credentials');
         }
 
         $user = auth()->user();
         $token = $this->generateAuthToken($user);
 
-        return $this->response([
+        return $this->responseJson([
             'user' => $user,
             'token' => $token,
         ], 'Login successful');
@@ -50,7 +50,7 @@ class AuthController extends Controller
 
         $token = $this->generateAuthToken($user);
 
-        return $this->response([
+        return $this->responseJson([
             'user' => $user,
             'token' => $token,
         ], 'Registration successful', 201);
@@ -60,7 +60,15 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return $this->response(null, 'Logged out successfully');
+        return $this->responseJson(null, 'Logged out successfully');
+    }
+
+    /**
+     * Gets current user based on session
+     */
+    public function getMe(Request $request): JsonResponse
+    {
+        return $this->responseJson($request->user());
     }
 
     private function generateAuthToken(User $user): string

@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function getUser(Request $request): JsonResponse
+    public function getUserById(Request $request, string $userId): JsonResponse
     {
-        return $this->response($request->user());
+        $user = User::find($userId);
+
+        if (!$user) {
+            return $this->notFoundResponse(message: 'User not found');
+        }
+
+        return $this->responseJson($user);
     }
 }
