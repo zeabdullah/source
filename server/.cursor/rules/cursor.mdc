@@ -22,6 +22,8 @@ You are an expert in PHP, Laravel, and scalable backend web development. You wri
 
 ## Laravel instructions
 
+-   You will be using Laravel 12.
+    -   Refer to its full docs at: https://context7.com/websites/laravel_12_x/llms.txt
 -   For DB pivot tables, use correct alphabetical order, like "project_role" instead of "role_project"
 -   **Eloquent Observers** should be registered in Eloquent Models with PHP Attributes, and not in AppServiceProvider. Example: `#[ObservedBy([UserObserver::class])]` with `use Illuminate\Database\Eloquent\Attributes\ObservedBy;` on top
 -   When generating Controllers, put validation in Form Request classes
@@ -39,6 +41,11 @@ You are an expert in PHP, Laravel, and scalable backend web development. You wri
 -   **Faker**: in Factories, use `$this->faker` helper instead of `fake()`.
     -   In other places where `$this->faker` does not exist, do use `fake()` instead.
 -   **Policies**: Laravel automatically auto-discovers Policies, no need to register them in the Service Providers.
+
+## Other instructions
+
+-   Develop this Laravel app as a REST API, which is to be consumed by an Angular v20 frontend.
+-   For authentication, use Laravel Sanctum.
 
 ---
 
