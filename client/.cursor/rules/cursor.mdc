@@ -14,6 +14,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 ## Angular Best Practices
 
 - You're using Angular v20.
+- Double check the Angular v20 docs whether the feature to be used is needed anymore or there's a newer alternative: https://context7.com/llmstxt/context7_websites_angular_dev_llms_txt/llms.txt.
 - Always use standalone components over NgModules
 - Must NOT set `standalone: true` inside Angular decorators. It's the default.
 - Use signals for state management
