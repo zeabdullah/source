@@ -14,19 +14,6 @@
         "serve:ssr:source-client": "node dist/source-client/server/server.mjs",
         "lint": "ng lint"
     },
-    "prettier": {
-        "printWidth": 100,
-        "singleQuote": true,
-        "tabWidth": 4,
-        "overrides": [
-            {
-                "files": "*.html",
-                "options": {
-                    "parser": "angular"
-                }
-            }
-        ]
-    },
     "private": true,
     "dependencies": {
         "@angular/common": "^20.2.0",
@@ -64,8 +51,8 @@
         "karma-jasmine": "~5.1.0",
         "karma-jasmine-html-reporter": "~2.1.0",
         "prettier": "3.6.2",
+        "prettier-plugin-tailwindcss": "^0.6.14",
         "typescript": "~5.9.2",
-        "typescript-eslint": "8.40.0",
-        "husky": "^8.0.0"
+        "typescript-eslint": "8.40.0"
     }
 }

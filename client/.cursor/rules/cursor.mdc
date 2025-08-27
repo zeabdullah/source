@@ -13,6 +13,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ## Angular Best Practices
 
+- You're using Angular v20.
 - Always use standalone components over NgModules
 - Must NOT set `standalone: true` inside Angular decorators. It's the default.
 - Use signals for state management
@@ -21,16 +22,37 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use `NgOptimizedImage` for all static images.
     - `NgOptimizedImage` does not work for inline base64 images.
 
+## Styling
+
+- Use Tailwind CSS v4, with the custom Tailwind theme variables inside `src/styles.css`
+- Some of Tailwind's default classes are not available due to the custom theme variables, so make sure a class exists before writing it.
+
+## Consistency
+
+- When in doubt, prefer convention and consistency based on the structure around you.
+- Refer to `/eslint.config.js` for lint rules, and make sure to ALWAYS abide by them.
+
 ## Components
 
 - Keep components small and focused on a single responsibility
 - Use `input()` and `output()` functions instead of decorators
 - Use `computed()` for derived state
 - Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component` decorator
-- Prefer inline templates for small components
+- Prefer inline templates for tiny components.
 - Prefer Reactive forms instead of Template-driven ones
 - Do NOT use `ngClass`, use `class` bindings instead
 - Do NOT use `ngStyle`, use `style` bindings instead
+- Components should go to `src/app/`.
+- Use `ng g c <name>` command to create a component
+- Components should be named with **PascalCase**, without a `Component` suffix.
+    - Example: `ProfilePhoto`, `Button`
+        - NOT `ProfilePhotoComponent`, `ButtonComponent`
+
+### Pages
+
+- Page are also components.
+- Page components should go into `src/app/pages/`
+- All component rules stated above apply to pages too, except NEVER inline templates.
 
 ## State Management
 
