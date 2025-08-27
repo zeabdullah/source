@@ -5,12 +5,15 @@
     "htmlWhitespaceSensitivity": "css",
     "bracketSameLine": false,
     "printWidth": 100,
-    "proseWrap": "",
+    "proseWrap": "preserve",
     "quoteProps": "consistent",
     "requirePragma": false,
     "semi": false,
     "singleQuote": true,
     "tabWidth": 4,
     "trailingComma": "all",
-    "useTabs": false
+    "useTabs": false,
+
+    "plugins": ["prettier-plugin-tailwindcss"],
+    "tailwindStylesheet": "./src/styles.css"
 }
