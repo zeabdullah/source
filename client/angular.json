@@ -37,6 +37,10 @@
                 "@schematics/angular:interceptor": {
                     "path": "src/app/interceptors",
                     "typeSeparator": "."
+                },
+                "@schematics/angular:interface": {
+                    "path": "src/app/interfaces",
+                    "type": "interface"
                 }
             },
             "root": "",

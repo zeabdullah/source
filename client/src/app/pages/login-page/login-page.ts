@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, signal, inject, OnInit } from '@angular/core'
 import { RouterLink } from '@angular/router'
-import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms'
+import { Validators, ReactiveFormsModule, NonNullableFormBuilder } from '@angular/forms'
 import { HttpClient, HttpErrorResponse } from '@angular/common/http'
+import { BASE_URL } from '../../constants/http.constants'
 
 @Component({
     selector: 'app-login-page',
@@ -10,7 +11,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http'
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginPage implements OnInit {
-    protected fb = inject(FormBuilder)
+    protected fb = inject(NonNullableFormBuilder)
     protected http = inject(HttpClient)
 
     protected isLoading = signal(false)
@@ -22,11 +23,11 @@ export class LoginPage implements OnInit {
         password: ['', Validators.required],
     })
 
-    ngOnInit() {
-        fetch('http://localhost:8000/sanctum/csrf-cookie', { credentials: 'include' })
+    ngOnInit(): void {
+        fetch(`${BASE_URL}/sanctum/csrf-cookie`, { credentials: 'include' })
     }
 
-    login() {
+    login(): void {
         if (this.loginForm.invalid) {
             return
         }
