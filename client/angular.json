@@ -9,22 +9,25 @@
                 "@schematics/angular:component": {
                     "path": "src/app",
                     "style": "none",
-                    "skipTests": false,
+                    "skipTests": true,
                     "inlineStyle": false,
                     "inlineTemplate": false,
                     "changeDetection": "OnPush"
                 },
                 "@schematics/angular:guard": {
                     "path": "src/app/guards",
-                    "typeSeparator": "."
+                    "typeSeparator": ".",
+                    "skipTests": true
                 },
                 "@schematics/angular:service": {
                     "path": "src/app/services",
-                    "type": "service"
+                    "type": "service",
+                    "skipTests": true
                 },
                 "@schematics/angular:pipe": {
                     "path": "src/app/pipes",
-                    "typeSeparator": "."
+                    "typeSeparator": ".",
+                    "skipTests": true
                 },
                 "@schematics/angular:directive": {
                     "path": "src/app/directives",
@@ -32,11 +35,13 @@
                 },
                 "@schematics/angular:resolver": {
                     "path": "src/app/resolvers",
-                    "typeSeparator": "."
+                    "typeSeparator": ".",
+                    "skipTests": true
                 },
                 "@schematics/angular:interceptor": {
                     "path": "src/app/interceptors",
-                    "typeSeparator": "."
+                    "typeSeparator": ".",
+                    "skipTests": true
                 },
                 "@schematics/angular:interface": {
                     "path": "src/app/interfaces",
