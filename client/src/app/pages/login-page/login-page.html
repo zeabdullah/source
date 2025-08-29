@@ -1,7 +1,5 @@
-<div class="flex min-h-full flex-col items-stretch justify-center p-4">
-    <a routerLink="/" class="mx-auto mb-8 block">
-        <img src="/source-logo-brand.svg" height="80" alt="logo" class="h-20" />
-    </a>
+<div class="flex min-h-full flex-col items-stretch justify-center gap-y-8 p-4">
+    <app-logo />
 
     <div class="mx-auto w-full max-w-[580px] rounded-3xl border border-gray-200 p-14 shadow-xs">
         <h1 class="mb-14 text-center text-h2 font-bold tracking-tight">Log in to your account</h1>
@@ -12,7 +10,7 @@
         </div>
         }
 
-        <form class="space-y-8" [formGroup]="loginForm" (ngSubmit)="login()">
+        <form class="mb-8 space-y-8" [formGroup]="loginForm" (ngSubmit)="login()">
             <fieldset [disabled]="isLoading()" class="space-y-4">
                 <div>
                     <label>
@@ -45,16 +43,16 @@
                     <div class="text-sm text-danger-500">Password is required.</div>
                     }
                 </div>
-            </fieldset>
 
-            <div class="text-end">
-                <a
-                    routerLink="/forgot-password"
-                    class="text-button font-bold text-brand-500 hover:underline"
-                >
-                    Forgot password?
-                </a>
-            </div>
+                <div class="text-end">
+                    <a
+                        routerLink="/forgot-password"
+                        class="text-button font-bold text-brand-500 hover:underline"
+                    >
+                        Forgot password?
+                    </a>
+                </div>
+            </fieldset>
 
             <button
                 [disabled]="!loginForm.valid || isLoading()"
@@ -64,5 +62,12 @@
                 @if (isLoading()) { Logging in... } @else { Log in → }
             </button>
         </form>
+
+        <div class="text-center text-button text-gray-700">
+            Don't have an account?
+            <a routerLink="/register" class="font-bold text-brand-500 hover:underline"
+                >Create an account</a
+            >.
+        </div>
     </div>
 </div>

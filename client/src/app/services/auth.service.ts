@@ -10,6 +10,7 @@ type LoginResponse = LaravelApiResponse<{
     token: string
     user: SessionUser
 }>
+type RegisterResponse = LoginResponse
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -23,16 +24,39 @@ export class AuthService {
             map(res => {
                 this.user.set(res.payload)
                 this.isAuthenticated.set(true)
-                return Boolean(res.payload)
+                return true
             }),
             catchError(() => of(false)),
         )
     }
 
+    register(formData: FormData): Observable<{ success: boolean; errorMessage: string | null }> {
+        return this.http
+            .post<RegisterResponse>('/api/register', formData, { observe: 'response' })
+            .pipe(
+                map(res => {
+                    if (res.ok && res.body?.payload?.user) {
+                        this.user.set(res.body.payload.user)
+                        this.isAuthenticated.set(true)
+                        return { success: true, errorMessage: null }
+                    }
+                    return { success: false, errorMessage: res.body?.message || 'Login failed.' }
+                }),
+                catchError((errResp: HttpErrorResponse) => {
+                    const errorMessage =
+                        (errResp.error?.message as string) ||
+                        (typeof errResp.error === 'string' ? errResp.error : null) ||
+                        'Login failed. Please try again.'
+
+                    return of({ success: false, errorMessage })
+                }),
+            )
+    }
+
     login(formData: FormData): Observable<{ success: boolean; errorMessage: string | null }> {
         return this.http.post<LoginResponse>('/api/login', formData, { observe: 'response' }).pipe(
             map(res => {
-                if (res.status === 200 && res.body?.payload?.user) {
+                if (res.ok && res.body?.payload?.user) {
                     this.user.set(res.body.payload.user)
                     this.isAuthenticated.set(true)
                     return { success: true, errorMessage: null }
@@ -57,7 +81,7 @@ export class AuthService {
     logout(): Observable<boolean> {
         return this.http.post('/api/logout', null, { observe: 'response' }).pipe(
             map(res => {
-                if (res.status === 200) {
+                if (res.ok) {
                     this.user.set(null)
                     this.isAuthenticated.set(false)
                     return true
