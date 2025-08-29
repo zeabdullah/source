@@ -13,6 +13,34 @@
                     "inlineStyle": false,
                     "inlineTemplate": false,
                     "changeDetection": "OnPush"
+                },
+                "@schematics/angular:guard": {
+                    "path": "src/app/guards",
+                    "typeSeparator": "."
+                },
+                "@schematics/angular:service": {
+                    "path": "src/app/services",
+                    "type": "service"
+                },
+                "@schematics/angular:pipe": {
+                    "path": "src/app/pipes",
+                    "typeSeparator": "."
+                },
+                "@schematics/angular:directive": {
+                    "path": "src/app/directives",
+                    "type": "directive"
+                },
+                "@schematics/angular:resolver": {
+                    "path": "src/app/resolvers",
+                    "typeSeparator": "."
+                },
+                "@schematics/angular:interceptor": {
+                    "path": "src/app/interceptors",
+                    "typeSeparator": "."
+                },
+                "@schematics/angular:interface": {
+                    "path": "src/app/interfaces",
+                    "type": "interface"
                 }
             },
             "root": "",

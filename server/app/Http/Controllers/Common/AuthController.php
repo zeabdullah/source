@@ -60,6 +60,10 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
+        // `auth()->logout()` without will throw an error if the API is
+        // requested from a non-browser client (e.g. Postman).
+        auth()->guard('web')->logout();
+
         return $this->responseJson(null, 'Logged out successfully');
     }
 
