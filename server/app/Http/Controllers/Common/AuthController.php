@@ -23,13 +23,17 @@ class AuthController extends Controller
             return $this->unauthorizedResponse(message: 'Invalid credentials');
         }
 
+        $payload = [];
         $user = auth()->user();
-        $token = $this->generateAuthToken($user);
 
-        return $this->responseJson([
-            'user' => $user,
-            'token' => $token,
-        ], 'Login successful');
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        } else {
+            $payload['token'] = $this->generateAuthToken($user);
+        }
+        $payload['user'] = $user;
+
+        return $this->responseJson($payload, 'Login successful');
     }
 
     public function register(Request $request): JsonResponse
@@ -41,28 +45,34 @@ class AuthController extends Controller
             'avatar_url' => 'nullable|url',
         ]);
 
+        $payload = [];
+
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'avatar_url' => $validated['avatar_url'] ?? null,
         ]);
+        $payload['user'] = $user;
 
-        $token = $this->generateAuthToken($user);
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        } else {
+            $payload['token'] = $this->generateAuthToken($user);
+        }
 
-        return $this->responseJson([
-            'user' => $user,
-            'token' => $token,
-        ], 'Registration successful', 201);
+        return $this->responseJson($payload, 'Registration successful', 201);
     }
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
 
-        // `auth()->logout()` without will throw an error if the API is
-        // requested from a non-browser client (e.g. Postman).
-        auth()->guard('web')->logout();
+        if ($request->hasSession()) {
+            auth()->guard('web')->logout();
+        } else {
+            $request->user()->currentAccessToken()?->delete();
+
+        }
 
         return $this->responseJson(null, 'Logged out successfully');
     }
