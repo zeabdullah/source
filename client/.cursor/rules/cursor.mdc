@@ -32,6 +32,12 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 - When in doubt, prefer convention and consistency based on the structure around you.
 - Refer to `/eslint.config.js` for lint rules, and make sure to ALWAYS abide by them.
+- ALWAYS prefer to use Angular's schematics over manually creating files, using `ng generate`.
+    - E.g. To create an interface, use:
+        - ng g interface `<interface-name>`
+    - E.g. To create a guard, use:
+        - ng g guard `<guard-name>`
+    - Refer to `/angular.json` for details about the their configurations
 
 ## Components
 
@@ -44,7 +50,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Do NOT use `ngClass`, use `class` bindings instead
 - Do NOT use `ngStyle`, use `style` bindings instead
 - Components should go to `src/app/`.
-- Use `ng g c <name>` command to create a component
+- Use `ng g c <component-name>` command to create a component
 - Components should be named with **PascalCase**, without a `Component` suffix.
     - Example: `ProfilePhoto`, `Button`
         - NOT `ProfilePhotoComponent`, `ButtonComponent`

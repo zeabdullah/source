@@ -1,4 +1,4 @@
-import { provideHttpClient, withInterceptors } from '@angular/common/http'
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http'
 import {
     ApplicationConfig,
     provideBrowserGlobalErrorListeners,
@@ -15,6 +15,6 @@ export const appConfig: ApplicationConfig = {
         provideZonelessChangeDetection(),
         provideRouter(routes),
         provideClientHydration(withEventReplay()),
-        provideHttpClient(withInterceptors([baseInterceptor])),
+        provideHttpClient(withInterceptors([baseInterceptor]), withFetch()),
     ],
 }
