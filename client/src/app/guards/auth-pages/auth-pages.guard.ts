@@ -8,7 +8,7 @@ export const authPagesGuard: CanActivateFn = (_route, _state) => {
     const router = inject(Router)
 
     return auth
-        .isAuthenticated()
+        .checkIfAuthenticated()
         .pipe(
             map(isAuthenticated => (isAuthenticated ? router.createUrlTree(['/dashboard']) : true)),
         )

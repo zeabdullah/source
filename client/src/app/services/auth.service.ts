@@ -4,7 +4,6 @@ import { Observable, of } from 'rxjs'
 import { catchError, map } from 'rxjs/operators'
 import { SessionUser } from '../interfaces/session-user.interface'
 import { LaravelApiResponse } from '../interfaces/laravel-api-response.interface'
-import { Router } from '@angular/router'
 
 type MeResponse = LaravelApiResponse<SessionUser>
 type LoginResponse = LaravelApiResponse<{
@@ -15,13 +14,15 @@ type LoginResponse = LaravelApiResponse<{
 @Injectable({ providedIn: 'root' })
 export class AuthService {
     protected http = inject(HttpClient)
-    protected router = inject(Router)
-    protected user = signal<SessionUser | null>(null)
 
-    isAuthenticated(): Observable<boolean> {
+    public user = signal<SessionUser | null>(null)
+    public isAuthenticated = signal<boolean>(false)
+
+    checkIfAuthenticated(): Observable<boolean> {
         return this.http.get<MeResponse>('/api/me').pipe(
             map(res => {
                 this.user.set(res.payload)
+                this.isAuthenticated.set(true)
                 return Boolean(res.payload)
             }),
             catchError(() => of(false)),
@@ -33,6 +34,7 @@ export class AuthService {
             map(res => {
                 if (res.status === 200 && res.body?.payload?.user) {
                     this.user.set(res.body.payload.user)
+                    this.isAuthenticated.set(true)
                     return { success: true, errorMessage: null }
                 }
                 return { success: false, errorMessage: res.body?.message || 'Login failed.' }
@@ -57,7 +59,7 @@ export class AuthService {
             map(res => {
                 if (res.status === 200) {
                     this.user.set(null)
-                    this.router.navigate(['/'])
+                    this.isAuthenticated.set(false)
                     return true
                 }
                 return false

@@ -1,0 +1,16 @@
+<nav class="p-4">
+    <div class="container mx-auto flex items-center justify-between">
+        <a routerLink="/">
+            <img src="/source-logo-brand.svg" alt="Source" height="80" class="h-14 w-auto" />
+        </a>
+
+        @if (isAuthenticated()) {
+        <div class="space-x-4">
+            <a routerLink="/dashboard">Dashboard</a>
+            <button (click)="logout()">Logout</button>
+        </div>
+        } @else {
+        <button routerLink="/login">Login</button>
+        }
+    </div>
+</nav>
