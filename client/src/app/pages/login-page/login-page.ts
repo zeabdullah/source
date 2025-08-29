@@ -4,10 +4,11 @@ import { Validators, ReactiveFormsModule, NonNullableFormBuilder } from '@angula
 import { HttpErrorResponse } from '@angular/common/http'
 import { BASE_URL } from '../../constants/http.constants'
 import { AuthService } from '../../services/auth.service'
+import { Logo } from '../../components/logo/logo'
 
 @Component({
     selector: 'app-login-page',
-    imports: [RouterLink, ReactiveFormsModule],
+    imports: [RouterLink, ReactiveFormsModule, Logo],
     templateUrl: './login-page.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

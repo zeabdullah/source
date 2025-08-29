@@ -15,7 +15,7 @@ describe('LoginPage', () => {
             providers: [
                 provideZonelessChangeDetection(),
                 provideRouter(routes),
-                provideHttpClientTesting(),
+                provideHttpClientTesting(), // TODO: this isn't enough. fix the test
             ],
         }).compileComponents()
 
