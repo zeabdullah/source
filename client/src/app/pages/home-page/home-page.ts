@@ -5,6 +5,7 @@ import { FeaturesSection } from '../../components/features-section/features-sect
 import { TrustingClients } from '../../components/trusting-clients/trusting-clients'
 import { FaqSection } from '../../components/faq-section/faq-section'
 import { CtaSection } from '../../components/cta-section/cta-section'
+import { Footer } from '../../components/footer/footer'
 
 @Component({
     selector: 'app-home-page',
@@ -14,7 +15,8 @@ import { CtaSection } from '../../components/cta-section/cta-section'
         FeaturesSection,
         TrustingClients,
         FaqSection,
-        CtaSection
+        CtaSection,
+        Footer,
     ],
     templateUrl: './home-page.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
