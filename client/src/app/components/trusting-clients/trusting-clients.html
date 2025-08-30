@@ -1,0 +1,19 @@
+<section class="px-20 py-24">
+    <div class="mx-auto max-w-7xl">
+        <!-- Section Title -->
+        <h2
+            class="mb-24 text-[32px] leading-[1.26] font-extrabold tracking-[-0.03em] text-[#1B1E27]"
+        >
+            Trusted by Product Teams Everywhere
+        </h2>
+
+        <!-- Client Logos -->
+        <div class="flex items-center justify-between gap-8 opacity-50">
+            @for (client of clients; track client.name) {
+            <div class="flex-shrink-0">
+                <div [innerHTML]="client.logo" class="h-10"></div>
+            </div>
+            }
+        </div>
+    </div>
+</section>

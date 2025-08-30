@@ -1,0 +1,86 @@
+<section class="px-20 py-16">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-16">
+        <!-- Hero Text -->
+        <div class="flex-1 space-y-8">
+            <h1 class="max-w-[580px] text-hero font-extrabold tracking-tighter text-brand-900">
+                One <span class="text-brand-500">Source</span> for All Your User Flows
+            </h1>
+            <p class="text-h4 font-medium">
+                Bring all your UI screens, emails, ads, A/B tests, and notifications into a single,
+                AI-powered workspace.
+            </p>
+        </div>
+
+        <!-- Signup Form -->
+        <div class="max-w-[518px] flex-1">
+            <div class="rounded-[24px] border border-gray-200 bg-gray-100 px-8 py-12 shadow-sm">
+                <h2 class="mb-8 text-h3 font-bold">Signup now to get started</h2>
+
+                <form [formGroup]="signupFb" (ngSubmit)="onSubmit()" class="space-y-8">
+                    <!-- Email Input -->
+                    <div class="space-y-1.5">
+                        <label for="email" class="text-lg block font-semibold">
+                            Email Address
+                        </label>
+                        <input
+                            id="email"
+                            type="email"
+                            formControlName="email"
+                            placeholder="johndoe@example.com"
+                            class="text-lg w-full rounded-xl border-2 border-[#A7ACB9] bg-white px-4 py-3 placeholder-[#A7ACB9] transition-colors focus:border-brand-500 focus:outline-none"
+                        />
+                    </div>
+
+                    <p class="text-caption/normal">
+                        By Signing up, you agree to our terms and Privacy Policy.
+                    </p>
+
+                    <!-- Action Buttons -->
+                    <div class="space-y-3">
+                        <!-- Primary CTA Button -->
+                        <button
+                            type="submit"
+                            [disabled]="!signupFb.valid || isLoading()"
+                            class="flex w-full items-center justify-center gap-1.5 rounded-[14px] bg-brand-500 px-6 py-3 text-base font-bold text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            @if (isLoading()) {
+                            <svg class="h-5 w-5 animate-spin" viewBox="0 0 24 24">
+                                <circle
+                                    class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="4"
+                                    fill="none"
+                                ></circle>
+                                <path
+                                    class="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                            </svg>
+                            Creating Account... } @else { Create Your Account
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                class="text-white"
+                            >
+                                <path
+                                    d="M3.75 10H16.25M16.25 10L11.25 5M16.25 10L11.25 15"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                            </svg>
+                            }
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

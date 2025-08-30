@@ -103,3 +103,9 @@
     font-style: normal;
     font-display: swap;
 }
+
+@layer base {
+    button:enabled {
+        cursor: pointer;
+    }
+}

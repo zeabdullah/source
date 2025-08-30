@@ -1,0 +1,15 @@
+<div
+    class="rounded-3xl border border-gray-100 bg-white p-8 shadow-2xs transition-[box-shadow,transform,translate] duration-300 hover:-translate-y-1 hover:shadow-md"
+    [class]="big() ? 'col-span-2' : ''"
+>
+    <div class="flex h-full flex-col items-center gap-5">
+        <div class="flex-1 space-y-3 text-start">
+            <h3 class="text-h3 font-bold">{{ title() }}</h3>
+            <p>{{ description() }}</p>
+        </div>
+
+        <div class="relative isolate flex h-50 w-full flex-shrink-0 items-center justify-center">
+            <img fill [ngSrc]="illustrationSrc()" alt="" />
+        </div>
+    </div>
+</div>
