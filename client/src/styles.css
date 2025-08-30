@@ -61,7 +61,7 @@
     --text-button--line-height: 1;
 
     --text-base: 1.125rem;
-    --text-base--line-height: calc(1.5 / 1);
+    --text-base--line-height: 1.5;
     --text-h4: 1.25rem;
     --text-h4--line-height: calc(1.75 / 1.25);
     --text-h3: 1.5rem;
@@ -69,10 +69,10 @@
     --text-h2: 2rem;
     --text-h2--line-height: 1;
     --text-h1: 2.5rem;
-    --text-h1--line-height: 1;
+    --text-h1--line-height: 1.15;
 
     --text-hero: 4rem;
-    --text-hero--line-height: 1;
+    --text-hero--line-height: 1.1;
 
     /* Font weight */
     --font-weight-*: initial;
@@ -102,4 +102,10 @@
     font-weight: 100 800;
     font-style: normal;
     font-display: swap;
+}
+
+@layer base {
+    button:enabled {
+        cursor: pointer;
+    }
 }

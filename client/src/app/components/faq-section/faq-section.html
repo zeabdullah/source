@@ -1,0 +1,21 @@
+<section class="px-20 py-24">
+    <div class="mx-auto max-w-4xl">
+        <!-- Section Title -->
+        <h2 class="mb-24 text-center text-h2 font-extrabold tracking-tight text-gray-900">
+            Frequently Asked Questions
+        </h2>
+
+        <!-- FAQ List -->
+        <div class="space-y-5">
+            @for (faq of faqs; track $index) {
+            <app-faq-accordion
+                class="block"
+                [question]="faq.question"
+                [answer]="faq.answer"
+                [isOpen]="$index === openFaqIndex()"
+                (toggled)="toggleFaq($index)"
+            />
+            }
+        </div>
+    </div>
+</section>
