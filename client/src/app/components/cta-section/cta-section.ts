@@ -5,14 +5,10 @@ import { Router } from '@angular/router'
     selector: 'app-cta-section',
     templateUrl: './cta-section.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [],
 })
 export class CtaSection {
-    private router = inject(Router);
-
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {}
+    private router = inject(Router)
 
     protected onGetStarted(): void {
         this.router.navigate(['/register'])

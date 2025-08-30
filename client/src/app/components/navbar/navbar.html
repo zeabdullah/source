@@ -4,7 +4,7 @@
             <img src="/source-logo-brand.svg" alt="Source" height="56" class="h-14 w-auto" />
         </a>
 
-        @if (true) {
+        @if (isAuthenticated()) {
         <div class="space-x-4">
             <a routerLink="/dashboard" class="text-gray-700 transition-colors hover:text-brand-500"
                 >Dashboard</a
