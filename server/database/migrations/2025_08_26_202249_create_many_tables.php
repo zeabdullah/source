@@ -49,6 +49,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('commentable_id')->constrained('screens')->onDelete('cascade');
+            $table->string('commentable_type');
             $table->text('content')->nullable();
             $table->timestamps();
         });
