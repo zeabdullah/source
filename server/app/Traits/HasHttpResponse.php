@@ -23,6 +23,11 @@ trait HasHttpResponse
         return $this->responseJson($payload, $message, $code);
     }
 
+    public function forbiddenResponse($payload = null, $message = "Forbidden", $code = 403)
+    {
+        return $this->responseJson($payload, $message, $code);
+    }
+
     public function notFoundResponse($payload = null, $message = "Not found", $code = 404)
     {
         return $this->responseJson($payload, $message, $code);
