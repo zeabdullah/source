@@ -84,19 +84,36 @@ describe('createProject', function () {
 });
 
 describe('getMyProjects', function () {
-    it('lists all projects for the authenticated user', function () {
+    it('lists all projects for the authenticated user without search', function () {
         $user = User::factory()->create();
         actingAs($user);
 
-        $response = getJson('/api/projects');
+        $project1 = Project::factory()->for($user, 'owner')->create(['name' => 'Alpha Project']);
+        $project2 = Project::factory()->for($user, 'owner')->create(['name' => 'Beta Project']);
 
+        $response = getJson('/api/projects');
         $response->assertStatus(200)
             ->assertExactJsonStructure([
                 'message',
                 'payload' => [
                     '*' => ['id', 'owner_id', 'name', 'description']
                 ],
-            ]);
+            ])
+            ->assertJsonFragment(['id' => $project1->id, 'name' => 'Alpha Project'])
+            ->assertJsonFragment(['id' => $project2->id, 'name' => 'Beta Project']);
+    });
+
+    it('lists only matching projects for the authenticated user with search', function () {
+        $user = User::factory()->create();
+        actingAs($user);
+
+        $project1 = Project::factory()->for($user, 'owner')->create(['name' => 'Alpha Project']);
+        $project2 = Project::factory()->for($user, 'owner')->create(['name' => 'Beta Project']);
+
+        $searchResponse = getJson('/api/projects?search=alpha');
+        $searchResponse->assertStatus(200)
+            ->assertJsonFragment(['id' => $project1->id, 'name' => 'Alpha Project'])
+            ->assertJsonMissing(['id' => $project2->id, 'name' => 'Beta Project']);
     });
 });
 
