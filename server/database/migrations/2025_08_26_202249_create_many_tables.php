@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->foreignId('owner_id')->constrained('users')->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
+            $table->timestamps();
         });
 
         Schema::create('releases', function (Blueprint $table) {
@@ -23,6 +24,7 @@ return new class extends Migration {
             $table->string('version');
             $table->text('description')->nullable();
             $table->string('tags')->nullable();
+            $table->timestamps();
         });
 
         // This is a 'commentable'
