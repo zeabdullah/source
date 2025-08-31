@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Common\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Common\AuthController;
 use App\Http\Controllers\Project\ProjectController;
 use App\Http\Controllers\Project\ReleaseController;
 use App\Http\Controllers\Project\ScreenController;
