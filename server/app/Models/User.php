@@ -34,6 +34,17 @@ class User extends Authenticatable
     ];
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'avatar_url' => null
+    ];
+
+
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
