@@ -68,21 +68,21 @@ class Project extends Model
 
     public function releases(): HasMany
     {
-        return $this->hasMany(Release::class, 'project_id');
+        return $this->hasMany(Release::class);
     }
 
     public function integrations(): HasMany
     {
-        return $this->hasMany(Integration::class, 'project_id');
+        return $this->hasMany(Integration::class);
     }
 
     public function screens(): HasMany
     {
-        return $this->hasMany(Screen::class, 'project_id');
+        return $this->hasMany(Screen::class);
     }
 
     public function emailTemplates(): HasMany
     {
-        return $this->hasMany(EmailTemplate::class, 'project_id');
+        return $this->hasMany(EmailTemplate::class);
     }
 }
