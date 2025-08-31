@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Project;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -11,10 +13,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Create users first
+        $users = User::factory(4)->create();
 
-        $this->call([
-            UserSeeder::class
-        ]);
+        $projects = Project::factory(10)
+            ->recycle($users)
+            ->create();
+
+        // Attach users to projects through many-to-many relationship
+        foreach ($projects as $project) {
+            // Attach 2-4 random users to each project (excluding the owner)
+            $randomUsers = $users->where('id', '!=', $project->owner_id)->random(rand(1, 3));
+            $project->members()->attach($randomUsers);
+        }
     }
 }
