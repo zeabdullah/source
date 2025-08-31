@@ -36,6 +36,8 @@ Route::middleware('auth:sanctum')->group(function () {
         // Screens (per project)
         Route::post('/{projectId}/screens', [ScreenController::class, 'createScreen']);
         Route::get('/{projectId}/screens', [ScreenController::class, 'getProjectScreens']);
+        Route::put('/{projectId}/screens', [ScreenController::class, 'updateScreenById']);
+        Route::delete('/{projectId}/screens', [ScreenController::class, 'deleteScreenById']);
 
         // Email Templates (per project)
         Route::post('/{projectId}/email-templates', [EmailTemplateController::class, 'createEmailTemplate']);
