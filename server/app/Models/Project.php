@@ -14,6 +14,38 @@ class Project extends Model
     use HasFactory;
 
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'description',
+    ];
+
+    /**
+     * The attributes that should be visible in arrays.
+     *
+     * @var list<string>
+     */
+    protected $visible = [
+        'id',
+        'owner_id',
+        'name',
+        'description',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'description' => null
+    ];
+
+
+    /**
      * Get the project's owner
      */
     public function owner(): BelongsTo
@@ -48,6 +80,7 @@ class Project extends Model
     {
         return $this->hasMany(Screen::class, 'project_id');
     }
+
     public function emailTemplates(): HasMany
     {
         return $this->hasMany(EmailTemplate::class, 'project_id');
