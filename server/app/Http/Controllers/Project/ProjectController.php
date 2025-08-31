@@ -74,6 +74,27 @@ class ProjectController extends Controller
 
     public function updateProjectById(Request $request, string $projectId)
     {
-        return $this->notImplementedResponse();
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1500',
+        ]);
+
+        $project = Project::find($projectId);
+
+        if (!$project) {
+            return $this->notFoundResponse('Project not found');
+        }
+        if ($project->owner_id !== $request->user()->id) {
+            return $this->notFoundResponse('Project not found');
+        }
+
+        try {
+            $project->updateOrFail($validated);
+        } catch (\Throwable $e) {
+            return $this->serverErrorResponse(message: 'Failed to update Project: ' . $e->getMessage());
+        }
+
+        $project->refresh();
+        return $this->responseJson($project, 'Updated successfully');
     }
 }
