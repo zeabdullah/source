@@ -138,4 +138,44 @@ class ScreenController extends Controller
     {
         $this->notImplementedResponse();
     }
+
+    public function updateScreenById(Request $request, string $screenId)
+    {
+        $validated = $request->validate([
+            'section_name' => 'nullable|string|max:255',
+            'data' => 'nullable|array',
+        ]);
+
+        $screen = Screen::find($screenId);
+
+        if (!$screen) {
+            return $this->notFoundResponse('Screen not found');
+        }
+
+        try {
+            $screen->updateOrFail($validated);
+        } catch (\Throwable $e) {
+            return $this->serverErrorResponse(message: 'Failed to update Screen: ' . $e->getMessage());
+        }
+
+        $screen->refresh();
+        return $this->responseJson($screen, 'Updated successfully');
+    }
+
+    public function deleteScreenById(Request $request, string $screenId)
+    {
+        $screen = Screen::find($screenId);
+
+        if (!$screen) {
+            return $this->notFoundResponse('Screen not found');
+        }
+
+        try {
+            $screen->deleteOrFail();
+        } catch (\Throwable $e) {
+            return $this->serverErrorResponse(message: 'Failed to delete screen: ' . $e->getMessage());
+        }
+
+        return $this->responseJson($screen, 'Screen deleted');
+    }
 }
