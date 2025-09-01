@@ -3,17 +3,86 @@
 namespace App\Http\Controllers\Project;
 
 use App\Http\Controllers\Controller;
+use App\Models\Project;
+use App\Models\Screen;
 use Illuminate\Http\Request;
 
 class ScreenController extends Controller
 {
     public function createScreen(Request $request, string $projectId)
     {
-        return $this->notImplementedResponse();
+        $user = $request->user();
+        $project = Project::find($projectId);
+
+        if (
+            !$project ||
+            $project->owner_id !== $user->id ||
+            !$user->memberProjects()->whereExists('projects.id', $projectId)->exists()
+        ) {
+            // We'll show the same response to avoid info leakage
+            return $this->notFoundResponse('Project not found');
+        }
+
+        $validated = $request->validate([
+            'section_name' => 'nullable|string|max:255',
+            'data' => 'required|array',
+        ]);
+
+        $screen = new Screen($validated);
+        $screen->project_id = $projectId;
+
+        $success = $screen->save();
+
+        if (!$success) {
+            return $this->serverErrorResponse(message: 'Failed to save Screen to database');
+        }
+
+        return $this->responseJson($screen->fresh(), 'Created successfully', 201);
     }
 
     public function getProjectScreens(Request $request, string $projectId)
     {
+
         return $this->notImplementedResponse();
+    }
+
+    public function updateScreenById(Request $request, string $screenId)
+    {
+        $validated = $request->validate([
+            'section_name' => 'nullable|string|max:255',
+            'data' => 'nullable|array',
+        ]);
+
+        $screen = Screen::find($screenId);
+
+        if (!$screen) {
+            return $this->notFoundResponse('Screen not found');
+        }
+
+        try {
+            $screen->updateOrFail($validated);
+        } catch (\Throwable $e) {
+            return $this->serverErrorResponse(message: 'Failed to update Screen: ' . $e->getMessage());
+        }
+
+        $screen->refresh();
+        return $this->responseJson($screen, 'Updated successfully');
+    }
+
+    public function deleteScreenById(Request $request, string $screenId)
+    {
+        $screen = Screen::find($screenId);
+
+        if (!$screen) {
+            return $this->notFoundResponse('Screen not found');
+        }
+
+        try {
+            $screen->deleteOrFail();
+        } catch (\Throwable $e) {
+            return $this->serverErrorResponse(message: 'Failed to delete screen: ' . $e->getMessage());
+        }
+
+        return $this->responseJson($screen, 'Screen deleted');
     }
 }
