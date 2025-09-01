@@ -21,6 +21,9 @@ class Project extends Model
     protected $fillable = [
         'name',
         'description',
+        'figma_file_key',
+        'figma_file_name',
+        'figma_last_synced',
     ];
 
     /**
@@ -33,6 +36,9 @@ class Project extends Model
         'owner_id',
         'name',
         'description',
+        'figma_file_key',
+        'figma_file_name',
+        'figma_last_synced',
     ];
 
     /**
@@ -44,6 +50,17 @@ class Project extends Model
         'description' => null
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'figma_last_synced' => 'datetime',
+        ];
+    }
 
     /**
      * Get the project's owner
@@ -84,5 +101,45 @@ class Project extends Model
     public function emailTemplates(): HasMany
     {
         return $this->hasMany(EmailTemplate::class);
+    }
+
+    /**
+     * Connect a Figma file to this project
+     */
+    public function connectFigmaFile(string $fileKey, string $fileName): bool
+    {
+        return $this->update([
+            'figma_file_key' => $fileKey,
+            'figma_file_name' => $fileName,
+            'figma_last_synced' => now(),
+        ]);
+    }
+
+    /**
+     * Disconnect Figma file from this project
+     */
+    public function disconnectFigmaFile(): bool
+    {
+        return $this->update([
+            'figma_file_key' => null,
+            'figma_file_name' => null,
+            'figma_last_synced' => null,
+        ]);
+    }
+
+    /**
+     * Update the last synced timestamp
+     */
+    public function updateLastSynced(): bool
+    {
+        return $this->update(['figma_last_synced' => now()]);
+    }
+
+    /**
+     * Check if project has a connected Figma file
+     */
+    public function hasFigmaFile(): bool
+    {
+        return !empty($this->figma_file_key);
     }
 }
