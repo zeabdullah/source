@@ -20,7 +20,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (!auth()->attempt($credentials)) {
-            return $this->unauthorizedResponse(message: 'Invalid credentials');
+            return $this->unauthorizedResponse('Invalid credentials');
         }
 
         $payload = [];

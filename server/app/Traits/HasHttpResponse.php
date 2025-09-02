@@ -13,22 +13,22 @@ trait HasHttpResponse
         return $this->responseJson($payload, $message, $code);
     }
 
-    public function badRequestResponse($payload = null, $message = 'Bad request', $code = 400)
+    public function badRequestResponse($message = 'Bad request', $payload = null, $code = 400)
     {
         return $this->responseJson($payload, $message, $code);
     }
 
-    public function unauthorizedResponse($payload = null, $message = "Unauthorized", $code = 401)
+    public function unauthorizedResponse($message = "Unauthorized", $payload = null, $code = 401)
     {
         return $this->responseJson($payload, $message, $code);
     }
 
-    public function forbiddenResponse($payload = null, $message = "Forbidden", $code = 403)
+    public function forbiddenResponse($message = "Forbidden", $payload = null, $code = 403)
     {
         return $this->responseJson($payload, $message, $code);
     }
 
-    public function notFoundResponse($payload = null, $message = "Not found", $code = 404)
+    public function notFoundResponse($message = "Not found", $payload = null, $code = 404)
     {
         return $this->responseJson($payload, $message, $code);
     }
