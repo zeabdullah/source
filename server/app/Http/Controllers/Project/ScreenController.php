@@ -162,6 +162,20 @@ class ScreenController extends Controller
         return $this->responseJson($screen, 'Updated successfully');
     }
 
+    public function regenerateDescription(Request $request, string $screenId, ScreenService $screenService)
+    {
+        $screen = Screen::find($screenId);
+        if (!$screen) {
+            return $this->notFoundResponse('Screen not found');
+        }
+
+        $frameNode = $screen->data ?? [];
+        $screen->description = $screenService->generateDescription($screen, $frameNode);
+        $screen->save();
+
+        return $this->responseJson($screen->fresh(), 'Description regenerated');
+    }
+
     public function deleteScreenById(Request $request, string $screenId)
     {
         $screen = Screen::find($screenId);
