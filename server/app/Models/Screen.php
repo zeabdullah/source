@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,7 +19,6 @@ class Screen extends Model
         'data',
         'figma_node_id',
         'figma_url',
-        'description',
     ];
 
     protected $visible = [
@@ -55,9 +55,10 @@ class Screen extends Model
     /**
      * Scope to search screens by description and section name
      */
-    public function scopeSearch(Builder $query, string $searchTerm): Builder
+    #[Scope]
+    public function semanticSearch(Builder $query, string $searchTerm): void
     {
-        return $query->where(function (Builder $q) use ($searchTerm) {
+        $query->where(function (Builder $q) use ($searchTerm) {
             $q->where('description', 'like', "%{$searchTerm}%")
                 ->orWhere('section_name', 'like', "%{$searchTerm}%");
         });
@@ -66,9 +67,10 @@ class Screen extends Model
     /**
      * Scope to filter screens by Figma file
      */
-    public function scopeByFigmaFile(Builder $query, string $fileKey): Builder
+    #[Scope]
+    public function byFigmaFile(Builder $query, string $fileKey): void
     {
-        return $query->whereHas('project', function (Builder $q) use ($fileKey) {
+        $query->whereHas('project', function (Builder $q) use ($fileKey) {
             $q->where('figma_file_key', $fileKey);
         });
     }

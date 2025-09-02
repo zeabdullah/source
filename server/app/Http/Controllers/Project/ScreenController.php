@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Project;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Screen;
+use App\Services\ScreenService;
 use Illuminate\Http\Request;
 
 class ScreenController extends Controller
@@ -42,8 +43,19 @@ class ScreenController extends Controller
 
     public function getProjectScreens(Request $request, string $projectId)
     {
+        $project = Project::find($projectId);
+        if (!$project) {
+            return $this->notFoundResponse('Project not found');
+        }
 
-        return $this->notImplementedResponse();
+        $screensQuery = $project->screens();
+        if ($search = $request->query('search')) {
+            $screensQuery = $screensQuery->semanticSearch($search);
+        }
+
+        $screens = $screensQuery->get();
+
+        return $this->responseJson($screens);
     }
 
     public function updateScreenById(Request $request, string $screenId)
@@ -67,6 +79,20 @@ class ScreenController extends Controller
 
         $screen->refresh();
         return $this->responseJson($screen, 'Updated successfully');
+    }
+
+    public function regenerateDescription(Request $request, string $screenId, ScreenService $screenService)
+    {
+        $screen = Screen::find($screenId);
+        if (!$screen) {
+            return $this->notFoundResponse('Screen not found');
+        }
+
+        $frameNode = $screen->data ?? [];
+        $screen->description = $screenService->generateDescription($screen, $frameNode);
+        $screen->save();
+
+        return $this->responseJson($screen->fresh(), 'Description regenerated');
     }
 
     public function deleteScreenById(Request $request, string $screenId)

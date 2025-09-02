@@ -5,6 +5,7 @@ use App\Http\Controllers\Common\AuthController;
 use App\Http\Controllers\Project\ProjectController;
 use App\Http\Controllers\Project\ReleaseController;
 use App\Http\Controllers\Project\ScreenController;
+use App\Http\Controllers\Project\FigmaController;
 use App\Http\Controllers\Project\EmailTemplateController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,6 +40,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{projectId}/screens', [ScreenController::class, 'updateScreenById']);
         Route::delete('/{projectId}/screens', [ScreenController::class, 'deleteScreenById']);
 
+        // Figma connections (per project)
+        Route::post('/{projectId}/figma/connect', [FigmaController::class, 'connectFile']);
+        Route::post('/{projectId}/figma/sync', [FigmaController::class, 'syncFile']);
+        Route::put('/{projectId}/figma/disconnect', [FigmaController::class, 'disconnectFile']);
+
         // Email Templates (per project)
         Route::post('/{projectId}/email-templates', [EmailTemplateController::class, 'createEmailTemplate']);
         Route::get('/{projectId}/email-templates', [EmailTemplateController::class, 'getProjectEmailTemplates']);
@@ -49,6 +55,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{releaseId}', [ReleaseController::class, 'getReleaseById']);
         Route::put('/{releaseId}', [ReleaseController::class, 'updateReleaseById']);
         Route::delete('/{releaseId}', [ReleaseController::class, 'deleteReleaseById']);
+    });
+
+    // Screens (by id)
+    Route::prefix('screens')->group(function () {
+        Route::post('/{screenId}/regenerate-description', [ScreenController::class, 'regenerateDescription']);
     });
 
 

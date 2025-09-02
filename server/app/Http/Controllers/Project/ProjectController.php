@@ -29,11 +29,9 @@ class ProjectController extends Controller
 
     public function getMyProjects(Request $request)
     {
-        $me = $request->user();
-        $search = $request->query('search');
+        $ownedProjects = $request->user()->ownedProjects();
 
-        $ownedProjects = $me->ownedProjects();
-        if ($search) {
+        if ($search = $request->query('search')) {
             $ownedProjects = $ownedProjects->where('name', 'like', "%$search%");
         }
 

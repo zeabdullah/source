@@ -93,7 +93,7 @@ class Project extends Model
         return $this->hasMany(Integration::class);
     }
 
-    public function screens(): HasMany
+    public function screens()
     {
         return $this->hasMany(Screen::class);
     }
