@@ -40,11 +40,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{projectId}/screens', [ScreenController::class, 'updateScreenById']);
         Route::delete('/{projectId}/screens', [ScreenController::class, 'deleteScreenById']);
 
-        // Figma connections (per project)
-        Route::post('/{projectId}/figma/connect', [FigmaController::class, 'connectFile']);
-        Route::post('/{projectId}/figma/sync', [FigmaController::class, 'syncFile']);
-        Route::put('/{projectId}/figma/disconnect', [FigmaController::class, 'disconnectFile']);
-
         // Email Templates (per project)
         Route::post('/{projectId}/email-templates', [EmailTemplateController::class, 'createEmailTemplate']);
         Route::get('/{projectId}/email-templates', [EmailTemplateController::class, 'getProjectEmailTemplates']);
