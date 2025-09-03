@@ -52,11 +52,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{projectId}/screens/{screenId}', [ScreenController::class, 'deleteScreenById']);
         });
 
-        // Figma connections (per project)
-        Route::post('/{projectId}/figma/connect', [FigmaController::class, 'connectFile']);
-        Route::post('/{projectId}/figma/sync', [FigmaController::class, 'syncFile']);
-        Route::put('/{projectId}/figma/disconnect', [FigmaController::class, 'disconnectFile']);
-
         // Email Templates (per project)
         Route::middleware('is_owner')->group(function () {
             Route::post('/{projectId}/email-templates', [EmailTemplateController::class, 'createEmailTemplate']);
