@@ -1,15 +1,40 @@
-<h2>Rectangle Creator</h2>
-<p>Count: <input id="count" type="number" value="5" /></p>
-<button id="create">Create</button>
-<button id="cancel">Cancel</button>
+<div>
+    <h3>Choose Screens to export</h3>
+    <p>Anything that is a frame can be exported</p>
+
+    <p>
+        <code>Number of selected frames: <span id="selected-frames-count">0</span></code>
+    </p>
+    <p>
+        <code>Their Frame IDs are: <span id="selected-frames-ids">_</span></code>
+    </p>
+
+    <div><button type="button" id="export">Export selected</button></div>
+</div>
+
 <script>
-    document.getElementById('create').onclick = () => {
-        const textbox = document.getElementById('count')
-        const count = parseInt(textbox.value, 10)
-        parent.postMessage({ pluginMessage: { type: 'create-shapes', count } }, '*')
+    const exportBtn = document.getElementById('export')
+    const framesCountEl = document.getElementById('selected-frames-count')
+    const frameIdsDisplayEl = document.getElementById('selected-frames-ids')
+
+    let frameIds = []
+
+    onmessage = event => {
+        const { type, payload: payload } = event.data.pluginMessage
+
+        if (type !== 'frame-select') {
+            return
+        }
+
+        frameIds = payload.map(f => f.id)
+
+        framesCountEl.textContent = frameIds.length
+        frameIdsDisplayEl.textContent = frameIds.join(', ')
     }
 
-    document.getElementById('cancel').onclick = () => {
-        parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*')
-    }
+    // document.getElementById('create').onclick = () => {
+    //     const textbox = document.getElementById('count')
+    //     const count = parseInt(textbox.value, 10)
+    //     parent.postMessage({ pluginMessage: { type: 'create-shapes', count } }, '*')
+    // }
 </script>
