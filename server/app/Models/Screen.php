@@ -18,7 +18,6 @@ class Screen extends Model
         'section_name',
         'data',
         'figma_node_id',
-        'figma_url',
     ];
 
     protected $visible = [
@@ -27,7 +26,6 @@ class Screen extends Model
         'section_name',
         'data',
         'figma_node_id',
-        'figma_url',
         'description',
         'created_at',
         'updated_at',
