@@ -28,7 +28,15 @@ describe('createProject', function () {
         $response->assertStatus(201)
             ->assertExactJsonStructure([
                 'message',
-                'payload' => ['id', 'owner_id', 'name', 'description']
+                'payload' => [
+                    'id',
+                    'owner_id',
+                    'name',
+                    'description',
+                    'figma_file_key',
+                    'figma_file_name',
+                    'figma_last_synced',
+                ]
             ])
             ->assertJson([
                 'payload' => [
@@ -96,7 +104,15 @@ describe('getMyProjects', function () {
             ->assertExactJsonStructure([
                 'message',
                 'payload' => [
-                    '*' => ['id', 'owner_id', 'name', 'description']
+                    '*' => [
+                        'id',
+                        'owner_id',
+                        'name',
+                        'description',
+                        'figma_file_key',
+                        'figma_file_name',
+                        'figma_last_synced',
+                    ]
                 ],
             ])
             ->assertJsonFragment(['id' => $project1->id, 'name' => 'Alpha Project'])

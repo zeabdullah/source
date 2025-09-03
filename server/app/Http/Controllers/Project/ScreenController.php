@@ -15,11 +15,10 @@ class ScreenController extends Controller
         $user = $request->user();
         $project = Project::find($projectId);
 
-        if (
-            !$project ||
-            $project->owner_id !== $user->id ||
-            !$user->memberProjects()->whereExists('projects.id', $projectId)->exists()
-        ) {
+        $isOwner = $project?->owner_id === $user->id;
+        $isMember = $user->memberProjects()->where('project_id', $projectId)->exists();
+
+        if (!$project || !$isOwner || !$isMember) {
             // We'll show the same response to avoid info leakage
             return $this->notFoundResponse('Project not found');
         }

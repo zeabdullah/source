@@ -73,7 +73,7 @@ class User extends Authenticatable
     /**
      * Get the projects the user is a member in.
      */
-    public function memberProjects(): BelongsToMany
+    public function memberProjects()
     {
         return $this->belongsToMany(
             Project::class,
