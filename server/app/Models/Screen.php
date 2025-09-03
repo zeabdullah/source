@@ -94,12 +94,5 @@ class Screen extends Model
 
         return "https://www.figma.com/file/{$this->project->figma_file_key}/?node-id={$this->figma_node_id}";
     }
-
-    // public function aiChats(): HasMany
-    // {
-    //     return $this
-    //         ->hasMany(AiChat::class, 'commentable_id')
-    //         ->where('commentable_type', self::class);
-    // }
 }
 
