@@ -88,11 +88,6 @@ class Project extends Model
         return $this->hasMany(Release::class);
     }
 
-    public function integrations(): HasMany
-    {
-        return $this->hasMany(Integration::class);
-    }
-
     public function screens()
     {
         return $this->hasMany(Screen::class);
@@ -104,9 +99,9 @@ class Project extends Model
     }
 
     /**
-     * Connect a Figma file to this project
+     * Register a Figma file to this project
      */
-    public function connectFigmaFile(string $fileKey, string $fileName): bool
+    public function registerFigmaFile(string $fileKey, string $fileName): bool
     {
         return $this->update([
             'figma_file_key' => $fileKey,
@@ -116,9 +111,10 @@ class Project extends Model
     }
 
     /**
-     * Disconnect Figma file from this project
+     * Un-register Figma file from this project
+     *
      */
-    public function disconnectFigmaFile(): bool
+    public function unregisterFigmaFile(): bool
     {
         return $this->update([
             'figma_file_key' => null,
