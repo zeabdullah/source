@@ -9,6 +9,7 @@
     "editorType": ["figma"],
     "ui": "ui.html",
     "networkAccess": {
-        "allowedDomains": ["none"]
+        "allowedDomains": [],
+        "devAllowedDomains": ["localhost", "localhost:8000", "localhost:5173"]
     }
 }

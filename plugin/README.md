@@ -1,3 +1,7 @@
+## Getting Started with Figma Plugins
+
+> The below is directly inserted by the Figma starter.
+
 Below are the steps to get your plugin running. You can also find instructions at:
 
 https://www.figma.com/plugin-docs/plugin-quickstart-guide/
