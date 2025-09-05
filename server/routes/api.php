@@ -16,6 +16,12 @@ Route::group([], function () {
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 });
 
+Route::prefix('plugin')->group(function () {
+    Route::post('/login', [AuthController::class, 'pluginLogin']);
+    Route::post('/logout', [AuthController::class, 'pluginLogout'])->middleware('auth:sanctum');
+});
+
+
 Route::middleware('auth:sanctum')->group(function () {
     // Users
     Route::get('/users/{userId}', [UserController::class, 'getUserById']);

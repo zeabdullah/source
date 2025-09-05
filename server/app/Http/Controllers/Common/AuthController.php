@@ -10,6 +10,32 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    public function pluginLogin(Request $request): JsonResponse
+    {
+        $credentials = $request->validate([
+            'username' => 'required',
+            'password' => 'required',
+        ]);
+
+        if (!auth()->attempt($credentials)) {
+            return $this->unauthorizedResponse('Invalid credentials');
+        }
+
+        $user = auth()->user();
+        $token = $user->createToken('plugin_auth_token')->plainTextToken;
+
+        return $this->responseJson([
+            'user' => $user,
+            'token' => $token
+        ], 'Login successful');
+    }
+
+    public function pluginLogout(Request $request): JsonResponse
+    {
+        $request->user()->currentAccessToken()->delete();
+        return $this->responseJson(null, 'Logged out successfully');
+    }
+
     public function login(Request $request): JsonResponse
     {
         $request->validate([
@@ -29,7 +55,7 @@ class AuthController extends Controller
         if ($request->hasSession()) {
             $request->session()->regenerate();
         } else {
-            $payload['token'] = $this->generateAuthToken($user);
+            $payload['token'] = $user->createToken('auth_token')->plainTextToken;
         }
         $payload['user'] = $user;
 
@@ -58,7 +84,7 @@ class AuthController extends Controller
         if ($request->hasSession()) {
             $request->session()->regenerate();
         } else {
-            $payload['token'] = $this->generateAuthToken($user);
+            $payload['token'] = $user->createToken('auth_token')->plainTextToken;
         }
 
         return $this->responseJson($payload, 'Registration successful', 201);
@@ -66,7 +92,6 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-
         if ($request->hasSession()) {
             auth()->guard('web')->logout();
         } else {
@@ -83,10 +108,5 @@ class AuthController extends Controller
     public function getMe(Request $request): JsonResponse
     {
         return $this->responseJson($request->user());
-    }
-
-    private function generateAuthToken(User $user): string
-    {
-        return $user->createToken('auth_token')->plainTextToken;
     }
 }
