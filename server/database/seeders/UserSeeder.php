@@ -19,5 +19,6 @@ class UserSeeder extends Seeder
             'password' => Hash::make('12341234'),
             'avatar_url' => 'https://i.pravatar.cc/300?u=' . fake()->randomNumber(2),
         ]);
+        User::factory(4)->create();
     }
 }
