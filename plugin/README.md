@@ -2,12 +2,12 @@
 
 ## Development guide
 
-*This plugin is built with [Create Figma Plugin](https://yuanqing.github.io/create-figma-plugin/).*
+_This plugin is built with [Create Figma Plugin](https://yuanqing.github.io/create-figma-plugin/)._
 
 ### Pre-requisites
 
-- [Node.js](https://nodejs.org) – v22
-- [Figma desktop app](https://figma.com/downloads/)
+-   [Node.js](https://nodejs.org) – v22
+-   [Figma desktop app](https://figma.com/downloads/)
 
 ### Build the plugin
 
@@ -39,10 +39,10 @@ To open the developer console, search for and run `Show/Hide Console` via the Qu
 
 ## See also
 
-- [Create Figma Plugin docs](https://yuanqing.github.io/create-figma-plugin/)
-- [`yuanqing/figma-plugins`](https://github.com/yuanqing/figma-plugins#readme)
+-   [Create Figma Plugin docs](https://yuanqing.github.io/create-figma-plugin/)
+-   [`yuanqing/figma-plugins`](https://github.com/yuanqing/figma-plugins#readme)
 
 Official docs and code samples from Figma:
 
-- [Plugin API docs](https://figma.com/plugin-docs/)
-- [`figma/plugin-samples`](https://github.com/figma/plugin-samples#readme)
+-   [Plugin API docs](https://figma.com/plugin-docs/)
+-   [`figma/plugin-samples`](https://github.com/figma/plugin-samples#readme)

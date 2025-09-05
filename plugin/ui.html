@@ -10,17 +10,23 @@
     </p>
 
     <div><button type="button" id="export">Export selected</button></div>
+    <div><button onclick="window.open('https://google.com')">open google</button></div>
 </div>
 
 <script>
+    // @ts-check
     const exportBtn = document.getElementById('export')
     const framesCountEl = document.getElementById('selected-frames-count')
     const frameIdsDisplayEl = document.getElementById('selected-frames-ids')
 
     let frameIds = []
 
+    if (!exportBtn || !framesCountEl || !frameIdsDisplayEl) {
+        throw new Error('Required DOM elements not found')
+    }
+
     onmessage = event => {
-        const { type, payload: payload } = event.data.pluginMessage
+        const { type, payload } = event.data.pluginMessage
 
         if (type !== 'frame-select') {
             return
@@ -31,4 +37,32 @@
         framesCountEl.textContent = frameIds.length
         frameIdsDisplayEl.textContent = frameIds.join(', ')
     }
+
+    exportBtn.addEventListener('click', async () => {
+        const PROJECT_ID = 2
+        const FIGMA_ACCESS_TOKEN = 'figd_mtYm-06ihYxjMPcv1_S3ko1bUTOVnNZDueh9aPVM'
+        const SOURCE_JWT = '2|uvEBP3hK7cpvnXNemAMzRwmOkcOtyoj7g90KW2Vg70d261af'
+
+        const formData = new FormData()
+        formData.append('figma_access_token', FIGMA_ACCESS_TOKEN)
+        frameIds.forEach(id => formData.append('frame_ids[]', id))
+
+        try {
+            const resp = await fetch(
+                `https://localhost:8000/api/projects/${PROJECT_ID}/screens/exports`,
+                {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${SOURCE_JWT}`,
+                    },
+                },
+            )
+            alert('Success! Created Screens with the IDS: ' + frameIds.join(', '))
+        } catch (err) {
+            alert('Failed to export screens. See console')
+            console.warn(err instanceof Error ? err.message : err)
+        }
+    })
 </script>
