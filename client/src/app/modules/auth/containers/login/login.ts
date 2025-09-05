@@ -2,17 +2,17 @@ import { ChangeDetectionStrategy, Component, signal, inject, OnInit } from '@ang
 import { Router, RouterLink } from '@angular/router'
 import { Validators, ReactiveFormsModule, NonNullableFormBuilder } from '@angular/forms'
 import { HttpErrorResponse } from '@angular/common/http'
-import { BASE_URL } from '../../constants/http.constants'
-import { AuthService } from '../../services/auth.service'
+import { BASE_URL } from '../../../../shared/constants/http.constants'
+import { AuthService } from '../../../../services/auth.service'
 import { Logo } from '../../components/logo/logo'
 
 @Component({
-    selector: 'app-login-page',
+    selector: 'app-login',
     imports: [RouterLink, ReactiveFormsModule, Logo],
-    templateUrl: './login-page.html',
+    templateUrl: './login.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginPage implements OnInit {
+export class Login implements OnInit {
     protected fb = inject(NonNullableFormBuilder)
     protected authService = inject(AuthService)
     protected router = inject(Router)

@@ -3,9 +3,9 @@ import { Logo } from '../../components/logo/logo'
 import { RegisterForm } from '../../components/forms/register-form/register-form'
 
 @Component({
-    selector: 'app-register-page',
+    selector: 'app-register',
     imports: [Logo, RegisterForm],
-    templateUrl: './register-page.html',
+    templateUrl: './register.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RegisterPage {}
+export class Register {}

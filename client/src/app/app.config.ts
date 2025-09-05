@@ -7,7 +7,7 @@ import {
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser'
 import { provideRouter } from '@angular/router'
 import { routes } from './app.routes'
-import { baseInterceptor } from './interceptors/base.interceptor'
+import { baseInterceptor } from './shared/interceptors/base.interceptor'
 
 export const appConfig: ApplicationConfig = {
     providers: [

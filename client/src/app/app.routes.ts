@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router'
-import { authPagesGuard } from './guards/auth-pages/auth-pages.guard'
+import { authRoutes } from './modules/auth/auth.routes'
 
 export const routes: Routes = [
     {
@@ -7,15 +7,8 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/home-page/home-page').then(m => m.HomePage),
     },
     {
-        path: 'login',
-        loadComponent: () => import('./pages/login-page/login-page').then(m => m.LoginPage),
-        canActivate: [authPagesGuard],
-    },
-    {
-        path: 'register',
-        loadComponent: () =>
-            import('./pages/register-page/register-page').then(m => m.RegisterPage),
-        canActivate: [authPagesGuard],
+        path: 'auth',
+        children: authRoutes,
     },
     {
         path: 'dashboard',
