@@ -99,7 +99,7 @@ class Project extends Model
     }
 
     /**
-     * Register a Figma file to this project
+     * Add a reference to Figma file to this project
      */
     public function registerFigmaFile(string $fileKey, string $fileName): bool
     {
@@ -111,7 +111,7 @@ class Project extends Model
     }
 
     /**
-     * Un-register Figma file from this project
+     * Remove reference to Figma file from this project
      *
      */
     public function unregisterFigmaFile(): bool

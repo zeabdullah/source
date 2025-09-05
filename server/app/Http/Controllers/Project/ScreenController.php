@@ -40,6 +40,15 @@ class ScreenController extends Controller
         return $this->responseJson($screen->fresh(), 'Created successfully', 201);
     }
 
+    public function exportScreens(Request $request, string $projectId)
+    {
+        $request->validate([
+            'frame_ids' => 'required|array|min:1',
+            'frame_ids.*' => 'string|distinct',
+        ]);
+
+    }
+
     public function getProjectScreens(Request $request, string $projectId)
     {
         $project = Project::find($projectId);

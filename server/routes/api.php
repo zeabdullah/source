@@ -5,7 +5,6 @@ use App\Http\Controllers\Common\AuthController;
 use App\Http\Controllers\Project\ProjectController;
 use App\Http\Controllers\Project\ReleaseController;
 use App\Http\Controllers\Project\ScreenController;
-use App\Http\Controllers\Project\FigmaController;
 use App\Http\Controllers\Project\EmailTemplateController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +28,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{projectId}', [ProjectController::class, 'getProjectById']);
         Route::put('/{projectId}', [ProjectController::class, 'updateProjectById']);
         Route::delete('/{projectId}', [ProjectController::class, 'deleteProjectById']);
+        Route::post('/{projectId}/figma/connect', [ProjectController::class, 'connectFigmaFile']);
+        Route::post('/{projectId}/figma/disconnect', [ProjectController::class, 'disconnectFigmaFile']);
 
         // Releases (per project)
         Route::post('/{projectId}/releases', [ReleaseController::class, 'createRelease']);
@@ -36,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Screens (per project)
         Route::post('/{projectId}/screens', [ScreenController::class, 'createScreen']);
+        Route::post('/{projectId}/screens/export', [ScreenController::class, 'exportScreens']);
         Route::get('/{projectId}/screens', [ScreenController::class, 'getProjectScreens']);
         Route::put('/{projectId}/screens', [ScreenController::class, 'updateScreenById']);
         Route::delete('/{projectId}/screens', [ScreenController::class, 'deleteScreenById']);

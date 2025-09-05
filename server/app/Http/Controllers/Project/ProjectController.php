@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Project;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Services\FigmaService;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
@@ -29,22 +30,24 @@ class ProjectController extends Controller
 
     public function getMyProjects(Request $request)
     {
-        $ownedProjects = $request->user()->ownedProjects();
+        $ownedProjectsQuery = $request->user()->ownedProjects();
 
         if ($search = $request->query('search')) {
-            $ownedProjects = $ownedProjects->where('name', 'like', "%$search%");
+            $ownedProjectsQuery = $ownedProjectsQuery->whereLike('name', "%$search%");
         }
 
-        return $this->responseJson($ownedProjects->get());
+        return $this->responseJson($ownedProjectsQuery->get());
     }
 
     public function getProjectById(Request $request, string $projectId)
     {
         $project = Project::find($projectId);
 
-        if (!$project) {
+        $isOwner = $project->owner_id === $request->user()->id;
+        if (!$project || !$isOwner) {
             return $this->notFoundResponse('Project not found');
         }
+
         return $this->responseJson($project);
     }
 
@@ -52,10 +55,8 @@ class ProjectController extends Controller
     {
         $project = Project::find($projectId);
 
-        if (!$project) {
-            return $this->notFoundResponse('Project not found');
-        }
-        if ($project->owner_id !== $request->user()->id) {
+        $isOwner = $project->owner_id === $request->user()->id;
+        if (!$project || !$isOwner) {
             return $this->notFoundResponse('Project not found');
         }
 
@@ -68,7 +69,6 @@ class ProjectController extends Controller
         return $this->responseJson($project, 'Project deleted');
     }
 
-
     public function updateProjectById(Request $request, string $projectId)
     {
         $validated = $request->validate([
@@ -78,10 +78,8 @@ class ProjectController extends Controller
 
         $project = Project::find($projectId);
 
-        if (!$project) {
-            return $this->notFoundResponse('Project not found');
-        }
-        if ($project->owner_id !== $request->user()->id) {
+        $isOwner = $project->owner_id === $request->user()->id;
+        if (!$project || !$isOwner) {
             return $this->notFoundResponse('Project not found');
         }
 
@@ -91,7 +89,52 @@ class ProjectController extends Controller
             return $this->serverErrorResponse(message: 'Failed to update Project: ' . $e->getMessage());
         }
 
-        $project->refresh();
-        return $this->responseJson($project, 'Updated successfully');
+        return $this->responseJson($project->fresh(), 'Updated successfully');
+    }
+
+    public function connectFigmaFile(Request $request, string $projectId, FigmaService $figmaService)
+    {
+        $validated = $request->validate([
+            'figma_access_token' => 'required|string',
+            'figma_file_key' => 'required|string',
+        ]);
+
+        $project = Project::find($projectId);
+
+        $isOwner = $project->owner_id === $request->user()->id;
+        if (!$project || !$isOwner) {
+            return $this->notFoundResponse('Project not found');
+        }
+
+        try {
+            [$fileKey, $fileName] = $figmaService->connectFigmaFile(
+                $project,
+                $validated['figma_file_key'],
+                $validated['figma_access_token']
+            );
+        } catch (\Exception $e) {
+            return $this->serverErrorResponse(message: "Failed to connect Figma file: " . $e->getMessage());
+        }
+
+        return $this->responseJson(
+            $project->fresh(),
+            "Successfully connected the Figma file '$fileName'"
+        );
+    }
+    public function disconnectFigmaFile(Request $request, string $projectId, FigmaService $figmaService)
+    {
+        $project = Project::find($projectId);
+
+        $isOwner = $project->owner_id === $request->user()->id;
+        if (!$project || !$isOwner) {
+            return $this->notFoundResponse('Project not found');
+        }
+
+        $figmaService->disconnectFigmaFile($project);
+
+        return $this->responseJson(
+            $project->fresh(),
+            "Successfully disconnected the Figma file"
+        );
     }
 }
