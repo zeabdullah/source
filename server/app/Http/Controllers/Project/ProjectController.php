@@ -43,7 +43,7 @@ class ProjectController extends Controller
     {
         $project = Project::find($projectId);
 
-        $isOwner = $project->owner_id === $request->user()->id;
+        $isOwner = $project?->owner_id === $request->user()->id;
         if (!$project || !$isOwner) {
             return $this->notFoundResponse('Project not found');
         }
@@ -55,7 +55,7 @@ class ProjectController extends Controller
     {
         $project = Project::find($projectId);
 
-        $isOwner = $project->owner_id === $request->user()->id;
+        $isOwner = $project?->owner_id === $request->user()->id;
         if (!$project || !$isOwner) {
             return $this->notFoundResponse('Project not found');
         }
@@ -78,7 +78,7 @@ class ProjectController extends Controller
 
         $project = Project::find($projectId);
 
-        $isOwner = $project->owner_id === $request->user()->id;
+        $isOwner = $project?->owner_id === $request->user()->id;
         if (!$project || !$isOwner) {
             return $this->notFoundResponse('Project not found');
         }
@@ -101,7 +101,7 @@ class ProjectController extends Controller
 
         $project = Project::find($projectId);
 
-        $isOwner = $project->owner_id === $request->user()->id;
+        $isOwner = $project?->owner_id === $request->user()->id;
         if (!$project || !$isOwner) {
             return $this->notFoundResponse('Project not found');
         }
@@ -125,7 +125,7 @@ class ProjectController extends Controller
     {
         $project = Project::find($projectId);
 
-        $isOwner = $project->owner_id === $request->user()->id;
+        $isOwner = $project?->owner_id === $request->user()->id;
         if (!$project || !$isOwner) {
             return $this->notFoundResponse('Project not found');
         }
