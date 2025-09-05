@@ -2,8 +2,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http'
 import { inject, Injectable, signal } from '@angular/core'
 import { Observable, of } from 'rxjs'
 import { catchError, map } from 'rxjs/operators'
-import { SessionUser } from '../shared/interfaces/session-user.interface'
-import { LaravelApiResponse } from '../shared/interfaces/laravel-api-response.interface'
+import { LaravelApiResponse } from '../../../../shared/interfaces/laravel-api-response.interface'
+import { SessionUser } from '../../../../shared/interfaces/session-user.interface'
 
 type MeResponse = LaravelApiResponse<SessionUser>
 type LoginResponse = LaravelApiResponse<{

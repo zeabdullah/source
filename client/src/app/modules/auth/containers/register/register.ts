@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
-import { RegisterForm } from '../../../../shared/components/forms/register-form/register-form'
+import { RegisterForm } from '../../components/register-form/register-form'
 import { Logo } from '../../../../shared/components/logo/logo'
 
 @Component({
