@@ -1,15 +1,17 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
-import { Navbar } from '../../components/navbar/navbar'
-import { HeroSection } from '../../components/hero-section/hero-section'
-import { FeaturesSection } from '../../components/features-section/features-section'
-import { TrustingClients } from '../../components/trusting-clients/trusting-clients'
-import { FaqSection } from '../../components/faq-section/faq-section'
-import { CtaSection } from '../../components/cta-section/cta-section'
-import { Footer } from '../../components/footer/footer'
+import { CtaSection } from '../../shared/components/cta-section/cta-section'
+import { FaqSection } from '../../shared/components/faq-section/faq-section'
+import { FeaturesSection } from '../../shared/components/features-section/features-section'
+import { HeroSection } from '../../shared/components/hero-section/hero-section'
+import { Navbar } from '../../shared/components/navbar/navbar'
+import { TrustingClients } from '../../shared/components/trusting-clients/trusting-clients'
+import { Footer } from '../../shared/components/footer/footer'
+import { Button } from 'primeng/button'
 
 @Component({
     selector: 'app-home-page',
     imports: [
+        Button,
         Navbar,
         HeroSection,
         FeaturesSection,

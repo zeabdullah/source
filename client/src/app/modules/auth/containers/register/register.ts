@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
-import { Logo } from '../../components/logo/logo'
-import { RegisterForm } from '../../components/forms/register-form/register-form'
+import { RegisterForm } from '../../../../shared/components/forms/register-form/register-form'
+import { Logo } from '../../../../shared/components/logo/logo'
 
 @Component({
     selector: 'app-register',

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
-import { Navbar } from '../../components/navbar/navbar'
+import { Navbar } from '../../shared/components/navbar/navbar'
 
 @Component({
     selector: 'app-dashboard-page',
