@@ -6,7 +6,6 @@ use App\Http\Controllers\Common\AuthController;
 use App\Http\Controllers\Project\ProjectController;
 use App\Http\Controllers\Project\ReleaseController;
 use App\Http\Controllers\Project\ScreenController;
-use App\Http\Controllers\Project\FigmaController;
 use App\Http\Controllers\Project\EmailTemplateController;
 use Illuminate\Support\Facades\Route;
 
