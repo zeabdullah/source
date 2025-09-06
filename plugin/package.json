@@ -31,7 +31,7 @@
         "ui": "src/ui.tsx",
         "networkAccess": {
             "allowedDomains": [
-                "none"
+                "https://*.pravatar.cc"
             ],
             "reasoning": "",
             "devAllowedDomains": [

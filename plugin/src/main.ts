@@ -8,11 +8,11 @@ const data = {
 export type UIProps = typeof data
 
 export default async function () {
+    showUI({ height: 300, width: 280, title: 'Source' }, data)
+
     const existingSession = (await figma.clientStorage.getAsync(
         'user-session',
     )) as UserSession | null
-
-    showUI({ height: 200, width: 280, title: 'Source' }, data)
 
     if (existingSession) {
         figma.ui.postMessage({ type: 'restore-session', session: existingSession })

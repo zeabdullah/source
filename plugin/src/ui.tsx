@@ -14,11 +14,18 @@ function Plugin(props: UIProps) {
 
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
-            if (event.data.pluginMessage?.type === 'restore-session') {
-                const session = event.data.pluginMessage.session as UserSession
-                setUserSession(session)
-                setIsLoggedIn(true)
-                fetchProjects(session.token)
+            switch (event.data.pluginMessage?.type) {
+                case 'restore-session': {
+                    const session = event.data.pluginMessage.session as UserSession
+                    setUserSession(session)
+                    setIsLoggedIn(true)
+                    fetchProjects(session.token)
+                    break
+                }
+                // Add more cases as needed
+                default: {
+                    break
+                }
             }
         }
 
@@ -71,6 +78,7 @@ function Plugin(props: UIProps) {
             {isLoggedIn ? (
                 <ProjectList
                     user={userSession!.user}
+                    token={userSession!.token}
                     projects={projects}
                     loading={loadingProjects}
                     onLogout={handleLogout}
@@ -167,15 +175,149 @@ function LoginForm({ onLoginSuccess }: { onLoginSuccess(data: unknown): void }) 
 
 function ProjectList({
     user,
+    token,
     projects,
     loading,
     onLogout,
 }: {
     user: UserSession['user']
+    token: string
     projects: Project[]
     loading: boolean
     onLogout: () => void
 }) {
+    const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+    const [isConnectingProject, setIsConnectingProject] = useState(false)
+    const [figmaAccessToken, setFigmaAccessToken] = useState<string>('')
+    const [showTokenInput, setShowTokenInput] = useState(false)
+    const [pendingProject, setPendingProject] = useState<Project | null>(null)
+    const [fileKey, setFileKey] = useState('')
+
+    const handleProjectSelect = async (project: Project) => {
+        setIsConnectingProject(true)
+
+        try {
+            if (!fileKey) {
+                console.error('No Figma file key found')
+                setIsConnectingProject(false)
+                return
+            }
+
+            const accessToken = ''
+
+            if (!accessToken) {
+                setPendingProject(project)
+                setShowTokenInput(true)
+                setIsConnectingProject(false)
+                return
+            }
+
+            await connectProjectToFigma(project, fileKey, accessToken)
+        } catch (err) {
+            console.error('Failed to connect project:', err)
+            setIsConnectingProject(false)
+        }
+    }
+
+    const connectProjectToFigma = async (
+        project: Project,
+        fileKey: string,
+        accessToken: string,
+    ) => {
+        const formData = new FormData()
+        formData.append('figma_file_key', fileKey)
+        formData.append('figma_access_token', accessToken)
+        try {
+            const resp = await fetch(
+                `http://localhost:8000/api/projects/${project.id}/figma/connect`,
+                {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        Accept: 'application/json',
+                    },
+                    body: formData,
+                },
+            )
+
+            const data = await resp.json()
+
+            if (!resp.ok) {
+                throw new Error(data.message || 'Failed to connect project')
+            }
+
+            setSelectedProject(project)
+            setShowTokenInput(false)
+            console.log('Project connected successfully:', data)
+        } catch (err) {
+            console.error('Failed to connect project:', err)
+            throw err
+        } finally {
+            setIsConnectingProject(false)
+        }
+    }
+
+    const handleTokenSubmit = async () => {
+        if (!figmaAccessToken.trim() || !pendingProject) return
+
+        setIsConnectingProject(true)
+        try {
+            if (!fileKey) {
+                console.error('No Figma file key found')
+                setIsConnectingProject(false)
+                return
+            }
+
+            await connectProjectToFigma(pendingProject, fileKey, figmaAccessToken)
+        } catch (err) {
+            console.error('Failed to connect project:', err)
+            setIsConnectingProject(false)
+        }
+    }
+
+    if (selectedProject) {
+        return (
+            <Fragment>
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center">
+                        {user.avatar_url && (
+                            <img
+                                src={user.avatar_url}
+                                alt={user.name}
+                                height={32}
+                                width={32}
+                                class="w-8 h-8 rounded-full mr-3 border border-gray-200"
+                            />
+                        )}
+                        <div>
+                            <p class="text-lg leading-tight font-bold">Welcome, {user.name}!</p>
+                            <p class="text-xs text-gray-500">{user.email}</p>
+                        </div>
+                    </div>
+                    <Button onClick={onLogout} secondary>
+                        Logout
+                    </Button>
+                </div>
+
+                <VerticalSpace space="small" />
+
+                <div class="border rounded p-3 bg-green-50">
+                    <div class="font-medium text-green-800">✅ Connected to Project</div>
+                    <div class="text-sm text-green-700 mt-1">{selectedProject.name}</div>
+                    {selectedProject.description && (
+                        <div class="text-xs text-green-600 mt-1">{selectedProject.description}</div>
+                    )}
+                </div>
+
+                <VerticalSpace space="small" />
+
+                <p class="text-sm text-gray-600 text-center">
+                    Ready to select frames from this Figma file!
+                </p>
+            </Fragment>
+        )
+    }
+
     return (
         <Fragment>
             <div class="flex justify-between items-center mb-4">
@@ -201,7 +343,58 @@ function ProjectList({
 
             <VerticalSpace space="small" />
 
-            <p class="text- font-medium pb-2">Your Projects</p>
+            {showTokenInput && (
+                <Fragment>
+                    <div class="border rounded p-3 bg-yellow-100 mb-3">
+                        <p class="text-sm font-medium text-yellow-800 mb-2">
+                            Figma Access Token Required
+                        </p>
+                        <p class="text-xs text-yellow-800 mb-3">
+                            Enter your Figma personal access token to connect projects.
+                        </p>
+                        <Textbox
+                            placeholder="Figma Access Token"
+                            value={figmaAccessToken}
+                            onValueInput={setFigmaAccessToken}
+                            password
+                        />
+                        <VerticalSpace space="small" />
+                        <div class="flex gap-2">
+                            <Button
+                                onClick={handleTokenSubmit}
+                                disabled={!figmaAccessToken.trim() || isConnectingProject}
+                                loading={isConnectingProject}
+                            >
+                                Connect
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setShowTokenInput(false)
+                                    setPendingProject(null)
+                                }}
+                                secondary
+                                disabled={isConnectingProject}
+                                class="!text-black"
+                            >
+                                Cancel
+                            </Button>
+                        </div>
+                    </div>
+                </Fragment>
+            )}
+
+            <p class="text-sm font-medium pb-2">
+                Select a project to connect with this Figma file:
+            </p>
+
+            <VerticalSpace space="medium" />
+            <Textbox
+                placeholder="Copy your file key here..."
+                value={fileKey}
+                onValueInput={v => setFileKey(v)}
+                password
+            />
+            <VerticalSpace space="medium" />
 
             {loading ? (
                 <p class="text-center text-gray-600">Loading projects...</p>
@@ -210,7 +403,11 @@ function ProjectList({
             ) : (
                 <div class="space-y-2">
                     {projects.map(project => (
-                        <div key={project.id} class="border rounded p-3">
+                        <div
+                            key={project.id}
+                            class="border rounded p-3 hover:bg-neutral-600"
+                            onClick={() => handleProjectSelect(project)}
+                        >
                             <div class="font-medium">{project.name}</div>
                             {project.description && (
                                 <div class="text-xs text-gray-500 mt-1">{project.description}</div>
@@ -219,6 +416,9 @@ function ProjectList({
                                 <div class="text-xs text-blue-400 mt-1">
                                     📎 {project.figma_file_name}
                                 </div>
+                            )}
+                            {isConnectingProject && (
+                                <div class="text-xs text-gray-500 mt-1">Connecting...</div>
                             )}
                         </div>
                     ))}
