@@ -13,8 +13,8 @@ class AuthController extends Controller
     public function pluginLogin(Request $request): JsonResponse
     {
         $credentials = $request->validate([
-            'username' => 'required',
-            'password' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|string',
         ]);
 
         if (!auth()->attempt($credentials)) {

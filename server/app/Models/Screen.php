@@ -16,8 +16,9 @@ class Screen extends Model
 
     protected $fillable = [
         'section_name',
-        'data',
+        'project_id',
         'figma_node_id',
+        'data',
     ];
 
     protected $visible = [

@@ -14,3 +14,5 @@ yarn.lock
 out/
 dist/
 code.js
+
+manifest.json
