@@ -43,23 +43,12 @@ class ProjectController extends Controller
     {
         $project = Project::find($projectId);
 
-        $isOwner = $project?->owner_id === $request->user()->id;
-        if (!$project || !$isOwner) {
-            return $this->notFoundResponse('Project not found');
-        }
-
         return $this->responseJson($project);
     }
 
     public function deleteProjectById(Request $request, string $projectId)
     {
         $project = Project::find($projectId);
-
-        $isOwner = $project?->owner_id === $request->user()->id;
-        if (!$project || !$isOwner) {
-            return $this->notFoundResponse('Project not found');
-        }
-
         try {
             $project->deleteOrFail();
         } catch (\Throwable $e) {
@@ -77,11 +66,6 @@ class ProjectController extends Controller
         ]);
 
         $project = Project::find($projectId);
-
-        $isOwner = $project?->owner_id === $request->user()->id;
-        if (!$project || !$isOwner) {
-            return $this->notFoundResponse('Project not found');
-        }
 
         try {
             $project->updateOrFail($validated);
@@ -101,11 +85,6 @@ class ProjectController extends Controller
 
         $project = Project::find($projectId);
 
-        $isOwner = $project?->owner_id === $request->user()->id;
-        if (!$project || !$isOwner) {
-            return $this->notFoundResponse('Project not found');
-        }
-
         try {
             [$fileKey, $fileName] = $figmaService->connectFigmaFile(
                 $project,
@@ -124,11 +103,6 @@ class ProjectController extends Controller
     public function disconnectFigmaFile(Request $request, string $projectId, FigmaService $figmaService)
     {
         $project = Project::find($projectId);
-
-        $isOwner = $project?->owner_id === $request->user()->id;
-        if (!$project || !$isOwner) {
-            return $this->notFoundResponse('Project not found');
-        }
 
         $figmaService->disconnectFigmaFile($project);
 

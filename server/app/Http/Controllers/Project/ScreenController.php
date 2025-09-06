@@ -12,13 +12,17 @@ class ScreenController extends Controller
 {
     public function createScreen(Request $request, string $projectId)
     {
-        $user = $request->user();
+
         $project = Project::find($projectId);
+        if (!$project) {
+            return $this->notFoundResponse('Project not found');
+        }
+
+        $user = $request->user();
 
         $isOwner = $project?->owner_id === $user->id;
         $isMember = $user->memberProjects()->where('project_id', $projectId)->exists();
-
-        if (!$project || !$isOwner || !$isMember) {
+        if (!($isOwner || $isMember)) {
             // We'll show the same response to avoid info leakage
             return $this->notFoundResponse('Project not found');
         }
@@ -28,16 +32,12 @@ class ScreenController extends Controller
             'data' => 'required|array',
         ]);
 
-        $screen = new Screen($validated);
-        $screen->project_id = $projectId;
-
-        $success = $screen->save();
-
-        if (!$success) {
-            return $this->serverErrorResponse(message: 'Failed to save Screen to database');
+        try {
+            $screen = Screen::create(array_merge($validated, ['project_id' => $projectId]));
+            return $this->responseJson($screen, 'Created successfully', 201);
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to save Screen to database: ' . $th->getMessage());
         }
-
-        return $this->responseJson($screen->fresh(), 'Created successfully', 201);
     }
 
     public function exportScreens(Request $request, string $projectId)
@@ -46,19 +46,6 @@ class ScreenController extends Controller
             'frame_ids' => 'required|array|min:1',
             'frame_ids.*' => 'string|distinct|unique:screens,figma_node_id',
         ]);
-
-        $project = Project::find($projectId);
-        if (!$project) {
-            return $this->notFoundResponse('Project not found');
-        }
-
-        $user = $request->user();
-        $isOwner = $project->owner_id === $user->id;
-        $isMember = $user->memberProjects()->where('project_id', $projectId)->exists();
-
-        if (!$isOwner && !$isMember) {
-            return $this->notFoundResponse('Project not found');
-        }
 
         $frameIds = $request->input('frame_ids');
 
@@ -76,9 +63,6 @@ class ScreenController extends Controller
     public function getProjectScreens(Request $request, string $projectId)
     {
         $project = Project::find($projectId);
-        if (!$project) {
-            return $this->notFoundResponse('Project not found');
-        }
 
         $screensQuery = $project->screens();
         if ($search = $request->query('search')) {
@@ -90,7 +74,7 @@ class ScreenController extends Controller
         return $this->responseJson($screens);
     }
 
-    public function updateScreenById(Request $request, string $screenId)
+    public function updateScreenById(Request $request, string $projectId, string $screenId)
     {
         $validated = $request->validate([
             'section_name' => 'nullable|string|max:255',
@@ -105,15 +89,15 @@ class ScreenController extends Controller
 
         try {
             $screen->updateOrFail($validated);
-        } catch (\Throwable $e) {
-            return $this->serverErrorResponse(message: 'Failed to update Screen: ' . $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to update Screen: ' . $th->getMessage());
         }
 
         $screen->refresh();
         return $this->responseJson($screen, 'Updated successfully');
     }
 
-    public function regenerateDescription(Request $request, string $screenId, ScreenService $screenService)
+    public function regenerateDescription(Request $request, string $projectId, string $screenId, ScreenService $screenService)
     {
         $screen = Screen::find($screenId);
         if (!$screen) {
@@ -127,7 +111,7 @@ class ScreenController extends Controller
         return $this->responseJson($screen->fresh(), 'Description regenerated');
     }
 
-    public function deleteScreenById(Request $request, string $screenId)
+    public function deleteScreenById(Request $request, string $projectId, string $screenId)
     {
         $screen = Screen::find($screenId);
 
@@ -137,8 +121,8 @@ class ScreenController extends Controller
 
         try {
             $screen->deleteOrFail();
-        } catch (\Throwable $e) {
-            return $this->serverErrorResponse(message: 'Failed to delete screen: ' . $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to delete screen: ' . $th->getMessage());
         }
 
         return $this->responseJson($screen, 'Screen deleted');
