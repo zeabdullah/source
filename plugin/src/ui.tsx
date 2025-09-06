@@ -5,24 +5,33 @@ import '!./output.css'
 import { useState, useEffect } from 'preact/hooks'
 import { emit } from '@create-figma-plugin/utilities'
 import { LoginSuccessPayload, UserSession, Project } from './types'
+import { PLUGIN_EVENT } from './constants'
 
 function Plugin(props: UIProps) {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [userSession, setUserSession] = useState<UserSession | null>(null)
     const [projects, setProjects] = useState<Project[]>([])
     const [loadingProjects, setLoadingProjects] = useState(false)
+    const [selectedFrames, setSelectedFrames] = useState<Array<{ id: string }>>([])
 
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
             switch (event.data.pluginMessage?.type) {
-                case 'restore-session': {
+                case PLUGIN_EVENT.RESTORE_SESSION: {
                     const session = event.data.pluginMessage.session as UserSession
                     setUserSession(session)
                     setIsLoggedIn(true)
                     fetchProjects(session.token)
                     break
                 }
-                // Add more cases as needed
+                case PLUGIN_EVENT.SELECTION_CHANGED: {
+                    const newFrames = event.data.pluginMessage.selectedFrames as Array<{
+                        id: string
+                    }>
+                    setSelectedFrames(newFrames)
+                    break
+                }
+
                 default: {
                     break
                 }
@@ -81,6 +90,7 @@ function Plugin(props: UIProps) {
                     token={userSession!.token}
                     projects={projects}
                     loading={loadingProjects}
+                    selectedFrames={selectedFrames}
                     onLogout={handleLogout}
                 />
             ) : (
@@ -132,12 +142,10 @@ function LoginForm({ onLoginSuccess }: { onLoginSuccess(data: unknown): void }) 
                 throw new Error(data.message || 'Login failed')
             }
 
-            // debugger
             onLoginSuccess(data.payload)
         } catch (err) {
             console.warn(err)
             setError(err instanceof Error ? err.message : 'Network error')
-            // debugger
         } finally {
             setLoading(false)
         }
@@ -178,12 +186,14 @@ function ProjectList({
     token,
     projects,
     loading,
+    selectedFrames,
     onLogout,
 }: {
     user: UserSession['user']
     token: string
     projects: Project[]
     loading: boolean
+    selectedFrames: Array<{ id: string }>
     onLogout: () => void
 }) {
     const [selectedProject, setSelectedProject] = useState<Project | null>(null)
@@ -192,8 +202,16 @@ function ProjectList({
     const [showTokenInput, setShowTokenInput] = useState(false)
     const [pendingProject, setPendingProject] = useState<Project | null>(null)
     const [fileKey, setFileKey] = useState('')
+    const [showFrameSelection, setShowFrameSelection] = useState(false)
 
     const handleProjectSelect = async (project: Project) => {
+        // If project is already connected, show frame selection
+        if (project.figma_file_key && project.figma_file_key === fileKey) {
+            setSelectedProject(project)
+            setShowFrameSelection(true)
+            return
+        }
+
         setIsConnectingProject(true)
 
         try {
@@ -248,6 +266,7 @@ function ProjectList({
 
             setSelectedProject(project)
             setShowTokenInput(false)
+            setShowFrameSelection(true)
             console.log('Project connected successfully:', data)
         } catch (err) {
             console.error('Failed to connect project:', err)
@@ -275,29 +294,26 @@ function ProjectList({
         }
     }
 
+    if (selectedProject && showFrameSelection) {
+        return (
+            <FrameSelection
+                project={selectedProject}
+                user={user}
+                selectedFrames={selectedFrames}
+                onBack={() => {
+                    setShowFrameSelection(false)
+                    setSelectedProject(null)
+                }}
+                onLogout={onLogout}
+                token={token}
+            />
+        )
+    }
+
     if (selectedProject) {
         return (
             <Fragment>
-                <div class="flex justify-between items-center mb-4">
-                    <div class="flex items-center">
-                        {user.avatar_url && (
-                            <img
-                                src={user.avatar_url}
-                                alt={user.name}
-                                height={32}
-                                width={32}
-                                class="w-8 h-8 rounded-full mr-3 border border-gray-200"
-                            />
-                        )}
-                        <div>
-                            <p class="text-lg leading-tight font-bold">Welcome, {user.name}!</p>
-                            <p class="text-xs text-gray-500">{user.email}</p>
-                        </div>
-                    </div>
-                    <Button onClick={onLogout} secondary>
-                        Logout
-                    </Button>
-                </div>
+                <UserHeader user={user} onLogout={onLogout} />
 
                 <VerticalSpace space="small" />
 
@@ -311,7 +327,7 @@ function ProjectList({
 
                 <VerticalSpace space="small" />
 
-                <p class="text-sm text-gray-600 text-center">
+                <p class="text-sm text-neutral-600 text-center">
                     Ready to select frames from this Figma file!
                 </p>
             </Fragment>
@@ -320,26 +336,7 @@ function ProjectList({
 
     return (
         <Fragment>
-            <div class="flex justify-between items-center mb-4">
-                <div class="flex items-center">
-                    {user.avatar_url && (
-                        <img
-                            src={user.avatar_url}
-                            alt={user.name}
-                            height={32}
-                            width={32}
-                            class="w-8 h-8 rounded-full mr-3 border border-gray-200"
-                        />
-                    )}
-                    <div>
-                        <p class="text-lg leading-tight font-bold">Welcome, {user.name}!</p>
-                        <p class="text-xs text-gray-500">{user.email}</p>
-                    </div>
-                </div>
-                <Button onClick={onLogout} secondary>
-                    Logout
-                </Button>
-            </div>
+            <UserHeader user={user} onLogout={onLogout} />
 
             <VerticalSpace space="small" />
 
@@ -397,20 +394,22 @@ function ProjectList({
             <VerticalSpace space="medium" />
 
             {loading ? (
-                <p class="text-center text-gray-600">Loading projects...</p>
+                <p class="text-center text-neutral-600">Loading projects...</p>
             ) : projects.length === 0 ? (
-                <p class="text-center text-gray-600">No projects found</p>
+                <p class="text-center text-neutral-600">No projects found</p>
             ) : (
                 <div class="space-y-2">
                     {projects.map(project => (
                         <div
                             key={project.id}
-                            class="border rounded p-3 hover:bg-neutral-600"
+                            class="border rounded p-3 hover:bg-neutral-700"
                             onClick={() => handleProjectSelect(project)}
                         >
                             <div class="font-medium">{project.name}</div>
                             {project.description && (
-                                <div class="text-xs text-gray-500 mt-1">{project.description}</div>
+                                <div class="text-xs text-neutral-500 mt-1">
+                                    {project.description}
+                                </div>
                             )}
                             {project.figma_file_name && (
                                 <div class="text-xs text-blue-400 mt-1">
@@ -418,12 +417,149 @@ function ProjectList({
                                 </div>
                             )}
                             {isConnectingProject && (
-                                <div class="text-xs text-gray-500 mt-1">Connecting...</div>
+                                <div class="text-xs text-neutral-500 mt-1">Connecting...</div>
                             )}
                         </div>
                     ))}
                 </div>
             )}
+        </Fragment>
+    )
+}
+
+function UserHeader({ user, onLogout }: { user: UserSession['user']; onLogout(): void }) {
+    return (
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center">
+                {user.avatar_url && (
+                    <img
+                        src={user.avatar_url}
+                        alt={user.name}
+                        height={32}
+                        width={32}
+                        class="w-8 h-8 rounded-full mr-3 border border-neutral-200"
+                    />
+                )}
+                <div>
+                    <p class="text-lg leading-tight font-bold">Welcome, {user.name}!</p>
+                    <p class="text-xs text-neutral-500">{user.email}</p>
+                </div>
+            </div>
+            <Button onClick={onLogout} secondary>
+                Logout
+            </Button>
+        </div>
+    )
+}
+
+function FrameSelection({
+    project,
+    user,
+    selectedFrames,
+    onBack,
+    onLogout,
+    token,
+}: {
+    project: Project
+    user: UserSession['user']
+    selectedFrames: Array<{ id: string }>
+    onBack(): void
+    onLogout(): void
+    token: string
+}) {
+    const [isExporting, setIsExporting] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+    const [success, setSuccess] = useState(false)
+
+    async function exportToProject(token: string) {
+        setIsExporting(true)
+        setError(null)
+        setSuccess(false)
+
+        const json = JSON.stringify({
+            frame_ids: selectedFrames.map(f => f.id),
+        })
+
+        try {
+            const resp = await fetch(
+                `http://localhost:8000/api/projects/${project.id}/screens/export`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: json,
+                },
+            )
+            const data = await resp.json()
+            if (!resp.ok) {
+                throw new Error(data.message || 'Failed to export frames')
+            }
+            setSuccess(true)
+        } catch (err: any) {
+            setError(err.message || 'Failed to export frames')
+        } finally {
+            setIsExporting(false)
+        }
+    }
+
+    return (
+        <Fragment>
+            <UserHeader user={user} onLogout={onLogout} />
+
+            <VerticalSpace space="small" />
+
+            <div class="border rounded p-3 bg-blue-50">
+                <div class="font-medium text-blue-800">📋 Frame Selection</div>
+                <div class="text-sm text-blue-700 mt-1">Project: {project.name}</div>
+                {project.description && (
+                    <div class="text-xs text-blue-600 mt-1">{project.description}</div>
+                )}
+            </div>
+
+            <VerticalSpace space="small" />
+
+            <div class="text-center">
+                <p class="text-sm font-medium mb-2">Select frames in Figma</p>
+                <p class="text-xs text-neutral-600 mb-4">
+                    Click on frames in your Figma file to select them. Only frames can be selected.
+                </p>
+
+                <div class="border rounded p-3 bg-neutral-50">
+                    <div class="text-sm font-medium text-neutral-700">
+                        Selected Frames: {selectedFrames.length}
+                    </div>
+                    {selectedFrames.length > 0 && (
+                        <div class="text-xs text-neutral-500 mt-1">
+                            {selectedFrames.length} frame{selectedFrames.length !== 1 ? 's' : ''}{' '}
+                            ready for export
+                        </div>
+                    )}
+                </div>
+
+                <VerticalSpace space="small" />
+
+                {error && <div class="text-xs text-red-600 mt-2">{error}</div>}
+                {success && (
+                    <div class="text-xs text-green-600 mt-2">Frames exported successfully!</div>
+                )}
+                {isExporting && <div class="text-xs text-neutral-400 mt-2">Exporting...</div>}
+
+                <div class="flex gap-2 mt-2">
+                    <Button onClick={onBack} secondary disabled={isExporting}>
+                        Back to Projects
+                    </Button>
+                    {selectedFrames.length > 0 && (
+                        <Button onClick={() => exportToProject(token)} disabled={isExporting}>
+                            {isExporting
+                                ? `Exporting...`
+                                : `Export to Project (${selectedFrames.length})`}
+                        </Button>
+                    )}
+                </div>
+            </div>
         </Fragment>
     )
 }

@@ -44,9 +44,33 @@ class ScreenController extends Controller
     {
         $request->validate([
             'frame_ids' => 'required|array|min:1',
-            'frame_ids.*' => 'string|distinct',
+            'frame_ids.*' => 'string|distinct|unique:screens,figma_node_id',
         ]);
 
+        $project = Project::find($projectId);
+        if (!$project) {
+            return $this->notFoundResponse('Project not found');
+        }
+
+        $user = $request->user();
+        $isOwner = $project->owner_id === $user->id;
+        $isMember = $user->memberProjects()->where('project_id', $projectId)->exists();
+
+        if (!$isOwner && !$isMember) {
+            return $this->notFoundResponse('Project not found');
+        }
+
+        $frameIds = $request->input('frame_ids');
+
+        $createdScreens = collect($frameIds)->map(function ($frameId) use ($projectId) {
+            return Screen::create([
+                'project_id' => $projectId,
+                'figma_node_id' => $frameId,
+                'data' => [],
+            ]);
+        });
+
+        return $this->responseJson($createdScreens, 'Frames exported as screens', 201);
     }
 
     public function getProjectScreens(Request $request, string $projectId)
