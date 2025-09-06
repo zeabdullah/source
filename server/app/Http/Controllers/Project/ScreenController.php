@@ -154,15 +154,15 @@ class ScreenController extends Controller
 
         try {
             $screen->updateOrFail($validated);
-        } catch (\Throwable $e) {
-            return $this->serverErrorResponse(message: 'Failed to update Screen: ' . $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to update Screen: ' . $th->getMessage());
         }
 
         $screen->refresh();
         return $this->responseJson($screen, 'Updated successfully');
     }
 
-    public function regenerateDescription(Request $request, string $screenId, ScreenService $screenService)
+    public function regenerateDescription(Request $request, string $projectId, string $screenId, ScreenService $screenService)
     {
         $screen = Screen::find($screenId);
         if (!$screen) {
@@ -176,7 +176,7 @@ class ScreenController extends Controller
         return $this->responseJson($screen->fresh(), 'Description regenerated');
     }
 
-    public function deleteScreenById(Request $request, string $screenId)
+    public function deleteScreenById(Request $request, string $projectId, string $screenId)
     {
         $screen = Screen::find($screenId);
 
@@ -186,8 +186,8 @@ class ScreenController extends Controller
 
         try {
             $screen->deleteOrFail();
-        } catch (\Throwable $e) {
-            return $this->serverErrorResponse(message: 'Failed to delete screen: ' . $e->getMessage());
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to delete screen: ' . $th->getMessage());
         }
 
         return $this->responseJson($screen, 'Screen deleted');
