@@ -1,5 +1,5 @@
 import { HttpInterceptorFn } from '@angular/common/http'
-import { BASE_URL } from '../constants/http.constants'
+import { BASE_URL } from '~/shared/constants/http.constants'
 
 export const baseInterceptor: HttpInterceptorFn = (req, next) => {
     const modifiedReq = req.clone({

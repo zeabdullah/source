@@ -8,7 +8,7 @@ import {
 } from '@angular/core'
 import { Router, RouterLink } from '@angular/router'
 import { Subscription } from 'rxjs'
-import { AuthService } from '../../../modules/auth/shared/services/auth.service'
+import { AuthService } from '~/shared/services/auth.service'
 
 @Component({
     selector: 'app-navbar',

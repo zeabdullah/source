@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router'
 import { provideZonelessChangeDetection } from '@angular/core'
 import { Navbar } from './navbar'
 import { AuthService } from '../../services/auth.service'
-import { routes } from '../../app.routes'
+import { routes } from '../../../app.routes'
 
 describe('Navbar', () => {
     let component: Navbar

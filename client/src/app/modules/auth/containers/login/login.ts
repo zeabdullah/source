@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, signal, inject, OnInit } from '@ang
 import { Router, RouterLink } from '@angular/router'
 import { Validators, ReactiveFormsModule, NonNullableFormBuilder } from '@angular/forms'
 import { HttpErrorResponse } from '@angular/common/http'
-import { BASE_URL } from '../../../../shared/constants/http.constants'
-import { Logo } from '../../../../shared/components/logo/logo'
-import { AuthService } from '../../shared/services/auth.service'
+import { BASE_URL } from '~/shared/constants/http.constants'
+import { AuthService } from '~/shared/services/auth.service'
+import { Logo } from '~/shared/components/logo/logo'
 
 @Component({
     selector: 'app-login',
