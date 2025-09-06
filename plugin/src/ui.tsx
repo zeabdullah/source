@@ -28,7 +28,7 @@ function Plugin(props: UIProps) {
         }
     }, [])
 
-    const fetchProjects = async (token: string) => {
+    async function fetchProjects(token: string) {
         setLoadingProjects(true)
         try {
             const resp = await fetch('http://localhost:8000/api/projects', {
@@ -190,8 +190,8 @@ function ProjectList({
                         />
                     )}
                     <div>
-                        <p class="text-lg font-bold">Welcome, {user.name}!</p>
-                        <p class="text-xs text-gray-600">{user.email}</p>
+                        <p class="text-lg leading-tight font-bold">Welcome, {user.name}!</p>
+                        <p class="text-xs text-gray-500">{user.email}</p>
                     </div>
                 </div>
                 <Button onClick={onLogout} secondary>
@@ -201,7 +201,7 @@ function ProjectList({
 
             <VerticalSpace space="small" />
 
-            <h3 class="font-semibold pb-2">Your Projects</h3>
+            <p class="text- font-medium pb-2">Your Projects</p>
 
             {loading ? (
                 <p class="text-center text-gray-600">Loading projects...</p>
@@ -213,10 +213,10 @@ function ProjectList({
                         <div key={project.id} class="border rounded p-3">
                             <div class="font-medium">{project.name}</div>
                             {project.description && (
-                                <div class="text-xs text-gray-600 mt-1">{project.description}</div>
+                                <div class="text-xs text-gray-500 mt-1">{project.description}</div>
                             )}
                             {project.figma_file_name && (
-                                <div class="text-xs text-blue-600 mt-1">
+                                <div class="text-xs text-blue-400 mt-1">
                                     📎 {project.figma_file_name}
                                 </div>
                             )}
