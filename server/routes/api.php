@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Common\AuthController;
 use App\Http\Controllers\Project\ProjectController;
@@ -72,14 +73,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{screenId}/regenerate-description', [ScreenController::class, 'regenerateDescription']);
     });
 
-
-    // // Chats (per screen)
-    // Route::get('/screens/{screenId}/chats', [ChatController::class, 'index']);
-    // Route::post('/screens/{screenId}/chats', [ChatController::class, 'store']);
-    // Route::get('/chats/{chatId}', [ChatController::class, 'show']);
-    // Route::put('/chats/{chatId}', [ChatController::class, 'update']);
-    // Route::patch('/chats/{chatId}', [ChatController::class, 'update']);
-    // Route::delete('/chats/{chatId}', [ChatController::class, 'destroy']);
+    // Chats (per commentable, polymorphic)
+    Route::post('/screens/{screenId}/chats', [AiChatController::class, 'createScreenChatMessage']);
+    Route::get('/screens/{screenId}/chats', [AiChatController::class, 'getScreenChatMessages']);
+    Route::put('/chats/{chatId}', [AiChatController::class, 'updateChatMessageById']);
+    Route::delete('/chats/{chatId}', [AiChatController::class, 'deleteChatMessageById']);
 
     // // Comments (per screen, polymorphic but scoped here)
     // Route::get('/screens/{screenId}/comments', [CommentController::class, 'index']);

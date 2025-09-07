@@ -5,8 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
 
 class Screen extends Model
@@ -40,15 +38,19 @@ class Screen extends Model
         'data' => 'array',
     ];
 
-    public function project(): BelongsTo
+    public function project()
     {
         return $this->belongsTo(Project::class);
     }
 
-    public function comments(): HasMany
+    public function aiChats()
     {
-        return $this->hasMany(Comment::class, 'commentable_id')
-            ->where('commentable_type', self::class);
+        return $this->morphMany(AiChat::class, 'commentable');
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
     }
 
     /**

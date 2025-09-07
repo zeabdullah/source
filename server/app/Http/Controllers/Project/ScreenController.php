@@ -57,7 +57,7 @@ class ScreenController extends Controller
             ]);
         });
 
-        return $this->responseJson($createdScreens, 'Frames exported as screens', 201);
+        return $this->responseJson($createdScreens, 'Frames exported as screens successfully', 201);
     }
 
     public function getProjectScreens(Request $request, string $projectId)
@@ -89,12 +89,29 @@ class ScreenController extends Controller
 
         try {
             $screen->updateOrFail($validated);
+            $screen->refresh();
+            return $this->responseJson($screen, 'Updated successfully');
         } catch (\Throwable $th) {
             return $this->serverErrorResponse(message: 'Failed to update Screen: ' . $th->getMessage());
         }
 
-        $screen->refresh();
-        return $this->responseJson($screen, 'Updated successfully');
+    }
+
+    public function deleteScreenById(Request $request, string $projectId, string $screenId)
+    {
+        $screen = Screen::find($screenId);
+
+        if (!$screen) {
+            return $this->notFoundResponse('Screen not found');
+        }
+
+        try {
+            $screen->deleteOrFail();
+            return $this->responseJson($screen, 'Screen deleted');
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to delete screen: ' . $th->getMessage());
+        }
+
     }
 
     public function regenerateDescription(Request $request, string $projectId, string $screenId, ScreenService $screenService)
@@ -109,22 +126,5 @@ class ScreenController extends Controller
         $screen->save();
 
         return $this->responseJson($screen->fresh(), 'Description regenerated');
-    }
-
-    public function deleteScreenById(Request $request, string $projectId, string $screenId)
-    {
-        $screen = Screen::find($screenId);
-
-        if (!$screen) {
-            return $this->notFoundResponse('Screen not found');
-        }
-
-        try {
-            $screen->deleteOrFail();
-        } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to delete screen: ' . $th->getMessage());
-        }
-
-        return $this->responseJson($screen, 'Screen deleted');
     }
 }
