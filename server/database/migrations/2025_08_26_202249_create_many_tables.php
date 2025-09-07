@@ -32,7 +32,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             $table->string('section_name')->nullable();
-            $table->json('data');
+            $table->json('data')->nullable();
             $table->timestamps();
         });
 

@@ -30,6 +30,7 @@ class ScreenController extends Controller
 
         $validated = $request->validate([
             'section_name' => 'nullable|string|max:255',
+            'data' => 'nullable|array',
         ]);
 
         try {
@@ -56,8 +57,6 @@ class ScreenController extends Controller
             return $this->forbiddenResponse('You must connect your project to a Figma file first');
         }
 
-        $svgUrls = [];
-
         try {
             $svgUrls = $figmaService->getSvgUrlsForNodes(
                 $frameIds,
@@ -76,7 +75,7 @@ class ScreenController extends Controller
             });
             return $this->responseJson($createdScreens, 'Frames exported as screens successfully', 201);
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: $th->getMessage());
+            return $this->serverErrorResponse(message: "Failed to export screens from Figma: " . $th->getMessage());
         }
     }
 

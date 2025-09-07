@@ -33,7 +33,8 @@ class Screen extends Model
     ];
 
     protected $attributes = [
-        'section_name' => null
+        'section_name' => null,
+        'data' => null
     ];
 
     protected $casts = [

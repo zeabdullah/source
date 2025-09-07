@@ -70,8 +70,8 @@ describe('createScreen', function () {
         $response = postJson("/api/projects/{$project->id}/screens", [
             'section_name' => 'Test Section'
         ]);
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['data']);
+        $response->assertStatus(201)
+            ->assertJsonStructure(['payload', 'message']);
 
         $response = postJson("/api/projects/{$project->id}/screens", [
             'section_name' => 'Test Section',
