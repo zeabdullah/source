@@ -9,7 +9,6 @@ use App\Http\Controllers\Project\ScreenController;
 use App\Http\Controllers\Project\EmailTemplateController;
 use Illuminate\Support\Facades\Route;
 
-
 Route::group([], function () {
     Route::get('/me', [AuthController::class, 'getMe'])->middleware('auth:sanctum');
     Route::post('/login', [AuthController::class, 'login']);

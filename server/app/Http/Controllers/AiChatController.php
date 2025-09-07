@@ -2,24 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\AiChat;
 use App\Models\Screen;
 use App\Services\AiAgentService;
-use Gemini\Data\Content;
-use Gemini\Enums\Role;
+use App\Services\FigmaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Gemini\Data\Content;
+use Gemini\Enums\Role;
 
 class AiChatController extends Controller
 {
-    public function sendScreenChatMessage(Request $request, string $screenId, AiAgentService $aiAgentService)
+    public function sendScreenChatMessage(Request $request, string $screenId, AiAgentService $aiAgentService, FigmaService $figmaService)
     {
         $validated = $request->validate([
-            'content' => 'required|string|max:2500'
+            'content' => 'required|string|max:2500',
+            'figma_access_token' => 'required|string',
         ]);
         $userMsg = $validated['content'];
+        $accessToken = $validated['figma_access_token'];
 
         $lockKey = "screen:{$screenId}:ai_chat_lock";
+        $figmaCacheKey = "figma_frame_data_{$screenId}"; // New cache key for Figma data
+
         try {
             $screen = Screen::find($screenId);
             if (!$screen) {
@@ -32,7 +38,7 @@ class AiChatController extends Controller
             }
             cache()->put($lockKey, true, ttl: 90);
 
-            $result = DB::transaction(function () use ($request, $screen, $screenId, $userMsg, $aiAgentService) {
+            $result = DB::transaction(function () use ($request, $screen, $screenId, $userMsg, $accessToken, $figmaCacheKey, $aiAgentService, $figmaService) {
                 // create user message
                 $chatMsg = new AiChat([
                     'content' => $userMsg,
@@ -41,7 +47,6 @@ class AiChatController extends Controller
                 $chatMsg->user_id = $request->user()->id;
                 $chatMsg->commentable_id = $screenId;
                 $chatMsg->commentable_type = Screen::class;
-
 
                 $contextMessages = $screen->aiChats()
                     ->orderBy('created_at', 'desc')
@@ -54,6 +59,22 @@ class AiChatController extends Controller
                         $msg->sender === 'user' ? Role::USER : Role::MODEL
                     ))
                     ->toArray();
+
+                // Fetch and add Figma data to context messages using cache
+                if ($screen->hasFigmaData() && $screen->project->hasFigmaFile()) {
+                    $figmaNodes = cache()->remember($figmaCacheKey, now()->addHours(12), function () use ($accessToken, $screen, $figmaService) {
+                        return $figmaService->getFigmaFrameForAI(
+                            $screen->project->figma_file_key,
+                            $screen->figma_node_id,
+                            $accessToken,
+                        );
+                    });
+
+                    if ($figmaNodes) {
+                        $figmaContext = "Figma Frame Data: " . json_encode($figmaNodes);
+                        $contextMessages[] = Content::parse($figmaContext, Role::USER); // Add as user role for context
+                    }
+                }
 
                 $aiReplyText = $aiAgentService->generateReplyFromContext($userMsg, history: $contextMessages);
 

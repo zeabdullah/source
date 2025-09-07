@@ -65,6 +65,35 @@ class FigmaService
         }
     }
 
+    public function getFigmaFrameForAI(string $fileKey, string $nodeId, $ACCESS_TOKEN_DO_NOT_COMMIT)
+    {
+        $client = new HttpClient([
+            'base_uri' => 'https://api.figma.com/v1/',
+            'headers' => [
+                'X-Figma-Token' => $ACCESS_TOKEN_DO_NOT_COMMIT,
+                'Accept' => 'application/json',
+            ],
+        ]);
+
+        try {
+            $response = $client->get("files/{$fileKey}/nodes", [
+                'query' => [
+                    'ids' => $nodeId,
+                ],
+            ]);
+
+            $data = json_decode($response->getBody()->getContents(), associative: true);
+
+            if (empty($data['nodes'][$nodeId]['document'])) {
+                return null;
+            }
+
+            return $data['nodes'][$nodeId]['document'];
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
     public function disconnectFigmaFile(Project $project)
     {
         return $project->unregisterFigmaFile();
