@@ -74,7 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Chats (per commentable, polymorphic)
-    Route::post('/screens/{screenId}/chats', [AiChatController::class, 'createScreenChatMessage']);
+    Route::post('/screens/{screenId}/chats', [AiChatController::class, 'sendScreenChatMessage']);
     Route::get('/screens/{screenId}/chats', [AiChatController::class, 'getScreenChatMessages']);
     Route::put('/chats/{chatId}', [AiChatController::class, 'updateChatMessageById']);
     Route::delete('/chats/{chatId}', [AiChatController::class, 'deleteChatMessageById']);
