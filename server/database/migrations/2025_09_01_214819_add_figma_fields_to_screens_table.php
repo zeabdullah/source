@@ -12,7 +12,8 @@ return new class extends Migration {
     {
         Schema::table('screens', function (Blueprint $table) {
             $table->string('figma_node_id')->nullable()->after('data');
-            $table->text('description')->nullable()->after('figma_node_id');
+            $table->string('figma_svg_url')->nullable()->after('figma_node_id');
+            $table->text('description')->nullable()->after('figma_svg_url');
         });
     }
 
@@ -22,7 +23,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('screens', function (Blueprint $table) {
-            $table->dropColumn(['figma_node_id', 'description']);
+            $table->dropColumn(['figma_node_id', 'figma_svg_url', 'description']);
         });
     }
 };

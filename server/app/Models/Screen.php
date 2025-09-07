@@ -15,6 +15,7 @@ class Screen extends Model
     protected $fillable = [
         'section_name',
         'project_id',
+        'figma_svg_url',
         'figma_node_id',
         'data',
     ];
@@ -24,6 +25,7 @@ class Screen extends Model
         'project_id',
         'section_name',
         'data',
+        'figma_svg_url',
         'figma_node_id',
         'description',
         'created_at',
