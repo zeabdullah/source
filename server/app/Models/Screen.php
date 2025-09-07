@@ -83,7 +83,7 @@ class Screen extends Model
      */
     public function hasFigmaData(): bool
     {
-        return !empty($this->figma_node_id);
+        return isset($this->figma_node_id);
     }
 
     /**
@@ -91,7 +91,7 @@ class Screen extends Model
      */
     public function getFigmaFrameUrl(): ?string
     {
-        if (empty($this->figma_node_id) || empty($this->project->figma_file_key)) {
+        if (!(isset($this->figma_node_id) && isset($this->project->figma_file_key))) {
             return null;
         }
 
