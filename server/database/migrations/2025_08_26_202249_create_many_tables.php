@@ -45,15 +45,6 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('ai_chats', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('commentable_id')->constrained('screens')->onDelete('cascade');
-            $table->string('commentable_type');
-            $table->text('content')->nullable();
-            $table->timestamps();
-        });
-
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
@@ -70,7 +61,6 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('comments');
-        Schema::dropIfExists('ai_chats');
         Schema::dropIfExists('email_templates');
         Schema::dropIfExists('screens');
         Schema::dropIfExists('releases');
