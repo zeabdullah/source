@@ -17,8 +17,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class
         ]);
 
-        $users = User::all();
-
+        $users = User::all()->except([1]);
         $projects = Project::factory(10)
             ->recycle($users)
             ->create();

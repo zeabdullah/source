@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use Gemini\Data\Content;
-use Gemini\GeminiHelper;
 use Gemini;
 
 class AiAgentService

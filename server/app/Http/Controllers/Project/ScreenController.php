@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Project;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Screen;
+use App\Services\FigmaService;
 use App\Services\ScreenService;
 use Illuminate\Http\Request;
 
@@ -29,7 +30,6 @@ class ScreenController extends Controller
 
         $validated = $request->validate([
             'section_name' => 'nullable|string|max:255',
-            'data' => 'required|array',
         ]);
 
         try {
@@ -40,28 +40,52 @@ class ScreenController extends Controller
         }
     }
 
-    public function exportScreens(Request $request, string $projectId)
+    public function exportScreens(Request $request, string $projectId, FigmaService $figmaService)
     {
-        $request->validate([
+        $validated = $request->validate([
             'frame_ids' => 'required|array|min:1',
             'frame_ids.*' => 'string|distinct|unique:screens,figma_node_id',
+            'figma_access_token' => 'required|string',
         ]);
+        /** @var string[] */
+        $frameIds = $validated['frame_ids'];
 
-        $frameIds = $request->input('frame_ids');
+        $project = Project::find($projectId);
 
-        $createdScreens = collect($frameIds)->map(function ($frameId) use ($projectId) {
-            return Screen::create([
-                'project_id' => $projectId,
-                'figma_node_id' => $frameId,
-                'data' => [],
-            ]);
-        });
+        if (!$project->figma_file_key) {
+            return $this->forbiddenResponse('You must connect your project to a Figma file first');
+        }
 
-        return $this->responseJson($createdScreens, 'Frames exported as screens successfully', 201);
+        $svgUrls = [];
+
+        try {
+            $svgUrls = $figmaService->getSvgUrlsForNodes(
+                $frameIds,
+                $project->figma_file_key,
+                $validated['figma_access_token'],
+            );
+            $createdScreens = collect($frameIds)->map(function ($frameId) use ($projectId, $svgUrls) {
+                $data = [
+                    'project_id' => $projectId,
+                    'figma_node_id' => $frameId,
+                ];
+                if (isset($svgUrls[$frameId])) {
+                    $data['figma_svg_url'] = $svgUrls[$frameId];
+                }
+                return Screen::create($data);
+            });
+            return $this->responseJson($createdScreens, 'Frames exported as screens successfully', 201);
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: $th->getMessage());
+        }
     }
 
-    public function getProjectScreens(Request $request, string $projectId)
+    public function getProjectScreens(Request $request, string $projectId, FigmaService $figmaService)
     {
+        $validated = $request->validate([
+            'figma_access_token' => 'required|string'
+        ]);
+
         $project = Project::find($projectId);
 
         $screensQuery = $project->screens();
@@ -78,7 +102,6 @@ class ScreenController extends Controller
     {
         $validated = $request->validate([
             'section_name' => 'nullable|string|max:255',
-            'data' => 'nullable|array',
         ]);
 
         $screen = Screen::find($screenId);
@@ -116,15 +139,6 @@ class ScreenController extends Controller
 
     public function regenerateDescription(Request $request, string $projectId, string $screenId, ScreenService $screenService)
     {
-        $screen = Screen::find($screenId);
-        if (!$screen) {
-            return $this->notFoundResponse('Screen not found');
-        }
-
-        $frameNode = $screen->data ?? [];
-        $screen->description = $screenService->generateDescription($screen, $frameNode);
-        $screen->save();
-
-        return $this->responseJson($screen->fresh(), 'Description regenerated');
+        $this->notImplementedResponse();
     }
 }
