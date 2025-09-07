@@ -31,11 +31,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('projects')->group(function () {
         Route::post('/', [ProjectController::class, 'createProject']);
         Route::get('/', [ProjectController::class, 'getMyProjects']);
-        Route::get('/{projectId}', [ProjectController::class, 'getProjectById'])->middleware('is_owner');
-        Route::put('/{projectId}', [ProjectController::class, 'updateProjectById'])->middleware('is_owner');
-        Route::delete('/{projectId}', [ProjectController::class, 'deleteProjectById'])->middleware('is_owner');
-        Route::post('/{projectId}/figma/connect', [ProjectController::class, 'connectFigmaFile'])->middleware('is_owner');
-        Route::post('/{projectId}/figma/disconnect', [ProjectController::class, 'disconnectFigmaFile'])->middleware('is_owner');
+        Route::middleware('is_owner')->group(function () {
+            Route::get('/{projectId}', [ProjectController::class, 'getProjectById']);
+            Route::put('/{projectId}', [ProjectController::class, 'updateProjectById']);
+            Route::delete('/{projectId}', [ProjectController::class, 'deleteProjectById']);
+            Route::post('/{projectId}/figma/connect', [ProjectController::class, 'connectFigmaFile']);
+            Route::post('/{projectId}/figma/disconnect', [ProjectController::class, 'disconnectFigmaFile']);
+        });
 
         // Releases (per project)
         Route::post('/{projectId}/releases', [ReleaseController::class, 'createRelease']);
@@ -43,14 +45,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Screens (per project)
         Route::post('/{projectId}/screens', [ScreenController::class, 'createScreen']); // likely going to remove this endpoint (screens are likely going to be added through Figma only through exportScreens  )
-        Route::post('/{projectId}/screens/export', [ScreenController::class, 'exportScreens'])->middleware('is_owner');
-        Route::get('/{projectId}/screens', [ScreenController::class, 'getProjectScreens'])->middleware('is_owner');
-        Route::put('/{projectId}/screens/{screenId}', [ScreenController::class, 'updateScreenById'])->middleware('is_owner');
-        Route::delete('/{projectId}/screens/{screenId}', [ScreenController::class, 'deleteScreenById'])->middleware('is_owner');
+        Route::middleware('is_owner')->group(function () {
+            Route::post('/{projectId}/screens/export', [ScreenController::class, 'exportScreens']);
+            Route::get('/{projectId}/screens', [ScreenController::class, 'getProjectScreens']);
+            Route::put('/{projectId}/screens/{screenId}', [ScreenController::class, 'updateScreenById']);
+            Route::delete('/{projectId}/screens/{screenId}', [ScreenController::class, 'deleteScreenById']);
+
+        });
 
         // Email Templates (per project)
-        Route::post('/{projectId}/email-templates', [EmailTemplateController::class, 'createEmailTemplate'])->middleware('is_owner');
-        Route::get('/{projectId}/email-templates', [EmailTemplateController::class, 'getProjectEmailTemplates'])->middleware('is_owner');
+        Route::middleware('is_owner')->group(function () {
+            Route::post('/{projectId}/email-templates', [EmailTemplateController::class, 'createEmailTemplate']);
+            Route::get('/{projectId}/email-templates', [EmailTemplateController::class, 'getProjectEmailTemplates']);
+        });
     });
 
     // Releases (by id)
