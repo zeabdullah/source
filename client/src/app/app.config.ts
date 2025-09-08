@@ -7,7 +7,10 @@ import {
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser'
 import { provideRouter } from '@angular/router'
 import { routes } from './app.routes'
-import { baseInterceptor } from './interceptors/base.interceptor'
+import { baseInterceptor } from './shared/interceptors/base.interceptor'
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
+import { providePrimeNG } from 'primeng/config'
+import { primengPreset } from './primeng.preset'
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -16,5 +19,12 @@ export const appConfig: ApplicationConfig = {
         provideRouter(routes),
         provideClientHydration(withEventReplay()),
         provideHttpClient(withInterceptors([baseInterceptor]), withFetch()),
+        provideAnimationsAsync(),
+        providePrimeNG({
+            theme: {
+                preset: primengPreset,
+                options: { darkModeSelector: 'light' },
+            },
+        }),
     ],
 }

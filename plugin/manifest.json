@@ -1,0 +1,21 @@
+{
+  "api": "1.0.0",
+  "editorType": [
+    "figma"
+  ],
+  "id": "plugin",
+  "name": "Plugin",
+  "main": "build/main.js",
+  "ui": "build/ui.js",
+  "networkAccess": {
+    "allowedDomains": [
+      "https://*.pravatar.cc"
+    ],
+    "reasoning": "",
+    "devAllowedDomains": [
+      "http://localhost:8000",
+      "http://localhost:4000",
+      "http://localhost:4200"
+    ]
+  }
+}

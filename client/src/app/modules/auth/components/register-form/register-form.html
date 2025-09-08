@@ -1,0 +1,99 @@
+<div class="mx-auto w-full max-w-[580px] rounded-3xl border border-gray-200 p-14 shadow-xs">
+    <h1 class="mb-14 text-center text-h2 font-bold tracking-tight">Join us. Create an account</h1>
+
+    @if (errorMessage()) {
+    <div class="mb-4 rounded-lg bg-danger-100 p-4 text-sm text-danger-700">
+        {{ errorMessage() }}
+    </div>
+    }
+
+    <form class="mb-8 space-y-8" [formGroup]="registerFb" (ngSubmit)="register()">
+        <fieldset [disabled]="isLoading()" class="space-y-4">
+            <div>
+                <label>
+                    <span class="mb-1 block text-label-text">Full Name</span>
+                    <input
+                        formControlName="name"
+                        type="text"
+                        name="name"
+                        class="w-full rounded-xl border-2 border-gray-300 px-4 py-2.5 outline-brand-500 placeholder:text-gray-300 focus:border-brand-500"
+                        placeholder="John Appleseed"
+                        required
+                    />
+                </label>
+                @if (registerFb.get('name')?.invalid && registerFb.get('name')?.touched) {
+                <div class="text-sm text-danger-500">Required</div>
+                }
+            </div>
+            <div>
+                <label>
+                    <span class="mb-1 block text-label-text">Email Address</span>
+                    <input
+                        formControlName="email"
+                        type="email"
+                        name="email"
+                        class="w-full rounded-xl border-2 border-gray-300 px-4 py-2.5 outline-brand-500 placeholder:text-gray-300 focus:border-brand-500"
+                        placeholder="john@example.com"
+                        required
+                    />
+                </label>
+                @if (registerFb.get('email')?.invalid && registerFb.get('email')?.touched) {
+                <div class="text-sm text-danger-500">
+                    {{registerFb.get('email')?.getError('email') ? 'Must be a valid email' :
+                    'Required'}}
+                </div>
+                }
+            </div>
+            <div>
+                <label>
+                    <span class="mb-1 block text-label-text">Password</span>
+                    <input
+                        formControlName="password"
+                        type="password"
+                        name="password"
+                        class="w-full rounded-xl border-2 border-gray-300 px-4 py-2.5 outline-brand-500 placeholder:text-gray-300 focus:border-brand-500"
+                        required
+                    />
+                </label>
+                @if (registerFb.get('password')?.invalid && registerFb.get('password')?.touched) {
+                <div class="text-sm text-danger-500">
+                    {{ registerFb.get('password')?.getError('required') ? 'Required' : 'Must be at
+                    least 8 characters long'}}
+                </div>
+                }
+            </div>
+            <div>
+                <label>
+                    <span class="mb-1 block text-label-text">Confirm Password</span>
+                    <input
+                        formControlName="password_confirmation"
+                        type="password"
+                        name="password_confirmation"
+                        class="w-full rounded-xl border-2 border-gray-300 px-4 py-2.5 outline-brand-500 placeholder:text-gray-300 focus:border-brand-500"
+                        required
+                    />
+                </label>
+                @if (registerFb.get('password_confirmation')?.invalid &&
+                registerFb.get('password_confirmation')?.touched) {
+                <div class="text-sm text-danger-500">
+                    {{ registerFb.get('password_confirmation')?.getError('passwordMismatch') ?
+                    'Passwords must match' : 'Required' }}
+                </div>
+                }
+            </div>
+        </fieldset>
+
+        <button
+            [disabled]="!registerFb.valid || isLoading()"
+            type="submit"
+            class="flex w-full items-center justify-center rounded-xl bg-brand-500 p-2 font-bold text-white disabled:opacity-50"
+        >
+            Create account →
+        </button>
+    </form>
+
+    <div class="text-center text-button text-gray-700">
+        Already have an account?
+        <a routerLink="/auth/login" class="font-bold text-brand-500 hover:underline">Sign in</a>.
+    </div>
+</div>

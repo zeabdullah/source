@@ -15,12 +15,12 @@
                     "changeDetection": "OnPush"
                 },
                 "@schematics/angular:guard": {
-                    "path": "src/app/guards",
+                    "path": "src/app",
                     "typeSeparator": ".",
                     "skipTests": true
                 },
                 "@schematics/angular:service": {
-                    "path": "src/app/services",
+                    "path": "src/app",
                     "type": "service",
                     "skipTests": true
                 },
@@ -34,17 +34,17 @@
                     "type": "directive"
                 },
                 "@schematics/angular:resolver": {
-                    "path": "src/app/resolvers",
+                    "path": "src/app/shared/resolvers",
                     "typeSeparator": ".",
                     "skipTests": true
                 },
                 "@schematics/angular:interceptor": {
-                    "path": "src/app/interceptors",
+                    "path": "src/app/shared/interceptors",
                     "typeSeparator": ".",
                     "skipTests": true
                 },
                 "@schematics/angular:interface": {
-                    "path": "src/app/interfaces",
+                    "path": "src/app/shared/interfaces",
                     "type": "interface"
                 }
             },
@@ -132,6 +132,7 @@
         }
     },
     "cli": {
+        "packageManager": "pnpm",
         "schematicCollections": ["angular-eslint"]
     }
 }

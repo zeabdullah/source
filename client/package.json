@@ -3,7 +3,7 @@
     "version": "0.0.0",
     "engines": {
         "node": "^22.17.0",
-        "pnpm": "^9"
+        "pnpm": "^10"
     },
     "scripts": {
         "ng": "ng",
@@ -11,7 +11,7 @@
         "build": "ng build",
         "watch": "ng build --watch --configuration development",
         "test": "ng test",
-        "serve:ssr:source-client": "node dist/source-client/server/server.mjs",
+        "serve:ssr": "node dist/source-client/server/server.mjs",
         "lint": "ng lint"
     },
     "private": true,
@@ -24,9 +24,12 @@
         "@angular/platform-server": "^20.2.0",
         "@angular/router": "^20.2.0",
         "@angular/ssr": "^20.2.0",
+        "@primeuix/themes": "^1.2.3",
         "@tailwindcss/postcss": "^4.1.12",
         "express": "^5.1.0",
         "postcss": "^8.5.6",
+        "primeicons": "^7.0.0",
+        "primeng": "^20.1.1",
         "rxjs": "~7.8.0",
         "tailwindcss": "^4.1.12",
         "tslib": "^2.3.0"

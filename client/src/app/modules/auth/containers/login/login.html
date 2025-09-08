@@ -1,0 +1,73 @@
+<div class="flex min-h-full flex-col items-stretch justify-center gap-y-8 p-4">
+    <app-logo class="mx-auto" />
+
+    <div class="mx-auto w-full max-w-[580px] rounded-3xl border border-gray-200 p-14 shadow-xs">
+        <h1 class="mb-14 text-center text-h2 font-bold tracking-tight">Log in to your account</h1>
+
+        @if (errorMessage()) {
+        <div class="mb-4 rounded-lg bg-danger-100 p-4 text-sm text-danger-700">
+            {{ errorMessage() }}
+        </div>
+        }
+
+        <form class="mb-8 space-y-8" [formGroup]="loginForm" (ngSubmit)="login()">
+            <fieldset [disabled]="isLoading()" class="space-y-4">
+                <div>
+                    <label>
+                        <span class="mb-1 block text-label-text">Email Address</span>
+                        <input
+                            formControlName="email"
+                            type="email"
+                            name="email"
+                            class="w-full rounded-xl border-2 border-gray-300 px-4 py-2.5 outline-brand-500 placeholder:text-gray-300 focus:border-brand-500"
+                            placeholder="john@example.com"
+                            required
+                        />
+                    </label>
+                    @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+                    <div class="text-sm text-danger-500">Must be a valid email.</div>
+                    }
+                </div>
+                <div>
+                    <label>
+                        <span class="mb-1 block text-label-text">Password</span>
+                        <input
+                            formControlName="password"
+                            type="password"
+                            name="password"
+                            class="w-full rounded-xl border-2 border-gray-300 px-4 py-2.5 outline-brand-500 placeholder:text-gray-300 focus:border-brand-500"
+                            required
+                        />
+                    </label>
+                    @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+                    <div class="text-sm text-danger-500">Password is required.</div>
+                    }
+                </div>
+
+                <div class="text-end">
+                    <a
+                        routerLink="/auth/forgot-password"
+                        class="text-button font-bold text-brand-500 hover:underline"
+                    >
+                        Forgot password?
+                    </a>
+                </div>
+            </fieldset>
+
+            <button
+                [disabled]="!loginForm.valid || isLoading()"
+                type="submit"
+                class="flex w-full items-center justify-center rounded-xl bg-brand-500 p-2 font-bold text-white disabled:opacity-50"
+            >
+                @if (isLoading()) { Logging in... } @else { Log in → }
+            </button>
+        </form>
+
+        <div class="text-center text-button text-gray-700">
+            Don't have an account?
+            <a routerLink="/auth/register" class="font-bold text-brand-500 hover:underline"
+                >Create an account</a
+            >.
+        </div>
+    </div>
+</div>
