@@ -2,14 +2,12 @@ import { on, showUI } from '@create-figma-plugin/utilities'
 import { LoginSuccessPayload, UserSession } from './types'
 import { PLUGIN_EVENT } from './constants'
 
-const data = {
-    greeting: 'lol',
-} as const satisfies Record<string, unknown>
+const props = {} as const satisfies Record<string, unknown>
 
-export type UIProps = typeof data
+export type UIProps = typeof props
 
 export default async function () {
-    showUI({ height: 360, width: 300, title: 'Source' }, data)
+    showUI({ height: 360, width: 300, title: 'Source' }, props)
 
     figma.on('selectionchange', () => {
         figma.ui.postMessage({
@@ -18,9 +16,9 @@ export default async function () {
         })
     })
 
-    const existingSession = (await figma.clientStorage.getAsync(
+    const existingSession: UserSession | undefined = await figma.clientStorage.getAsync(
         'user-session',
-    )) as UserSession | null
+    )
 
     if (existingSession) {
         figma.ui.postMessage({ type: PLUGIN_EVENT.RESTORE_SESSION, session: existingSession })
