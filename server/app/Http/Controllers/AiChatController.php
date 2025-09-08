@@ -24,19 +24,13 @@ class AiChatController extends Controller
         $accessToken = $validated['figma_access_token'];
 
         $lockKey = "screen:{$screenId}:ai_chat_lock";
-        $figmaCacheKey = "figma_frame_data_{$screenId}"; // New cache key for Figma data
+        $figmaCacheKey = "figma_frame_data_{$screenId}";
 
         try {
             $screen = Screen::find($screenId);
             if (!$screen) {
                 return $this->notFoundResponse('Screen not found');
             }
-
-            // Lock: prevent adding more messages to this screen while processing
-            if (cache()->has($lockKey)) {
-                return $this->forbiddenResponse('AI is currently replying. Please wait.');
-            }
-            cache()->put($lockKey, true, ttl: 90);
 
             $result = DB::transaction(function () use ($request, $screen, $screenId, $userMsg, $accessToken, $figmaCacheKey, $aiAgentService, $figmaService) {
                 // create user message
@@ -62,18 +56,20 @@ class AiChatController extends Controller
 
                 // Fetch and add Figma data to context messages using cache
                 if ($screen->hasFigmaData() && $screen->project->hasFigmaFile()) {
-                    $figmaNodes = cache()->remember($figmaCacheKey, now()->addHours(12), function () use ($accessToken, $screen, $figmaService) {
-                        return $figmaService->getFigmaFrameForAI(
-                            $screen->project->figma_file_key,
-                            $screen->figma_node_id,
-                            $accessToken,
-                        );
-                    });
+                    $figmaNodes = cache()->remember(
+                        $figmaCacheKey,
+                        now()->addHours(12),
+                        function () use ($accessToken, $screen, $figmaService) {
+                            return $figmaService->getFigmaFrameForAI(
+                                $screen->project->figma_file_key,
+                                $screen->figma_node_id,
+                                $accessToken,
+                            );
+                        }
+                    );
 
-                    if ($figmaNodes) {
-                        $figmaContext = "Figma Frame Data: " . json_encode($figmaNodes);
-                        $contextMessages[] = Content::parse($figmaContext, Role::USER); // Add as user role for context
-                    }
+                    $figmaContext = "Figma Frame Data: " . json_encode($figmaNodes);
+                    $contextMessages[] = Content::parse($figmaContext, Role::USER); // Add as user role for context
                 }
 
                 $aiReplyText = $aiAgentService->generateReplyFromContext($userMsg, history: $contextMessages);
@@ -96,13 +92,9 @@ class AiChatController extends Controller
                 ];
             }, attempts: 2);
 
-            cache()->forget($lockKey);
-
             return $this->responseJson($result, 'Created successfully', 201);
         } catch (\Throwable $th) {
-            cache()->forget($lockKey);
-            // return $this->serverErrorResponse('Failed to send chat message: ' . $th->getMessage());
-            throw $th;
+            return $this->serverErrorResponse('Failed to send chat message: ' . $th->getMessage());
         }
     }
 
@@ -115,11 +107,8 @@ class AiChatController extends Controller
             }
 
             $project = $screen->project;
-            if (!$project) {
-                return $this->notFoundResponse('Project not found');
-            }
-
             $user = $request->user();
+
             $isMember = $project->members()->where('users.id', $user->id)->exists();
             $isOwner = $project->owner_id === $user->id;
             if (!($isOwner || $isMember)) {
@@ -143,8 +132,9 @@ class AiChatController extends Controller
             'content' => 'required|string|max:2500'
         ]);
 
-        $chatMsg = AiChat::find($chatId);
         try {
+            $chatMsg = AiChat::find($chatId);
+
             if (!$chatMsg) {
                 return $this->notFoundResponse('Chat message not found');
             }

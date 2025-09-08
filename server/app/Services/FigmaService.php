@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Project;
 use GuzzleHttp\Client as HttpClient;
+use Illuminate\Support\Facades\Log;
 
 class FigmaService
 {
@@ -90,6 +91,7 @@ class FigmaService
 
             return $data['nodes'][$nodeId]['document'];
         } catch (\Exception $e) {
+            Log::error('Failed to fetch Figma frame for AI: ' . $e->getMessage(), ['exception' => $e]);
             return null;
         }
     }
