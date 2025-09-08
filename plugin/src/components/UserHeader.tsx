@@ -1,13 +1,13 @@
 import { Button } from '@create-figma-plugin/ui'
 import { h } from 'preact'
-import { UserSession } from '../types'
+import { useAuth } from '../contexts/AuthContext'
 
-interface UserHeaderProps {
-    user: UserSession['user']
-    onLogout: () => void
-}
+interface UserHeaderProps {}
 
-export function UserHeader({ user, onLogout }: UserHeaderProps) {
+export function UserHeader({}: UserHeaderProps) {
+    const { logout, userSession } = useAuth()
+    const user = userSession!.user
+
     return (
         <div class="flex justify-between items-center mb-4">
             <div class="flex items-center">
@@ -25,7 +25,7 @@ export function UserHeader({ user, onLogout }: UserHeaderProps) {
                     <p class="text-xs text-neutral-500">{user.email}</p>
                 </div>
             </div>
-            <Button onClick={onLogout} secondary>
+            <Button onClick={logout} secondary danger>
                 Logout
             </Button>
         </div>

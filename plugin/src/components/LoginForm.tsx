@@ -1,21 +1,21 @@
 import { Button, Textbox, VerticalSpace } from '@create-figma-plugin/ui'
 import { Fragment, h } from 'preact'
 import { useState } from 'preact/hooks'
-import { LoginSuccessPayload } from '../types'
+import { useApi } from '../hooks/useApi'
+import { useAuth } from '../contexts/AuthContext'
 
-interface LoginFormProps {
-    onLoginSuccess: (data: LoginSuccessPayload) => void
-}
+interface LoginFormProps {}
 
-export function LoginForm({ onLoginSuccess }: LoginFormProps) {
+export function LoginForm({}: LoginFormProps) {
     const [formState, setFormState] = useState({
         email: '',
         password: '',
     })
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+    const api = useApi()
+    const { login } = useAuth()
+
     const { email, password } = formState
-    const isValid = Boolean(email && password)
+    const isFormValid = Boolean(email && password)
 
     function handleChange(name: 'email' | 'password', value: string) {
         setFormState(prev => ({ ...prev, [name]: value }))
@@ -23,33 +23,13 @@ export function LoginForm({ onLoginSuccess }: LoginFormProps) {
 
     async function handleSubmit(event: Event) {
         event.preventDefault()
-
-        if (!isValid || loading) return
-
-        setLoading(true)
-        setError(null)
+        if (!isFormValid || api.loading) return
 
         try {
-            const resp = await fetch('http://localhost:8000/api/plugin/login', {
-                method: 'POST',
-                body: JSON.stringify({ email, password }),
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-            })
-            const data = await resp.json()
-
-            if (!resp.ok) {
-                throw new Error(data.message || 'Login failed')
-            }
-
-            onLoginSuccess(data.payload)
-        } catch (err) {
-            console.warn(err)
-            setError(err instanceof Error ? err.message : 'Network error')
-        } finally {
-            setLoading(false)
+            const payload = await api.post('/plugin/login', { email, password })
+            login(payload)
+        } catch {
+            console.warn('Failed to login:', api.error)
         }
     }
 
@@ -59,7 +39,7 @@ export function LoginForm({ onLoginSuccess }: LoginFormProps) {
                 placeholder="Email"
                 value={email}
                 onValueInput={val => handleChange('email', val)}
-                disabled={loading}
+                disabled={api.loading}
             />
             <VerticalSpace space="small" />
             <Textbox
@@ -67,16 +47,16 @@ export function LoginForm({ onLoginSuccess }: LoginFormProps) {
                 value={password}
                 onValueInput={val => handleChange('password', val)}
                 password
-                disabled={loading}
+                disabled={api.loading}
             />
             <VerticalSpace space="small" />
-            {error && (
+            {api.error && (
                 <Fragment>
-                    <p class="text-red-500 text-xs text-center">{error}</p>
+                    <p class="text-red-500 text-xs text-center">{api.error}</p>
                     <VerticalSpace space="small" />
                 </Fragment>
             )}
-            <Button fullWidth disabled={!isValid || loading} loading={loading}>
+            <Button fullWidth disabled={!isFormValid || api.loading} loading={api.loading}>
                 Log in
             </Button>
         </form>
