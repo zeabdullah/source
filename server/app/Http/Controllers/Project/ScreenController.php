@@ -83,6 +83,10 @@ class ScreenController extends Controller
 
     public function getProjectScreens(Request $request, string $projectId): JsonResponse
     {
+        $validated = $request->validate([
+            'figma_access_token' => 'required|string'
+        ]);
+
         $project = Project::find($projectId);
 
         $screensQuery = $project->screens();
@@ -143,7 +147,6 @@ class ScreenController extends Controller
     {
         $validated = $request->validate([
             'section_name' => 'nullable|string|max:255',
-            'data' => 'nullable|array',
         ]);
 
         $screen = Screen::find($screenId);
@@ -154,26 +157,12 @@ class ScreenController extends Controller
 
         try {
             $screen->updateOrFail($validated);
+            $screen->refresh();
+            return $this->responseJson($screen, 'Updated successfully');
         } catch (\Throwable $th) {
             return $this->serverErrorResponse(message: 'Failed to update Screen: ' . $th->getMessage());
         }
 
-        $screen->refresh();
-        return $this->responseJson($screen, 'Updated successfully');
-    }
-
-    public function regenerateDescription(Request $request, string $projectId, string $screenId, ScreenService $screenService)
-    {
-        $screen = Screen::find($screenId);
-        if (!$screen) {
-            return $this->notFoundResponse('Screen not found');
-        }
-
-        $frameNode = $screen->data ?? [];
-        $screen->description = $screenService->generateDescription($screen, $frameNode);
-        $screen->save();
-
-        return $this->responseJson($screen->fresh(), 'Description regenerated');
     }
 
     public function deleteScreenById(Request $request, string $projectId, string $screenId)
@@ -186,10 +175,15 @@ class ScreenController extends Controller
 
         try {
             $screen->deleteOrFail();
+            return $this->responseJson($screen, 'Screen deleted');
         } catch (\Throwable $th) {
             return $this->serverErrorResponse(message: 'Failed to delete screen: ' . $th->getMessage());
         }
 
-        return $this->responseJson($screen, 'Screen deleted');
+    }
+
+    public function regenerateDescription(Request $request, string $projectId, string $screenId, ScreenService $screenService)
+    {
+        $this->notImplementedResponse();
     }
 }
