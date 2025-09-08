@@ -7,11 +7,13 @@ use App\Models\Project;
 use App\Models\Screen;
 use App\Services\FigmaService;
 use App\Services\ScreenService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ScreenController extends Controller
 {
-    public function createScreen(Request $request, string $projectId)
+    /** @deprecated Use `exportScreens` instead */
+    public function createScreen(Request $request, string $projectId): JsonResponse
     {
 
         $project = Project::find($projectId);
@@ -41,7 +43,7 @@ class ScreenController extends Controller
         }
     }
 
-    public function exportScreens(Request $request, string $projectId, FigmaService $figmaService)
+    public function exportScreens(Request $request, string $projectId, FigmaService $figmaService): JsonResponse
     {
         $validated = $request->validate([
             'frame_ids' => 'required|array|min:1',
@@ -79,12 +81,8 @@ class ScreenController extends Controller
         }
     }
 
-    public function getProjectScreens(Request $request, string $projectId, FigmaService $figmaService)
+    public function getProjectScreens(Request $request, string $projectId): JsonResponse
     {
-        $validated = $request->validate([
-            'figma_access_token' => 'required|string'
-        ]);
-
         $project = Project::find($projectId);
 
         $screensQuery = $project->screens();
@@ -97,7 +95,7 @@ class ScreenController extends Controller
         return $this->responseJson($screens);
     }
 
-    public function updateScreenById(Request $request, string $projectId, string $screenId)
+    public function updateScreenById(Request $request, string $projectId, string $screenId): JsonResponse
     {
         $validated = $request->validate([
             'section_name' => 'nullable|string|max:255',
@@ -119,7 +117,7 @@ class ScreenController extends Controller
 
     }
 
-    public function deleteScreenById(Request $request, string $projectId, string $screenId)
+    public function deleteScreenById(Request $request, string $projectId, string $screenId): JsonResponse
     {
         $screen = Screen::find($screenId);
 
@@ -136,7 +134,7 @@ class ScreenController extends Controller
 
     }
 
-    public function regenerateDescription(Request $request, string $projectId, string $screenId, ScreenService $screenService)
+    public function regenerateDescription(Request $request, string $projectId, string $screenId, ScreenService $screenService): JsonResponse
     {
         $this->notImplementedResponse();
     }

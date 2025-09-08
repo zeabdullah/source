@@ -21,7 +21,6 @@ Route::prefix('plugin')->group(function () {
     Route::post('/logout', [AuthController::class, 'pluginLogout'])->middleware('auth:sanctum');
 });
 
-
 Route::middleware('auth:sanctum')->group(function () {
     // Users
     Route::get('/users/{userId}', [UserController::class, 'getUserById']);
@@ -44,13 +43,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{projectId}/releases', [ReleaseController::class, 'getProjectReleases']);
 
         // Screens (per project)
-        Route::post('/{projectId}/screens', [ScreenController::class, 'createScreen']); // likely going to remove this endpoint (screens are likely going to be added through Figma only through exportScreens  )
+        Route::post('/{projectId}/screens', [ScreenController::class, 'createScreen']); // deprecated
         Route::middleware('is_owner')->group(function () {
             Route::post('/{projectId}/screens/export', [ScreenController::class, 'exportScreens']);
             Route::get('/{projectId}/screens', [ScreenController::class, 'getProjectScreens']);
             Route::put('/{projectId}/screens/{screenId}', [ScreenController::class, 'updateScreenById']);
             Route::delete('/{projectId}/screens/{screenId}', [ScreenController::class, 'deleteScreenById']);
-
         });
 
         // Email Templates (per project)
