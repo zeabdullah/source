@@ -5,8 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
 
 class Screen extends Model
@@ -17,6 +15,7 @@ class Screen extends Model
     protected $fillable = [
         'section_name',
         'project_id',
+        'figma_svg_url',
         'figma_node_id',
         'data',
     ];
@@ -26,6 +25,7 @@ class Screen extends Model
         'project_id',
         'section_name',
         'data',
+        'figma_svg_url',
         'figma_node_id',
         'description',
         'created_at',
@@ -33,22 +33,27 @@ class Screen extends Model
     ];
 
     protected $attributes = [
-        'section_name' => null
+        'section_name' => null,
+        'data' => null
     ];
 
     protected $casts = [
         'data' => 'array',
     ];
 
-    public function project(): BelongsTo
+    public function project()
     {
         return $this->belongsTo(Project::class);
     }
 
-    public function comments(): HasMany
+    public function aiChats()
     {
-        return $this->hasMany(Comment::class, 'commentable_id')
-            ->where('commentable_type', self::class);
+        return $this->morphMany(AiChat::class, 'commentable');
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
     }
 
     /**
@@ -79,7 +84,7 @@ class Screen extends Model
      */
     public function hasFigmaData(): bool
     {
-        return !empty($this->figma_node_id);
+        return isset($this->figma_node_id);
     }
 
     /**
@@ -87,7 +92,7 @@ class Screen extends Model
      */
     public function getFigmaFrameUrl(): ?string
     {
-        if (empty($this->figma_node_id) || empty($this->project->figma_file_key)) {
+        if (!(isset($this->figma_node_id) && isset($this->project->figma_file_key))) {
             return null;
         }
 

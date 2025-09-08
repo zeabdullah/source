@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,13 @@ class ScreenFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'project_id' => Project::factory(),
+            'section_name' => $this->faker->optional()->word(),
+            'data' => [],
+            'figma_node_id' => $this->faker->optional()->uuid(),
+            'description' => $this->faker->optional()->sentence(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

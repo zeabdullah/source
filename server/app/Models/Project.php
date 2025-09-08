@@ -47,7 +47,9 @@ class Project extends Model
      * @var array<string, mixed>
      */
     protected $attributes = [
-        'description' => null
+        'description' => null,
+        'figma_file_key' => null,
+        'figma_file_name' => null,
     ];
 
     /**
@@ -136,6 +138,6 @@ class Project extends Model
      */
     public function hasFigmaFile(): bool
     {
-        return !empty($this->figma_file_key);
+        return isset($this->figma_file_key);
     }
 }

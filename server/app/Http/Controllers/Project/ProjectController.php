@@ -51,11 +51,10 @@ class ProjectController extends Controller
         $project = Project::find($projectId);
         try {
             $project->deleteOrFail();
+            return $this->responseJson($project, 'Project deleted');
         } catch (\Throwable $e) {
             return $this->serverErrorResponse(message: 'Failed to delete Project: ' . $e->getMessage());
         }
-
-        return $this->responseJson($project, 'Project deleted');
     }
 
     public function updateProjectById(Request $request, string $projectId)

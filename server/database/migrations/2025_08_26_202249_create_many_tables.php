@@ -32,7 +32,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             $table->string('section_name')->nullable();
-            $table->json('data');
+            $table->json('data')->nullable();
             $table->timestamps();
         });
 
@@ -42,15 +42,6 @@ return new class extends Migration {
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             $table->string('section_name')->nullable();
             $table->json('data');
-            $table->timestamps();
-        });
-
-        Schema::create('ai_chats', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('commentable_id')->constrained('screens')->onDelete('cascade');
-            $table->string('commentable_type');
-            $table->text('content')->nullable();
             $table->timestamps();
         });
 
@@ -70,7 +61,6 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('comments');
-        Schema::dropIfExists('ai_chats');
         Schema::dropIfExists('email_templates');
         Schema::dropIfExists('screens');
         Schema::dropIfExists('releases');
