@@ -1,5 +1,12 @@
-import { Button, Textbox, VerticalSpace } from '@create-figma-plugin/ui'
-import { Fragment, h } from 'preact'
+import {
+    Banner,
+    Button,
+    IconWarning16,
+    Stack,
+    Textbox,
+    useInitialFocus,
+} from '@create-figma-plugin/ui'
+import { h } from 'preact'
 import { useState } from 'preact/hooks'
 import { useApi } from '../hooks/useApi'
 import { useAuth } from '../contexts/AuthContext'
@@ -35,30 +42,32 @@ export function LoginForm({}: LoginFormProps) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <Textbox
-                placeholder="Email"
-                value={email}
-                onValueInput={val => handleChange('email', val)}
-                disabled={api.loading}
-            />
-            <VerticalSpace space="small" />
-            <Textbox
-                placeholder="Password"
-                value={password}
-                onValueInput={val => handleChange('password', val)}
-                password
-                disabled={api.loading}
-            />
-            <VerticalSpace space="small" />
-            {api.error && (
-                <Fragment>
-                    <p class="text-red-500 text-xs text-center">{api.error}</p>
-                    <VerticalSpace space="small" />
-                </Fragment>
-            )}
-            <Button fullWidth disabled={!isFormValid || api.loading} loading={api.loading}>
-                Log in
-            </Button>
+            <Stack space="small">
+                <Textbox
+                    {...useInitialFocus()}
+                    placeholder="Email"
+                    value={email}
+                    onValueInput={val => handleChange('email', val)}
+                    disabled={api.loading}
+                />
+                <Textbox
+                    placeholder="Password"
+                    value={password}
+                    onValueInput={val => handleChange('password', val)}
+                    password
+                    disabled={api.loading}
+                />
+
+                {api.error && (
+                    <Banner icon={<IconWarning16 />} variant="warning">
+                        {api.error}
+                    </Banner>
+                )}
+
+                <Button fullWidth disabled={!isFormValid || api.loading} loading={api.loading}>
+                    Log in
+                </Button>
+            </Stack>
         </form>
     )
 }

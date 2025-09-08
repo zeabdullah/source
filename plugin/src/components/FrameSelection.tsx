@@ -1,4 +1,14 @@
-import { Button, Stack, VerticalSpace } from '@create-figma-plugin/ui'
+import {
+    Banner,
+    Button,
+    IconCheck16,
+    IconPassword16,
+    IconWarning16,
+    Stack,
+    Textbox,
+    useInitialFocus,
+    VerticalSpace,
+} from '@create-figma-plugin/ui'
 import { Fragment, h } from 'preact'
 import { useState } from 'preact/hooks'
 import { Project } from '../types'
@@ -12,24 +22,25 @@ interface FrameSelectionProps {
 }
 
 export function FrameSelection({ project, selectedFrames, onBack }: FrameSelectionProps) {
-    const [success, setSuccess] = useState(false)
+    const [isExportSuccess, setIsExportSuccess] = useState(false)
+    const [accessToken, setAccessToken] = useState('')
 
     const { userSession } = useAuth()
     const api = useApi()
 
     async function exportToProject(token: string) {
-        setSuccess(false)
+        setIsExportSuccess(false)
 
         try {
             await api.post(
                 `/projects/${project.id}/screens/export`,
                 {
                     frame_ids: selectedFrames.map(f => f.id),
-                    figma_access_token: '',
+                    figma_access_token: accessToken,
                 },
                 { Authorization: `Bearer ${token}` },
             )
-            setSuccess(true)
+            setIsExportSuccess(true)
         } catch (err: any) {
             console.error('Failed to export frames:', err)
         }
@@ -45,6 +56,15 @@ export function FrameSelection({ project, selectedFrames, onBack }: FrameSelecti
                     Click on frames in your Figma file to select them. Only frames can be selected.
                 </p>
 
+                <Textbox
+                    {...useInitialFocus()}
+                    icon={<IconPassword16 />}
+                    placeholder="Access Token..."
+                    password
+                    value={accessToken}
+                    onValueInput={setAccessToken}
+                />
+
                 <div class="border rounded p-3 bg-neutral-100">
                     <div class="text-sm font-medium text-neutral-700">Selected Frames:</div>
                     {selectedFrames.length > 0 && (
@@ -59,9 +79,16 @@ export function FrameSelection({ project, selectedFrames, onBack }: FrameSelecti
                 </div>
 
                 <div class="text-xs">
-                    {api.error && <div class="text-red-600">{api.error}</div>}
-                    {success && <div class="text-green-600">Frames exported successfully!</div>}
-                    {api.loading && <div class="text-neutral-400">Exporting...</div>}
+                    {api.error && (
+                        <Banner icon={<IconWarning16 />} variant="warning">
+                            {api.error}
+                        </Banner>
+                    )}
+                    {isExportSuccess && isExportSuccess && (
+                        <Banner icon={<IconCheck16 />} variant="success">
+                            Frames exported successfully!
+                        </Banner>
+                    )}
                 </div>
 
                 <div class="flex gap-2">
@@ -72,10 +99,13 @@ export function FrameSelection({ project, selectedFrames, onBack }: FrameSelecti
                         <Button
                             onClick={() => exportToProject(userSession!.token)}
                             disabled={api.loading}
+                            loading={api.loading}
                         >
-                            {api.loading
-                                ? `Exporting...`
-                                : `Export to Project (${selectedFrames.length})`}
+                            {`Export ${
+                                selectedFrames.length === 1
+                                    ? '1 frame'
+                                    : `${selectedFrames.length} frames`
+                            }`}
                         </Button>
                     )}
                 </div>

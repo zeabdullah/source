@@ -3,8 +3,8 @@ import {
     IconPage16,
     LoadingIndicator,
     Stack,
-    Text,
     Textbox,
+    useInitialFocus,
     VerticalSpace,
 } from '@create-figma-plugin/ui'
 import { Fragment, h } from 'preact'
@@ -192,6 +192,7 @@ export function ProjectList({ selectedFrames }: ProjectListProps) {
 
             <VerticalSpace space="medium" />
             <Textbox
+                {...useInitialFocus()}
                 icon={<IconPage16 />}
                 placeholder="Enter your file key..."
                 value={fileKey}
