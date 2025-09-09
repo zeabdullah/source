@@ -1,6 +1,8 @@
 import {
+    Banner,
     Button,
     IconPage16,
+    IconWarning16,
     LoadingIndicator,
     Stack,
     Textbox,
@@ -145,10 +147,10 @@ export function ProjectList({ selectedFrames }: ProjectListProps) {
     }
 
     return (
-        <Fragment>
+        <Stack space="medium">
             {showTokenInput && (
-                <Fragment>
-                    <div class="border rounded p-3 bg-yellow-100 mb-3">
+                <div class="border rounded p-3 bg-yellow-100 mb-3">
+                    <Stack space="small">
                         <p class="text-sm font-medium text-yellow-800 mb-2">
                             Figma Access Token Required
                         </p>
@@ -161,7 +163,6 @@ export function ProjectList({ selectedFrames }: ProjectListProps) {
                             onValueInput={setFigmaAccessToken}
                             password
                         />
-                        <VerticalSpace space="small" />
                         <div class="flex gap-2">
                             <Button
                                 onClick={handleTokenSubmit}
@@ -182,15 +183,14 @@ export function ProjectList({ selectedFrames }: ProjectListProps) {
                                 Cancel
                             </Button>
                         </div>
-                    </div>
-                </Fragment>
+                    </Stack>
+                </div>
             )}
 
             <p class="text-sm font-medium pb-2">
                 Select a project to connect with this Figma file:
             </p>
 
-            <VerticalSpace space="medium" />
             <Textbox
                 {...useInitialFocus()}
                 icon={<IconPage16 />}
@@ -198,8 +198,11 @@ export function ProjectList({ selectedFrames }: ProjectListProps) {
                 value={fileKey}
                 onValueInput={setFileKey}
             />
-            <VerticalSpace space="medium" />
-            {fileKeyError && <div class="text-red-600 text-sm">{fileKeyError}</div>}
+            {fileKeyError && (
+                <Banner icon={<IconWarning16 />} variant="warning">
+                    {fileKeyError}
+                </Banner>
+            )}
 
             {isProjectsLoading ? (
                 <p class="text-center text-neutral-600">Loading projects...</p>
@@ -218,17 +221,19 @@ export function ProjectList({ selectedFrames }: ProjectListProps) {
                             >
                                 <p class="text-sm font-medium">{project.name}</p>
                                 {project.description && (
-                                    <p class="text-neutral-400">{project.description}</p>
+                                    <p class="text-neutral-400 line-clamp-2">
+                                        {project.description}
+                                    </p>
                                 )}
                                 {project.figma_file_name && (
                                     <div class="text-blue-400">📎 {project.figma_file_name}</div>
                                 )}
-                                {isConnectingProject && <LoadingIndicator class="w-fit" />}
+                                {isConnectingProject && <LoadingIndicator />}
                             </Stack>
                         </div>
                     ))}
                 </div>
             )}
-        </Fragment>
+        </Stack>
     )
 }
