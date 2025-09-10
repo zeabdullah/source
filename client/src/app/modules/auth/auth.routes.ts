@@ -3,6 +3,11 @@ import { redirectToDashboardIfLoggedInGuard } from './shared/guards/redirect-to-
 
 export const authRoutes: Routes = [
     {
+        path: '',
+        redirectTo: 'login',
+        pathMatch: 'full',
+    },
+    {
         path: 'login',
         loadComponent: () => import('./containers/login/login').then(m => m.Login),
         canActivate: [redirectToDashboardIfLoggedInGuard],

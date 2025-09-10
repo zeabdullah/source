@@ -30,7 +30,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ## Consistency
 
-- When in doubt, prefer convention and consistency based on the structure around you.
+- When in doubt, prefer and follow convention and consistency based on the file/folder structure around you.
 - Refer to `/eslint.config.js` for lint rules, and make sure to ALWAYS abide by them.
 - ALWAYS prefer to use Angular's schematics over manually creating files, using `ng generate`.
     - E.g. To create an interface, use:
@@ -42,6 +42,9 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 ## Components
 
 - Keep components small and focused on a single responsibility
+- Use primeng and primeicons, in combination with Tailwind, when creating components, when possible
+    - Consider PrimeNG before making any components from scratch
+    - Refer to `src/app/primeng.preset.ts` for the style presets, in addition to `src/app/app.config.ts` for configurations
 - Use `input()` and `output()` functions instead of decorators
 - Use `computed()` for derived state
 - Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component` decorator
@@ -49,17 +52,10 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Prefer Reactive forms instead of Template-driven ones
 - Do NOT use `ngClass`, use `class` bindings instead
 - Do NOT use `ngStyle`, use `style` bindings instead
-- Components should go to `src/app/`.
 - Use `ng g c <component-name>` command to create a component
 - Components should be named with **PascalCase**, without a `Component` suffix.
     - Example: `ProfilePhoto`, `Button`
         - NOT `ProfilePhotoComponent`, `ButtonComponent`
-
-### Pages
-
-- Page are also components.
-- Page components should go into `src/app/pages/`
-- All component rules stated above apply to pages too, except NEVER inline templates.
 
 ## State Management
 

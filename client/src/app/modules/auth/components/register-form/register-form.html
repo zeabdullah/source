@@ -8,88 +8,79 @@
     }
 
     <form class="mb-8 space-y-8" [formGroup]="registerFb" (ngSubmit)="register()">
-        <fieldset [disabled]="isLoading()" class="space-y-4">
-            <div>
-                <label>
-                    <span class="mb-1 block text-label-text">Full Name</span>
-                    <input
-                        formControlName="name"
-                        type="text"
-                        name="name"
-                        class="w-full rounded-xl border-2 border-gray-300 px-4 py-2.5 outline-brand-500 placeholder:text-gray-300 focus:border-brand-500"
-                        placeholder="John Appleseed"
-                        required
-                    />
-                </label>
-                @if (registerFb.get('name')?.invalid && registerFb.get('name')?.touched) {
-                <div class="text-sm text-danger-500">Required</div>
+        <fieldset class="space-y-4" [disabled]="isLoading()">
+            <div class="flex flex-col gap-1">
+                <label class="text-label-text">Full Name</label>
+                <input
+                    pInputText
+                    formControlName="name"
+                    type="text"
+                    name="name"
+                    placeholder="John Appleseed"
+                    required
+                    [invalid]="isInvalid('name')"
+                />
+                @if (isInvalid('name')) {
+                <p-message severity="error" variant="simple">Required</p-message>
                 }
             </div>
-            <div>
-                <label>
-                    <span class="mb-1 block text-label-text">Email Address</span>
-                    <input
-                        formControlName="email"
-                        type="email"
-                        name="email"
-                        class="w-full rounded-xl border-2 border-gray-300 px-4 py-2.5 outline-brand-500 placeholder:text-gray-300 focus:border-brand-500"
-                        placeholder="john@example.com"
-                        required
-                    />
-                </label>
-                @if (registerFb.get('email')?.invalid && registerFb.get('email')?.touched) {
-                <div class="text-sm text-danger-500">
-                    {{registerFb.get('email')?.getError('email') ? 'Must be a valid email' :
-                    'Required'}}
-                </div>
+            <div class="flex flex-col gap-1">
+                <label class="text-label-text">Email Address</label>
+                <input
+                    pInputText
+                    formControlName="email"
+                    type="email"
+                    name="email"
+                    placeholder="john@example.com"
+                    required
+                    [invalid]="isInvalid('email')"
+                />
+                @if (isInvalid('email')) {
+                <p-message severity="error" variant="simple">
+                    {{ registerFb.get('email')?.getError('email') ? 'Must be a valid email' :
+                    'Required' }}
+                </p-message>
                 }
             </div>
-            <div>
-                <label>
-                    <span class="mb-1 block text-label-text">Password</span>
-                    <input
-                        formControlName="password"
-                        type="password"
-                        name="password"
-                        class="w-full rounded-xl border-2 border-gray-300 px-4 py-2.5 outline-brand-500 placeholder:text-gray-300 focus:border-brand-500"
-                        required
-                    />
-                </label>
-                @if (registerFb.get('password')?.invalid && registerFb.get('password')?.touched) {
-                <div class="text-sm text-danger-500">
-                    {{ registerFb.get('password')?.getError('required') ? 'Required' : 'Must be at
-                    least 8 characters long'}}
-                </div>
+            <div class="flex flex-col gap-1">
+                <label class="text-label-text">Password</label>
+                <input
+                    pInputText
+                    formControlName="password"
+                    type="password"
+                    name="password"
+                    required
+                    [invalid]="isInvalid('password')"
+                />
+                @if (isInvalid('password')) {
+                <p-message severity="error" variant="simple">
+                    {{ registerFb.get('password')?.getError('required') ? 'Required' : `Must be at
+                    least 8 characters long` }}
+                </p-message>
                 }
             </div>
-            <div>
-                <label>
-                    <span class="mb-1 block text-label-text">Confirm Password</span>
-                    <input
-                        formControlName="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        class="w-full rounded-xl border-2 border-gray-300 px-4 py-2.5 outline-brand-500 placeholder:text-gray-300 focus:border-brand-500"
-                        required
-                    />
-                </label>
-                @if (registerFb.get('password_confirmation')?.invalid &&
-                registerFb.get('password_confirmation')?.touched) {
-                <div class="text-sm text-danger-500">
-                    {{ registerFb.get('password_confirmation')?.getError('passwordMismatch') ?
-                    'Passwords must match' : 'Required' }}
-                </div>
+            <div class="flex flex-col gap-1">
+                <label class="text-label-text">Confirm Password</label>
+                <input
+                    pInputText
+                    formControlName="password_confirmation"
+                    type="password"
+                    name="password_confirmation"
+                    required
+                    [invalid]="isInvalid('password_confirmation')"
+                />
+                @if (isInvalid('password_confirmation')) {
+                <p-message severity="error" variant="simple"
+                    >{{ registerFb.get('password_confirmation')?.getError('passwordMismatch') ?
+                    'Passwords must match' : 'Required' }}</p-message
+                >
                 }
             </div>
         </fieldset>
 
-        <button
-            [disabled]="!registerFb.valid || isLoading()"
-            type="submit"
-            class="flex w-full items-center justify-center rounded-xl bg-brand-500 p-2 font-bold text-white disabled:opacity-50"
-        >
-            Create account →
-        </button>
+        <p-button type="submit" fluid [disabled]="!registerFb.valid" [loading]="isLoading()">
+            Create account
+        </p-button>
     </form>
 
     <div class="text-center text-button text-gray-700">
