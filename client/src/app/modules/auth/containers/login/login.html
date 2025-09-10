@@ -1,8 +1,8 @@
 <div class="flex min-h-full flex-col items-stretch justify-center gap-y-8 p-4">
     <app-logo class="mx-auto" />
 
-    <div class="shadow-xs mx-auto w-full max-w-[580px] rounded-3xl border border-gray-200 p-14">
-        <h1 class="text-h2 mb-14 text-center font-bold tracking-tight">Log in to your account</h1>
+    <div class="mx-auto w-full max-w-[580px] rounded-3xl border border-gray-200 p-14 shadow-xs">
+        <h1 class="mb-14 text-center text-h2 font-bold tracking-tight">Log in to your account</h1>
 
         @if (errorMessage()) {
         <div class="mb-4">
@@ -13,9 +13,10 @@
         <form class="mb-8 space-y-8" [formGroup]="loginForm" (ngSubmit)="login()">
             <fieldset class="space-y-4" [disabled]="isLoading()">
                 <div class="flex flex-col gap-1">
-                    <label class="text-label-text">Email Address</label>
+                    <label for="email" class="text-label-text">Email Address</label>
                     <input
                         pInputText
+                        id="email"
                         formControlName="email"
                         type="email"
                         name="email"
@@ -30,9 +31,10 @@
                     }
                 </div>
                 <div class="flex flex-col gap-1">
-                    <label class="text-label-text">Password</label>
+                    <label for="password" class="text-label-text">Password</label>
                     <input
                         pInputText
+                        id="password"
                         formControlName="password"
                         type="password"
                         name="password"
@@ -47,7 +49,7 @@
                 <div class="text-end">
                     <a
                         routerLink="/auth/forgot-password"
-                        class="text-button text-brand-500 font-bold hover:underline"
+                        class="text-button font-bold text-brand-500 hover:underline"
                     >
                         Forgot password?
                     </a>
@@ -59,9 +61,9 @@
             </p-button>
         </form>
 
-        <div class="text-button text-center text-gray-700">
+        <div class="text-center text-button text-gray-700">
             Don't have an account?
-            <a routerLink="/auth/register" class="text-brand-500 font-bold hover:underline"
+            <a routerLink="/auth/register" class="font-bold text-brand-500 hover:underline"
                 >Create an account</a
             >.
         </div>
