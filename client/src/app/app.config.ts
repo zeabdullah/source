@@ -23,7 +23,13 @@ export const appConfig: ApplicationConfig = {
         providePrimeNG({
             theme: {
                 preset: primengPreset,
-                options: { darkModeSelector: 'light' },
+                options: {
+                    darkModeSelector: 'light',
+                    cssLayer: {
+                        name: 'primeng',
+                        order: 'theme, base, primeng',
+                    },
+                },
             },
         }),
     ],

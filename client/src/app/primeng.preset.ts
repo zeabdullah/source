@@ -17,4 +17,13 @@ export const primengPreset = definePreset(Aura, {
             950: '{purple.950}',
         },
     },
+    components: {
+        inputtext: {
+            root: {
+                borderRadius: '{borderRadius.xl}',
+                paddingY: '10px',
+                paddingX: '16px',
+            },
+        },
+    },
 })
