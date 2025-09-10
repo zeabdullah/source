@@ -1,0 +1,9 @@
+<a [routerLink]="['/dashboard', 'projects', project().id]" class="group">
+    <div
+        class="mb-4 flex h-[230px] items-center justify-center rounded-2xl border border-black/10 bg-gray-100 group-hover:bg-gray-200"
+    >
+        <img src="/source-logo-minimal-gray.svg" />
+    </div>
+    <p class="mb-2 text-caption font-semibold">{{project().name}}</p>
+    <p class="text-[13px] text-gray-500">Last viewed <span>{{project().updated_at}}</span> ago</p>
+</a>
