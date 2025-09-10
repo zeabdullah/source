@@ -2,16 +2,16 @@ import { ChangeDetectionStrategy, Component, signal, inject, OnInit } from '@ang
 import { Router, RouterLink } from '@angular/router'
 import { Validators, ReactiveFormsModule, NonNullableFormBuilder } from '@angular/forms'
 import { HttpErrorResponse } from '@angular/common/http'
-import { MessageModule } from 'primeng/message'
+import { Message } from 'primeng/message'
 import { BASE_URL } from '~/shared/constants/http.constants'
 import { AuthService } from '~/shared/services/auth.service'
 import { Logo } from '~/shared/components/logo/logo'
-import { InputTextModule } from 'primeng/inputtext'
-import { ButtonModule } from 'primeng/button'
+import { InputText } from 'primeng/inputtext'
+import { Button } from 'primeng/button'
 
 @Component({
     selector: 'app-login',
-    imports: [RouterLink, ReactiveFormsModule, Logo, MessageModule, InputTextModule, ButtonModule],
+    imports: [RouterLink, ReactiveFormsModule, Logo, Message, InputText, Button],
     templateUrl: './login.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
