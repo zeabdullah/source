@@ -1,6 +1,0 @@
-## Plugin integration with the app
-- auth the user to source backend
-- get the Frame IDs from the plugin
-- push them from the plugin to the backend
-- the backend exposes the ids through another api endpoint
-- the frontend requests urls of the image version of the frames from backend, and displays it
