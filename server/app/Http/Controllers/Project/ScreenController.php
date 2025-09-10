@@ -136,50 +136,6 @@ class ScreenController extends Controller
 
     public function regenerateDescription(Request $request, string $projectId, string $screenId, ScreenService $screenService): JsonResponse
     {
-        $this->notImplementedResponse();
-    }
-
-    public function updateScreenById(Request $request, string $screenId)
-    {
-        $validated = $request->validate([
-            'section_name' => 'nullable|string|max:255',
-        ]);
-
-        $screen = Screen::find($screenId);
-
-        if (!$screen) {
-            return $this->notFoundResponse('Screen not found');
-        }
-
-        try {
-            $screen->updateOrFail($validated);
-            $screen->refresh();
-            return $this->responseJson($screen, 'Updated successfully');
-        } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to update Screen: ' . $th->getMessage());
-        }
-
-    }
-
-    public function deleteScreenById(Request $request, string $projectId, string $screenId): JsonResponse
-    {
-        $screen = Screen::find($screenId);
-
-        if (!$screen) {
-            return $this->notFoundResponse('Screen not found');
-        }
-
-        try {
-            $screen->deleteOrFail();
-            return $this->responseJson($screen, 'Screen deleted');
-        } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to delete screen: ' . $th->getMessage());
-        }
-
-    }
-
-    public function regenerateDescription(Request $request, string $projectId, string $screenId, ScreenService $screenService): JsonResponse
-    {
-        $this->notImplementedResponse();
+        return $this->notImplementedResponse();
     }
 }
