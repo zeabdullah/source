@@ -18,8 +18,6 @@ class Screen extends Model
         'figma_svg_url',
         'figma_node_id',
         'data',
-        'figma_node_id',
-        'data',
     ];
 
     protected $visible = [
