@@ -25,5 +25,10 @@ export const primengPreset = definePreset(Aura, {
                 paddingX: '16px',
             },
         },
+        button: {
+            root: {
+                borderRadius: '14px',
+            },
+        },
     },
 })

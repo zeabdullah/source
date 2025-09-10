@@ -8,14 +8,14 @@ import {
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { HttpErrorResponse } from '@angular/common/http'
-import { MessageModule } from 'primeng/message'
-import { ButtonModule } from 'primeng/button'
-import { InputTextModule } from 'primeng/inputtext'
+import { Message } from 'primeng/message'
+import { Button } from 'primeng/button'
+import { InputText } from 'primeng/inputtext'
 import { AuthService } from '~/shared/services/auth.service'
 
 @Component({
     selector: 'app-register-form',
-    imports: [ReactiveFormsModule, RouterLink, MessageModule, InputTextModule, ButtonModule],
+    imports: [ReactiveFormsModule, RouterLink, Message, InputText, Button],
     templateUrl: './register-form.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

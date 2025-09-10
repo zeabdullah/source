@@ -13,9 +13,10 @@
         <form class="mb-8 space-y-8" [formGroup]="loginForm" (ngSubmit)="login()">
             <fieldset class="space-y-4" [disabled]="isLoading()">
                 <div class="flex flex-col gap-1">
-                    <label class="text-label-text">Email Address</label>
+                    <label for="email" class="text-label-text">Email Address</label>
                     <input
                         pInputText
+                        id="email"
                         formControlName="email"
                         type="email"
                         name="email"
@@ -30,9 +31,10 @@
                     }
                 </div>
                 <div class="flex flex-col gap-1">
-                    <label class="text-label-text">Password</label>
+                    <label for="password" class="text-label-text">Password</label>
                     <input
                         pInputText
+                        id="password"
                         formControlName="password"
                         type="password"
                         name="password"
