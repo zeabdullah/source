@@ -8,11 +8,14 @@ import {
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { HttpErrorResponse } from '@angular/common/http'
+import { MessageModule } from 'primeng/message'
+import { ButtonModule } from 'primeng/button'
+import { InputTextModule } from 'primeng/inputtext'
 import { AuthService } from '~/shared/services/auth.service'
 
 @Component({
     selector: 'app-register-form',
-    imports: [ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink, MessageModule, InputTextModule, ButtonModule],
     templateUrl: './register-form.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -40,6 +43,11 @@ export class RegisterForm {
         }
 
         return null
+    }
+
+    isInvalid(controlName: string): boolean | undefined {
+        const control = this.registerFb.get(controlName)
+        return control?.invalid && control?.touched
     }
 
     register(): void {

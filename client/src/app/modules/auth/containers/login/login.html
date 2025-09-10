@@ -5,42 +5,42 @@
         <h1 class="mb-14 text-center text-h2 font-bold tracking-tight">Log in to your account</h1>
 
         @if (errorMessage()) {
-        <div class="mb-4 rounded-lg bg-danger-100 p-4 text-sm text-danger-700">
-            {{ errorMessage() }}
+        <div class="mb-4">
+            <p-message severity="error"> {{ errorMessage() }} </p-message>
         </div>
         }
 
         <form class="mb-8 space-y-8" [formGroup]="loginForm" (ngSubmit)="login()">
-            <fieldset [disabled]="isLoading()" class="space-y-4">
-                <div>
-                    <label>
-                        <span class="mb-1 block text-label-text">Email Address</span>
-                        <input
-                            formControlName="email"
-                            type="email"
-                            name="email"
-                            class="w-full rounded-xl border-2 border-gray-300 px-4 py-2.5 outline-brand-500 placeholder:text-gray-300 focus:border-brand-500"
-                            placeholder="john@example.com"
-                            required
-                        />
-                    </label>
+            <fieldset class="space-y-4" [disabled]="isLoading()">
+                <div class="flex flex-col gap-1">
+                    <label class="text-label-text">Email Address</label>
+                    <input
+                        pInputText
+                        formControlName="email"
+                        type="email"
+                        name="email"
+                        class="w-full"
+                        placeholder="john@example.com"
+                        [invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+                    />
                     @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
-                    <div class="text-sm text-danger-500">Must be a valid email.</div>
+                    <p-message severity="error" variant="simple">
+                        Must be a valid email.
+                    </p-message>
                     }
                 </div>
-                <div>
-                    <label>
-                        <span class="mb-1 block text-label-text">Password</span>
-                        <input
-                            formControlName="password"
-                            type="password"
-                            name="password"
-                            class="w-full rounded-xl border-2 border-gray-300 px-4 py-2.5 outline-brand-500 placeholder:text-gray-300 focus:border-brand-500"
-                            required
-                        />
-                    </label>
+                <div class="flex flex-col gap-1">
+                    <label class="text-label-text">Password</label>
+                    <input
+                        pInputText
+                        formControlName="password"
+                        type="password"
+                        name="password"
+                        class="w-full"
+                        [invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+                    />
                     @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-                    <div class="text-sm text-danger-500">Password is required.</div>
+                    <p-message severity="error" variant="simple">Password is required.</p-message>
                     }
                 </div>
 
@@ -54,13 +54,9 @@
                 </div>
             </fieldset>
 
-            <button
-                [disabled]="!loginForm.valid || isLoading()"
-                type="submit"
-                class="flex w-full items-center justify-center rounded-xl bg-brand-500 p-2 font-bold text-white disabled:opacity-50"
-            >
-                @if (isLoading()) { Logging in... } @else { Log in → }
-            </button>
+            <p-button type="submit" fluid [disabled]="!loginForm.valid" [loading]="isLoading()">
+                @if (isLoading()) { Logging in... } @else { Log in }
+            </p-button>
         </form>
 
         <div class="text-center text-button text-gray-700">
