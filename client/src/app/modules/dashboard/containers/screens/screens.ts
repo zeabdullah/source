@@ -1,26 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core'
+import { FormsModule } from '@angular/forms'
 import { SelectModule } from 'primeng/select'
 import { InputTextModule } from 'primeng/inputtext'
 import { ButtonModule } from 'primeng/button'
 import { AvatarModule } from 'primeng/avatar'
-import { CardModule } from 'primeng/card'
-import { FormsModule } from '@angular/forms'
 import { DrawerModule } from 'primeng/drawer'
-import { ScreenDetails } from '../../components/screen-details/screen-details'
-
-interface SelectOption {
-    name: string
-    value: string
-}
-
-interface Screen {
-    id: number
-    name: string
-    section_name: string
-    image: string
-    device: string
-    release: string
-}
+import { SelectOption } from '~/modules/dashboard/shared/interfaces/select-option.interface'
+import { Screen } from '~/modules/dashboard/shared/interfaces/screen.interface'
+import { ExpandedImage } from '../../components/expanded-image/expanded-image'
+import { TabsModule } from 'primeng/tabs'
+import { AiChatMessage } from '../../components/ai-chat-message/ai-chat-message'
+import { Comment } from '../../components/comment/comment'
 
 @Component({
     selector: 'app-screens',
@@ -29,16 +19,22 @@ interface Screen {
         SelectModule,
         FormsModule,
         DrawerModule,
-        ScreenDetails,
         ButtonModule,
         AvatarModule,
-        CardModule,
+        ExpandedImage,
+        TabsModule,
+        AiChatMessage,
+        Comment,
     ],
     templateUrl: './screens.html',
+    styles: `
+        ::ng-deep .p-drawer-content {
+            overflow: hidden;
+            padding-inline-end: 0;
+            padding-bottom: 0;
+        }
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    host: {
-        class: 'block',
-    },
 })
 export class Screens {
     releases = [
@@ -57,9 +53,8 @@ export class Screens {
 
     shownScreenId = signal<number | null>(null)
     drawerVisible = false
-    activeTab = signal<'comments' | 'ai-chat'>('comments')
+    activeTab: 'comments' | 'ai-chat' = 'comments'
 
-    // Screen data
     screens: Screen[] = [
         // Signup & Onboarding
         {
@@ -245,7 +240,6 @@ export class Screens {
             release: '1.0.1',
         },
     ]
-
     comments = [
         {
             id: 1,
@@ -298,10 +292,9 @@ export class Screens {
             timestamp: '2024-01-16T10:01:30Z',
         },
     ])
-
     newMessage = signal('')
+    newComment = signal('')
 
-    // Filter screens based on selected device and release
     filteredScreens = computed(() => {
         return this.screens.filter(screen => {
             const deviceMatch = screen.device === this.selectedDevice()
@@ -330,12 +323,6 @@ export class Screens {
         }))
     })
 
-    constructor() {
-        effect(() => {
-            console.log('showing screen:', this.shownScreenId())
-        })
-    }
-
     showScreenDetails(screenId: number) {
         this.shownScreenId.set(screenId)
         this.drawerVisible = true
@@ -344,10 +331,6 @@ export class Screens {
     closeExpandedScreen() {
         this.shownScreenId.set(null)
         this.drawerVisible = false
-    }
-
-    setActiveTab(tab: 'comments' | 'ai-chat') {
-        this.activeTab.set(tab)
     }
 
     sendMessage() {
@@ -374,14 +357,20 @@ export class Screens {
         }
     }
 
-    formatDate(dateString: string): string {
-        const date = new Date(dateString)
-        return date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        })
+    sendComment() {
+        if (this.newComment().trim()) {
+            const newComment = {
+                id: this.comments.length + 1,
+                user: {
+                    name: 'Current User',
+                    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face',
+                },
+                date: new Date().toISOString(),
+                content: this.newComment(),
+            }
+            this.comments.push(newComment)
+            this.newComment.set('')
+        }
     }
 
     getScreenById(id: number) {

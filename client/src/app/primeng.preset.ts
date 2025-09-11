@@ -18,6 +18,9 @@ export const primengPreset = definePreset(Aura, {
         },
     },
     components: {
+        tabs: {
+            tabpanel: { padding: '1.5rem 0' },
+        },
         select: {
             overlay: { borderRadius: '12px' },
             option: { borderRadius: '8px' },
