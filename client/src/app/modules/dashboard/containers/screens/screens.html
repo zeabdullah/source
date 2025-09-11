@@ -12,10 +12,96 @@
     [(visible)]="drawerVisible"
     header="Screen Details"
     position="right"
-    styleClass="w-full max-w-[450px]"
     closable="false"
+    closeOnEscape="false"
+    styleClass="w-full max-w-[450px]"
 >
-    <p>Hello! You selected screen ID: {{ shownScreenId() }}</p>
+    <div class="flex h-full flex-col">
+        <!-- Tab Buttons -->
+        <div class="mb-4 flex border-b border-gray-200">
+            <p-button
+                (onClick)="setActiveTab('comments')"
+                [text]="true"
+                [severity]="activeTab() === 'comments' ? 'primary' : 'secondary'"
+                label="Comments"
+                class="flex-1"
+                [class]="activeTab() === 'comments' ? 'border-b-2 border-blue-500' : ''"
+            />
+            <p-button
+                (onClick)="setActiveTab('ai-chat')"
+                [text]="true"
+                [severity]="activeTab() === 'ai-chat' ? 'primary' : 'secondary'"
+                label="AI Chat"
+                class="flex-1"
+                [class]="activeTab() === 'ai-chat' ? 'border-b-2 border-blue-500' : ''"
+            />
+        </div>
+
+        <!-- Tab Content -->
+        <div class="flex-1 overflow-hidden">
+            @if (activeTab() === 'comments') {
+            <!-- Comments Section -->
+            <div class="h-full overflow-y-auto">
+                <div class="space-y-6 divide-y divide-black/5">
+                    @for (comment of comments; track comment.id) {
+                    <div class="flex gap-3 p-3">
+                        <p-avatar [image]="comment.user.avatar" size="normal" shape="circle" />
+                        <div class="flex-1">
+                            <div class="flex items-baseline justify-between gap-2">
+                                <span class="text-sm font-semibold">{{ comment.user.name }}</span>
+                                <span class="text-xs text-gray-500">
+                                    {{ formatDate(comment.date) }}
+                                </span>
+                            </div>
+                            <p class="mt-1 text-[16px] text-gray-700">{{ comment.content }}</p>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+            } @else {
+            <!-- AI Chat Section -->
+            <div class="flex h-full flex-col">
+                <!-- Chat Messages -->
+                <div class="flex-1 space-y-4 overflow-y-auto p-2">
+                    @for (message of aiChatMessages(); track message.id) {
+                    <div
+                        [class]="message.type === 'user' ? 'flex justify-end' : 'flex justify-start'"
+                    >
+                        <div
+                            [class]="message.type === 'user'
+                                ? 'max-w-4/5 bg-brand-500 text-white border-brand-500'
+                                : 'max-w-4/5 bg-gray-100 border border-gray-200 text-gray-700'"
+                            class="rounded-2xl p-4"
+                        >
+                            <p class="text-sm">{{ message.content + message.content }}</p>
+                        </div>
+                    </div>
+                    }
+                </div>
+
+                <!-- Chat Input -->
+                <div class="border-t border-gray-200 p-3">
+                    <div class="flex gap-2">
+                        <input
+                            pInputText
+                            [(ngModel)]="newMessage"
+                            (keydown.enter)="sendMessage()"
+                            placeholder="Ask about this screen..."
+                            class="flex-1"
+                        />
+                        <p-button
+                            (onClick)="sendMessage()"
+                            [disabled]="!newMessage().trim()"
+                            icon="pi pi-send"
+                            size="large"
+                        />
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
 </p-drawer>
 
 <!-- Main content area -->
