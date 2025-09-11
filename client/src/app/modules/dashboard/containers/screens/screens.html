@@ -1,0 +1,77 @@
+<div class="mb-16 flex gap-4">
+    <div class="flex flex-col gap-1">
+        <label for="release">Release</label>
+        <p-select
+            [options]="releases"
+            [(ngModel)]="selectedRelease"
+            [checkmark]="true"
+            optionLabel="name"
+            optionValue="value"
+            placeholder="Release..."
+            class="w-44 basis-full lg:w-56"
+        />
+    </div>
+    <div class="flex flex-col gap-1">
+        <label for="device">Device</label>
+        <p-select
+            [options]="devices"
+            [(ngModel)]="selectedDevice"
+            [checkmark]="true"
+            optionLabel="name"
+            optionValue="value"
+            placeholder="Device..."
+            class="w-44 basis-full lg:w-56"
+        />
+    </div>
+    <div class="flex flex-col gap-1">
+        <label for="Language">Language</label>
+        <p-select
+            [options]="languages"
+            [(ngModel)]="selectedLanguage"
+            [checkmark]="true"
+            optionLabel="name"
+            optionValue="value"
+            placeholder="Language..."
+            class="w-44 basis-full lg:w-56"
+        />
+    </div>
+</div>
+
+<div class="space-y-12">
+    <section>
+        <h3 class="mb-4 font-bold">Signup & Onboarding</h3>
+        <div class="scrollbar-hidden flex w-full gap-4 overflow-x-auto">
+            @for (i of [0,1,2,3,4,5,6,7]; track $index) {
+            <a
+                routerLink=":screenId?device=iphone_15"
+                class="flex min-w-fit items-center justify-center rounded-2xl border border-black/10 bg-gray-100"
+            >
+                <img
+                    src="/app-screen-mobile.png"
+                    alt=""
+                    width="200"
+                    class="h-80 w-[260px] object-cover"
+                />
+            </a>
+            }
+        </div>
+    </section>
+    <section>
+        <h3 class="mb-4 font-bold">Forgot Password</h3>
+        <div class="scrollbar-hidden flex w-full gap-4 overflow-x-auto">
+            @for (i of [0,1,2,3]; track $index) {
+            <a
+                routerLink=":screenId?device=iphone_15"
+                class="flex min-w-fit items-center justify-center rounded-2xl border border-black/10 bg-gray-100"
+            >
+                <img
+                    src="/app-screen-mobile.png"
+                    alt=""
+                    width="200"
+                    class="h-80 w-[260px] object-cover"
+                />
+            </a>
+            }
+        </div>
+    </section>
+</div>

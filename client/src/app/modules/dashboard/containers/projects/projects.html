@@ -1,0 +1,22 @@
+<header class="mb-12 flex items-center justify-between gap-4">
+    <h1 class="text-h1 font-extrabold tracking-tighter">Welcome, Abdullah</h1>
+    <p-button icon="pi pi-plus" label="New Project" class="shrink-0" />
+</header>
+
+<section>
+    <div class="mb-8 flex items-center justify-between gap-4">
+        <h2 class="text-h3 font-bold">Recents</h2>
+        <p-buttongroup>
+            <p-button size="small" icon="pi pi-list" severity="secondary" variant="outlined" />
+            <p-button size="small" icon="pi pi-th-large" severity="secondary" />
+        </p-buttongroup>
+    </div>
+
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6 lg:gap-8">
+        @for (i of [0,1,2,3,4,5]; track $index) {
+        <app-project-card
+            [project]="{ id: i, name: `Abdullah's Project ${i}`, updated_at: '2 days' }"
+        />
+        }
+    </div>
+</section>

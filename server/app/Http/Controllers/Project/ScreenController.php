@@ -136,6 +136,6 @@ class ScreenController extends Controller
 
     public function regenerateDescription(Request $request, string $projectId, string $screenId, ScreenService $screenService): JsonResponse
     {
-        $this->notImplementedResponse();
+        return $this->notImplementedResponse();
     }
 }
