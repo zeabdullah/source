@@ -1,0 +1,44 @@
+<div>
+    <!-- <p-select></p-select> -->
+    <div></div>
+    <div></div>
+</div>
+
+<div class="space-y-12">
+    <section>
+        <h3 class="mb-4 font-bold">Signup & Onboarding</h3>
+        <div class="scrollbar-hidden flex w-full gap-4 overflow-x-auto">
+            @for (i of [0,1,2,3,4,5,6,7]; track $index) {
+            <a
+                routerLink=":screenId?device=iphone_15"
+                class="flex min-w-fit items-center justify-center rounded-2xl border border-black/10 bg-gray-100"
+            >
+                <img
+                    src="/app-screen-mobile.png"
+                    alt=""
+                    width="200"
+                    class="h-80 w-[260px] object-cover"
+                />
+            </a>
+            }
+        </div>
+    </section>
+    <section>
+        <h3 class="mb-4 font-bold">Forgot Password</h3>
+        <div class="scrollbar-hidden flex w-full gap-4 overflow-x-auto">
+            @for (i of [0,1,2,3]; track $index) {
+            <a
+                routerLink=":screenId?device=iphone_15"
+                class="flex min-w-fit items-center justify-center rounded-2xl border border-black/10 bg-gray-100"
+            >
+                <img
+                    src="/app-screen-mobile.png"
+                    alt=""
+                    width="200"
+                    class="h-80 w-[260px] object-cover"
+                />
+            </a>
+            }
+        </div>
+    </section>
+</div>

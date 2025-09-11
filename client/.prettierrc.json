@@ -2,7 +2,7 @@
     "arrowParens": "avoid",
     "bracketSpacing": true,
     "endOfLine": "lf",
-    "htmlWhitespaceSensitivity": "css",
+    "htmlWhitespaceSensitivity": "ignore",
     "bracketSameLine": false,
     "printWidth": 100,
     "proseWrap": "preserve",
@@ -15,5 +15,6 @@
     "useTabs": false,
 
     "plugins": ["prettier-plugin-tailwindcss"],
-    "tailwindStylesheet": "./src/styles.css"
+    "tailwindStylesheet": "./src/styles.css",
+    "tailwindAttributes": ["routerLinkActive"]
 }

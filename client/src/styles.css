@@ -111,3 +111,12 @@
         cursor: pointer;
     }
 }
+
+@utility scrollbar-hidden {
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    & {
+        scrollbar-width: none;
+    }
+}
