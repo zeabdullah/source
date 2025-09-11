@@ -18,9 +18,20 @@ export const primengPreset = definePreset(Aura, {
         },
     },
     components: {
+        select: {
+            root: {
+                borderRadius: '12px',
+            },
+        },
+        textarea: {
+            root: {
+                borderRadius: '12px',
+            },
+        },
+
         inputtext: {
             root: {
-                borderRadius: '{borderRadius.xl}',
+                borderRadius: '12px',
                 paddingY: '10px',
                 paddingX: '16px',
             },

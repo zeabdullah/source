@@ -2,6 +2,15 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core'
 import { DialogModule } from 'primeng/dialog'
 import { CardModule } from 'primeng/card'
 
+interface Screen {
+    id: number
+    name: string
+    section_name: string
+    image: string
+    device: string
+    release: string
+}
+
 @Component({
     selector: 'app-screen-details',
     imports: [DialogModule, CardModule],
@@ -12,6 +21,5 @@ import { CardModule } from 'primeng/card'
     },
 })
 export class ScreenDetails {
-    id = input<number>()
-    imgSrc = input<string>()
+    screen = input<Screen>()
 }

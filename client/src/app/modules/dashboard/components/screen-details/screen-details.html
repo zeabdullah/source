@@ -1,5 +1,9 @@
-<img
-    [src]="[imgSrc()]"
-    alt="Screen Preview"
-    class="mr-auto ml-[10%] max-h-screen w-auto max-w-[50%] object-contain py-4"
-/>
+@let currentScreen = screen(); @if (currentScreen) {
+<div class="ms-[10%] me-auto flex h-screen w-fit flex-col gap-4 py-4 text-center">
+    <img
+        [src]="currentScreen.image"
+        [alt]="currentScreen.name"
+        class="h-full w-auto flex-1 object-contain shadow-lg"
+    />
+</div>
+}
