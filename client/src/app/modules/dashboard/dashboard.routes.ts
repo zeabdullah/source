@@ -49,6 +49,11 @@ export const dashboardRoutes: Routes = [
                                     ),
                             },
                             {
+                                path: 'releases',
+                                loadComponent: () =>
+                                    import('./containers/releases/releases').then(m => m.Releases),
+                            },
+                            {
                                 path: 'settings',
                                 loadComponent: () =>
                                     import('./containers/settings/settings').then(m => m.Settings),
