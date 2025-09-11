@@ -1,7 +1,40 @@
-<div>
-    <!-- <p-select></p-select> -->
-    <div></div>
-    <div></div>
+<div class="mb-16 flex gap-4">
+    <div class="flex flex-col gap-1">
+        <label for="release">Release</label>
+        <p-select
+            [options]="releases"
+            [(ngModel)]="selectedRelease"
+            [checkmark]="true"
+            optionLabel="name"
+            optionValue="value"
+            placeholder="Release..."
+            class="w-44 basis-full lg:w-56"
+        />
+    </div>
+    <div class="flex flex-col gap-1">
+        <label for="device">Device</label>
+        <p-select
+            [options]="devices"
+            [(ngModel)]="selectedDevice"
+            [checkmark]="true"
+            optionLabel="name"
+            optionValue="value"
+            placeholder="Device..."
+            class="w-44 basis-full lg:w-56"
+        />
+    </div>
+    <div class="flex flex-col gap-1">
+        <label for="Language">Language</label>
+        <p-select
+            [options]="languages"
+            [(ngModel)]="selectedLanguage"
+            [checkmark]="true"
+            optionLabel="name"
+            optionValue="value"
+            placeholder="Language..."
+            class="w-44 basis-full lg:w-56"
+        />
+    </div>
 </div>
 
 <div class="space-y-12">

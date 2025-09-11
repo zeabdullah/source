@@ -14,38 +14,43 @@ export const dashboardRoutes: Routes = [
             },
             {
                 path: 'projects',
-                component: Projects,
+                children: [
+                    {
+                        path: '',
+                        component: Projects,
+                    },
+                    {
+                        path: ':projectId',
+                        children: [
+                            {
+                                path: '',
+                                redirectTo: 'screens',
+                                pathMatch: 'full',
+                            },
+                            {
+                                path: 'screens',
+                                loadComponent: () =>
+                                    import('./containers/screens/screens').then(m => m.Screens),
+                            },
+                            {
+                                path: 'email-templates',
+                                loadComponent: () =>
+                                    import('./containers/email-templates/email-templates').then(
+                                        m => m.EmailTemplates,
+                                    ),
+                            },
+                            {
+                                path: 'settings',
+                                loadComponent: () =>
+                                    import('./containers/settings/settings').then(m => m.Settings),
+                            },
+                        ],
+                    },
+                ],
             },
             {
                 path: 'account',
                 loadComponent: () => import('./containers/account/account').then(m => m.Account),
-            },
-            {
-                path: 'projects/:projectId',
-                children: [
-                    {
-                        path: '',
-                        redirectTo: 'screens',
-                        pathMatch: 'full',
-                    },
-                    {
-                        path: 'screens',
-                        loadComponent: () =>
-                            import('./containers/screens/screens').then(m => m.Screens),
-                    },
-                    {
-                        path: 'email-templates',
-                        loadComponent: () =>
-                            import('./containers/email-templates/email-templates').then(
-                                m => m.EmailTemplates,
-                            ),
-                    },
-                    {
-                        path: 'settings',
-                        loadComponent: () =>
-                            import('./containers/settings/settings').then(m => m.Settings),
-                    },
-                ],
             },
         ],
     },
