@@ -31,6 +31,15 @@ export const primengPreset = definePreset(Aura, {
             '2xl': '24px',
         },
     },
+    primitive: {
+        borderRadius: {
+            'sm': '4px',
+            'md': '8px',
+            'lg': '12px',
+            'xl': '16px',
+            '2xl': '24px',
+        },
+    },
     components: {
         dialog: {
             root: { borderRadius: '{borderRadius.2xl}' },
