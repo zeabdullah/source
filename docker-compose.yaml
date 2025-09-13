@@ -19,7 +19,7 @@ services:
             BCRYPT_ROUNDS: 12
         healthcheck:
             test: ['CMD', 'curl', '-f', 'http://localhost/up']
-            interval: 30s
+            interval: 1m30s
             timeout: 10s
             start_period: 5s
             retries: 3
@@ -56,9 +56,9 @@ services:
                     '-q',
                     'http://localhost:5678/healthz/readiness',
                 ]
-            interval: 30s
+            interval: 1m30s
             timeout: 10s
-            start_period: 5s
+            start_period: 10s
             retries: 3
 
     db:
@@ -77,7 +77,7 @@ services:
             POSTGRES_DB: ${POSTGRES_DB}
         healthcheck:
             test: ['CMD-SHELL', 'pg_isready -U postgres']
-            interval: 30s
+            interval: 1m30s
             timeout: 5s
             start_period: 3s
             retries: 3
