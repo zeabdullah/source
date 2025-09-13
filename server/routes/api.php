@@ -55,6 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('is_owner')->group(function () {
             Route::post('/{projectId}/email-templates', [EmailTemplateController::class, 'createEmailTemplate']);
             Route::get('/{projectId}/email-templates', [EmailTemplateController::class, 'getProjectEmailTemplates']);
+            Route::put('/{projectId}/email-templates/{emailTemplateId}', [EmailTemplateController::class, 'updateEmailTemplateById']);
+            Route::delete('/{projectId}/email-templates/{emailTemplateId}', [EmailTemplateController::class, 'deleteEmailTemplateById']);
         });
     });
 

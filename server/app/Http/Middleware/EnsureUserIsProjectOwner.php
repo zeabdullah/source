@@ -31,6 +31,8 @@ class EnsureUserIsProjectOwner
             ], 404);
         }
 
+        $request->attributes->set('project', $project);
+
         return $next($request);
     }
 }
