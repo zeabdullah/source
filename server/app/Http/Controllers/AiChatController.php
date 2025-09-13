@@ -3,27 +3,114 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use App\Models\AiChat;
+use App\Models\EmailTemplate;
 use App\Models\Screen;
 use App\Services\AiAgentService;
 use App\Services\FigmaService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Gemini\Data\Content;
 use Gemini\Enums\Role;
 
 class AiChatController extends Controller
 {
-    public function sendScreenChatMessage(Request $request, string $screenId, AiAgentService $aiAgentService, FigmaService $figmaService)
+    /**
+     * Used for the AI response webhook from N8n.
+     */
+    public function createAiChatResponseForEmailTemplate(Request $request, string $emailTemplateId): JsonResponse
     {
         $validated = $request->validate([
-            'content' => 'required|string|max:2500',
+            'content' => 'required|string',
+        ]);
+        $aiMsg = $validated['content'];
+
+        try {
+            $emailTemplate = EmailTemplate::find($emailTemplateId);
+            if (!$emailTemplate) {
+                return $this->notFoundResponse('Email template not found');
+            }
+
+            $chatMsg = new AiChat(['content' => $aiMsg]);
+            $chatMsg->sender = 'ai';
+            $chatMsg->commentable_id = $emailTemplateId;
+            $chatMsg->commentable_type = EmailTemplate::class;
+            $chatMsg->saveOrFail();
+
+            return $this->responseJson($chatMsg->fresh(), 'AI chat message created successfully', 201);
+
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse('Failed to create AI chat message: ' . $th->getMessage());
+        }
+    }
+
+    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId, AiAgentService $aiAgentService): JsonResponse
+    {
+        $validated = $request->validate([
+            'content' => 'required|string',
+        ]);
+        $userMsg = $validated['content'];
+
+        try {
+            $emailTemplate = EmailTemplate::find($emailTemplateId);
+            if (!$emailTemplate) {
+                return $this->notFoundResponse('Email template not found');
+            }
+
+            $chatMsg = new AiChat(['content' => $userMsg]);
+            $chatMsg->sender = 'user';
+            $chatMsg->user_id = $request->user()->id;
+            $chatMsg->commentable_id = $emailTemplateId;
+            $chatMsg->commentable_type = EmailTemplate::class;
+            $chatMsg->saveOrFail();
+
+            return $this->responseJson($chatMsg->fresh(), 'Chat message created successfully', 201);
+
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse('Failed to send chat message: ' . $th->getMessage());
+        }
+    }
+
+    public function getEmailTemplateChatMessages(Request $request, string $emailTemplateId): JsonResponse
+    {
+        try {
+            /**
+             * @var \App\Models\EmailTemplate
+             */
+            $template = EmailTemplate::find($emailTemplateId);
+            if (!$template) {
+                return $this->notFoundResponse('Email template not found');
+            }
+
+            $project = $template->project;
+            $user = $request->user();
+
+            $isMember = $project->members()->where('users.id', $user->id)->exists();
+            $isOwner = $project->owner_id === $user->id;
+            if (!($isOwner || $isMember)) {
+                return $this->notFoundResponse('Project not found');
+            }
+
+            $chats = $template->aiChats()
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            return $this->responseJson($chats);
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse('Failed to retrieve chat messages: ' . $th->getMessage());
+        }
+    }
+
+    public function sendScreenChatMessage(Request $request, string $screenId, AiAgentService $aiAgentService, FigmaService $figmaService): JsonResponse
+    {
+        $validated = $request->validate([
+            'content' => 'required|string',
             'figma_access_token' => 'required|string',
         ]);
         $userMsg = $validated['content'];
         $accessToken = $validated['figma_access_token'];
 
-        $lockKey = "screen:{$screenId}:ai_chat_lock";
         $figmaCacheKey = "figma_frame_data_{$screenId}";
 
         try {
@@ -42,6 +129,7 @@ class AiChatController extends Controller
                 $chatMsg->commentable_id = $screenId;
                 $chatMsg->commentable_type = Screen::class;
 
+                // feed history of messages as ai context
                 $contextMessages = $screen->aiChats()
                     ->orderBy('created_at', 'desc')
                     ->limit(15)
@@ -98,7 +186,7 @@ class AiChatController extends Controller
         }
     }
 
-    public function getScreenChatMessages(Request $request, string $screenId)
+    public function getScreenChatMessages(Request $request, string $screenId): JsonResponse
     {
         try {
             $screen = Screen::find($screenId);
@@ -126,10 +214,10 @@ class AiChatController extends Controller
     }
 
 
-    public function updateChatMessageById(Request $request, string $chatId)
+    public function updateChatMessageById(Request $request, string $chatId): JsonResponse
     {
         $validated = $request->validate([
-            'content' => 'required|string|max:2500'
+            'content' => 'required|string'
         ]);
 
         try {
@@ -139,7 +227,8 @@ class AiChatController extends Controller
                 return $this->notFoundResponse('Chat message not found');
             }
 
-            if ($chatMsg->user_id !== $request->user()->id) {
+            $isMsgAuthor = $chatMsg->user_id === $request->user()->id;
+            if (!$isMsgAuthor) {
                 return $this->forbiddenResponse('You are not authorized to update this message');
             }
 
@@ -151,7 +240,7 @@ class AiChatController extends Controller
         }
     }
 
-    public function deleteChatMessageById(Request $request, string $chatId)
+    public function deleteChatMessageById(Request $request, string $chatId): JsonResponse
     {
         try {
             $chatMsg = AiChat::find($chatId);

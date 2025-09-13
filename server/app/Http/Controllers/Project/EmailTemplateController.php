@@ -3,37 +3,63 @@
 namespace App\Http\Controllers\Project;
 
 use App\Http\Controllers\Controller;
-use App\Models\Project;
+use App\Models\EmailTemplate;
+use App\Services\N8nService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Services\MailchimpService;
+use GuzzleHttp\Exception\RequestException;
+
 
 class EmailTemplateController extends Controller
 {
-    public function createEmailTemplate(Request $request, string $projectId): JsonResponse
+    public function importEmailTemplate(Request $request, string $projectId, MailchimpService $mailchimp, N8nService $n8n): JsonResponse
     {
         $validated = $request->validate([
-            'section_name' => 'required|string|max:255',
-            'campaign_id' => 'required|string',
-            'html' => 'required|string',
+            'mailchimp_campaign_id' => 'required|string',
         ]);
-
-        $project = $request->attributes->get('project');
+        $campaignId = $validated['mailchimp_campaign_id'];
 
         try {
-            $emailTemplate = $project->emailTemplates()->create($validated);
-            return $this->responseJson($emailTemplate, 'Email template created successfully', 201);
+            $campaignContent = $mailchimp->getCampaignContent($campaignId);
+
+            dd($campaignContent);
+            /**
+             * @var \App\Models\Project
+             */
+            $project = $request->attributes->get('project');
+
+            $emailTemplate = new EmailTemplate([
+                'project_id' => $project->id,
+                'campaign_id' => $campaignId,
+            ]);
+
+            // send html to n8n workflow, which generates a thumbnail, which is then saved to the email template as a url to the thumbnail
+            $n8nResponse = $n8n->generateThumbnail($campaignContent->html);
+            $emailTemplate->thumbnail_url = $n8nResponse->thumbnail_url;
+
+            $emailTemplate->saveOrFail();
+
+            return $this->responseJson($emailTemplate, 'Imported Campaign and created Email Template successfully', 201);
+        } catch (RequestException $e) {
+            if ($e->getResponse() && $e->getResponse()->getStatusCode() === 404) {
+                return $this->notFoundResponse(message: 'Campaign not found in Mailchimp');
+            }
+            return $this->serverErrorResponse(message: 'Failed to import email template: ' . $e->getMessage());
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to create email template: ' . $th->getMessage());
+            return $this->serverErrorResponse(message: 'Failed to import email template: ' . $th->getMessage());
         }
     }
 
     public function getProjectEmailTemplates(Request $request, string $projectId): JsonResponse
     {
+        /**
+         * @var \App\Models\Project
+         */
         $project = $request->attributes->get('project');
 
         try {
-            $emailTemplates = $project->emailTemplates;
-            return $this->responseJson($emailTemplates);
+            return $this->responseJson($project->emailTemplates);
         } catch (\Throwable $th) {
             return $this->serverErrorResponse(message: 'Failed to fetch email templates: ' . $th->getMessage());
         }
@@ -46,6 +72,9 @@ class EmailTemplateController extends Controller
             'html' => 'nullable|string',
         ]);
 
+        /**
+         * @var \App\Models\Project
+         */
         $project = $request->attributes->get('project');
 
         try {

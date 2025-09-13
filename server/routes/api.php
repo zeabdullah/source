@@ -53,11 +53,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Email Templates (per project)
         Route::middleware('is_owner')->group(function () {
-            Route::post('/{projectId}/email-templates', [EmailTemplateController::class, 'createEmailTemplate']);
+            Route::post('/{projectId}/email-templates/import', [EmailTemplateController::class, 'importEmailTemplate']);
             Route::get('/{projectId}/email-templates', [EmailTemplateController::class, 'getProjectEmailTemplates']);
             Route::put('/{projectId}/email-templates/{emailTemplateId}', [EmailTemplateController::class, 'updateEmailTemplateById']);
             Route::delete('/{projectId}/email-templates/{emailTemplateId}', [EmailTemplateController::class, 'deleteEmailTemplateById']);
         });
+        Route::post('/email-templates/{emailTemplateId}/chats', [AiChatController::class, 'sendEmailTemplateChatMessage']);
+        Route::post('/email-templates/{emailTemplateId}/chats/ai-response-webhook', [AiChatController::class, 'createAiChatResponseForEmailTemplate'])
+            ->middleware('basic_auth')->withoutMiddleware('auth:sanctum');
+        Route::get('/email-templates/{emailTemplateId}/chats', [AiChatController::class, 'getEmailTemplateChatMessages']);
     });
 
     // Releases (by id)

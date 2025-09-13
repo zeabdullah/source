@@ -20,7 +20,7 @@ class EmailTemplate extends Model
     protected $fillable = [
         'section_name',
         'campaign_id',
-        'html'
+        'thumbnail_url'
     ];
 
     /**
@@ -33,7 +33,7 @@ class EmailTemplate extends Model
         'project_id',
         'section_name',
         'campaign_id',
-        'html',
+        'thumbnail_url',
         'created_at',
         'updated_at'
     ];
