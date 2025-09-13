@@ -3,3 +3,5 @@
 /.nova
 /.vscode
 /.zed
+
+*.env
