@@ -2,11 +2,11 @@
 # E.g. after running `docker-compose up -d`
 # To do so, run: `docker exec -it source-server bash ./bootstrap.sh`
 
-echo "Laravel: Running startup script..."
+echo "Laravel: Running initialization script..."
 
 composer install
 php artisan key:generate
 php artisan migrate
 php artisan db:seed
 
-echo "Laravel: Startup script completed! ✨"
+echo "Laravel: Initialization script completed! ✨"
