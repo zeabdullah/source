@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureUserIsProjectOwner
+class EnsureUserIsProjectOwner extends BaseMiddleware
 {
     /**
      * Handle an incoming request.
@@ -25,10 +25,7 @@ class EnsureUserIsProjectOwner
         $isOwner = $project?->owner_id === $request->user()->id;
 
         if (!$project || !$isOwner) {
-            return response()->json([
-                'payload' => null,
-                'message' => 'Project not found'
-            ], 404);
+            return $this->notFoundResponse('Project not found');
         }
 
         $request->attributes->set('project', $project);
