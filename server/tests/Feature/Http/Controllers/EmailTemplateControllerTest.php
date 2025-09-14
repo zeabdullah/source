@@ -2,41 +2,54 @@
 
 use App\Models\Project;
 use App\Models\User;
+use App\Services\MailchimpService;
+use App\Services\N8nService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\actingAs;
-use function Pest\Laravel\assertDatabaseMissing;
-use function Pest\Laravel\deleteJson;
-use function Pest\Laravel\getJson;
-use function Pest\Laravel\postJson;
-use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class);
 
-describe('createEmailTemplate', function () {
-    it('creates an email template and returns its data', function () {
+describe('importEmailTemplate', function () {
+    it('successfully imports email template from Mailchimp campaign', function () {
         $user = User::factory()->create();
-        actingAs($user);
-
+        $this->actingAs($user);
         $project = Project::factory()->for($user, 'owner')->create();
 
+        $mailchimpCampaignId = 'test-campaign-123';
+        $campaignContent = (object) [
+            'html' => '<html><body><h1>Test Campaign</h1><p>This is a test email campaign.</p></body></html>'
+        ];
+        $thumbnailUrl = 'https://example.com/thumbnail.jpg';
+
+        $this->mock(MailchimpService::class, function ($mock) use ($mailchimpCampaignId, $campaignContent) {
+            $mock->shouldReceive('getCampaignContent')
+                ->once()
+                ->with($mailchimpCampaignId)
+                ->andReturn($campaignContent);
+        });
+
+        $this->mock(N8nService::class, function ($mock) use ($campaignContent, $thumbnailUrl) {
+            $mock->shouldReceive('generateThumbnail')
+                ->once()
+                ->with($campaignContent->html)
+                ->andReturn((object) ['thumbnail_url' => $thumbnailUrl]);
+        });
+
         $payload = [
-            'section_name' => 'Test Section',
-            'campaign_id' => 'campaign123',
-            'html' => '<p>Test HTML content</p>',
+            'mailchimp_campaign_id' => $mailchimpCampaignId,
         ];
 
-        $response = postJson("/api/projects/{$project->id}/email-templates", $payload);
+        // Act
+        $response = $this->postJson("/api/projects/{$project->id}/email-templates/import", $payload);
 
+        // Assert
         $response->assertStatus(201)
-            ->assertExactJsonStructure([
+            ->assertJsonStructure([
                 'message',
                 'payload' => [
                     'id',
                     'project_id',
-                    'section_name',
                     'campaign_id',
-                    'html',
+                    'thumbnail_url',
                     'created_at',
                     'updated_at',
                 ]
@@ -44,18 +57,131 @@ describe('createEmailTemplate', function () {
             ->assertJson([
                 'payload' => [
                     'project_id' => $project->id,
-                    'section_name' => 'Test Section',
-                    'campaign_id' => 'campaign123',
-                    'html' => '<p>Test HTML content</p>',
+                    'campaign_id' => $mailchimpCampaignId,
+                    'thumbnail_url' => $thumbnailUrl,
                 ]
             ]);
 
         assertDatabaseHas('email_templates', [
             'project_id' => $project->id,
-            'section_name' => 'Test Section',
-            'campaign_id' => 'campaign123',
-            'html' => '<p>Test HTML content</p>',
+            'campaign_id' => $mailchimpCampaignId,
+            'thumbnail_url' => $thumbnailUrl,
         ]);
+    });
+
+    it('validates mailchimp_campaign_id is required', function () {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        $project = Project::factory()->for($user, 'owner')->create();
+
+        $payload = [];
+
+        // Act
+        $response = $this->postJson("/api/projects/{$project->id}/email-templates/import", $payload);
+
+        // Assert
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['mailchimp_campaign_id']);
+    });
+
+    it('returns 404 when Mailchimp campaign is not found', function () {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        $project = Project::factory()->for($user, 'owner')->create();
+
+        $mailchimpCampaignId = 'non-existent-campaign';
+
+        $this->mock(MailchimpService::class, function ($mock) use ($mailchimpCampaignId) {
+            $mock->shouldReceive('getCampaignContent')
+                ->once()
+                ->with($mailchimpCampaignId)
+                ->andThrow(new \GuzzleHttp\Exception\RequestException(
+                    'Campaign not found',
+                    new \GuzzleHttp\Psr7\Request('GET', 'test'),
+                    new \GuzzleHttp\Psr7\Response(404)
+                ));
+        });
+
+        $payload = [
+            'mailchimp_campaign_id' => $mailchimpCampaignId,
+        ];
+
+        // Act
+        $response = $this->postJson("/api/projects/{$project->id}/email-templates/import", $payload);
+
+        // Assert
+        $response->assertStatus(404)
+            ->assertJson([
+                'message' => 'Campaign not found in Mailchimp'
+            ]);
+    });
+
+    it('returns 500 when Mailchimp service fails', function () {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        $project = Project::factory()->for($user, 'owner')->create();
+
+        $mailchimpCampaignId = 'test-campaign-123';
+
+        $this->mock(MailchimpService::class, function ($mock) use ($mailchimpCampaignId) {
+            $mock->shouldReceive('getCampaignContent')
+                ->once()
+                ->with($mailchimpCampaignId)
+                ->andThrow(new \GuzzleHttp\Exception\RequestException(
+                    'Service unavailable',
+                    new \GuzzleHttp\Psr7\Request('GET', 'test'),
+                    new \GuzzleHttp\Psr7\Response(500)
+                ));
+        });
+
+        $payload = [
+            'mailchimp_campaign_id' => $mailchimpCampaignId,
+        ];
+
+        // Act
+        $response = $this->postJson("/api/projects/{$project->id}/email-templates/import", $payload);
+
+        // Assert
+        $response->assertStatus(500)
+            ->assertJsonStructure(['message'])
+            ->assertJsonFragment(['message' => 'Failed to import email template: Service unavailable']);
+    });
+
+    it('returns 500 when N8n service fails', function () {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        $project = Project::factory()->for($user, 'owner')->create();
+
+        $mailchimpCampaignId = 'test-campaign-123';
+        $campaignContent = (object) [
+            'html' => '<html><body><h1>Test Campaign</h1></body></html>'
+        ];
+
+        $this->mock(MailchimpService::class, function ($mock) use ($mailchimpCampaignId, $campaignContent) {
+            $mock->shouldReceive('getCampaignContent')
+                ->once()
+                ->with($mailchimpCampaignId)
+                ->andReturn($campaignContent);
+        });
+
+        $this->mock(N8nService::class, function ($mock) use ($campaignContent) {
+            $mock->shouldReceive('generateThumbnail')
+                ->once()
+                ->with($campaignContent->html)
+                ->andThrow(new \Exception('N8n service unavailable'));
+        });
+
+        $payload = [
+            'mailchimp_campaign_id' => $mailchimpCampaignId,
+        ];
+
+        // Act
+        $response = $this->postJson("/api/projects/{$project->id}/email-templates/import", $payload);
+
+        // Assert
+        $response->assertStatus(500)
+            ->assertJsonStructure(['message'])
+            ->assertJsonFragment(['message' => 'Failed to import email template: N8n service unavailable']);
     });
 });
 

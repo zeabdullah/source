@@ -22,17 +22,14 @@ class EmailTemplateController extends Controller
 
         try {
             $campaignContent = $mailchimp->getCampaignContent($campaignId);
-
-            dd($campaignContent);
             /**
              * @var \App\Models\Project
              */
             $project = $request->attributes->get('project');
 
-            $emailTemplate = new EmailTemplate([
-                'project_id' => $project->id,
-                'campaign_id' => $campaignId,
-            ]);
+            $emailTemplate = new EmailTemplate();
+            $emailTemplate->campaign_id = $campaignId;
+            $emailTemplate->project_id = $project->id;
 
             // send html to n8n workflow, which generates a thumbnail, which is then saved to the email template as a url to the thumbnail
             $n8nResponse = $n8n->generateThumbnail($campaignContent->html);

@@ -19,7 +19,6 @@ class EmailTemplate extends Model
      */
     protected $fillable = [
         'section_name',
-        'campaign_id',
         'thumbnail_url'
     ];
 
