@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,10 @@ class EmailTemplateFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'project_id' => Project::factory(),
+            'section_name' => $this->faker->optional()->word(),
+            'campaign_id' => $this->faker->uuid(),
+            'thumbnail_url' => $this->faker->optional(0.7)->passthrough('https://picsum.photos/400/300?random=' . $this->faker->randomNumber()),
         ];
     }
 }

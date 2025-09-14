@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\EmailTemplate;
 use App\Models\Screen;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -19,15 +20,14 @@ class AiChatFactory extends Factory
     public function definition(): array
     {
         $sender = $this->faker->randomElement(['user', 'ai']);
+        $commentable = $this->faker->randomElement([Screen::class, EmailTemplate::class]);
 
         return [
             'user_id' => $sender === 'ai' ? null : User::factory(),
-            'commentable_id' => Screen::factory(),
-            'commentable_type' => Screen::class,
+            'commentable_id' => $commentable::factory(),
+            'commentable_type' => $commentable,
             'sender' => $sender,
             'content' => $this->faker->paragraph(),
-            'created_at' => now(),
-            'updated_at' => now(),
         ];
     }
 }

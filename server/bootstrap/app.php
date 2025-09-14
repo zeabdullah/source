@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureUserIsProjectOwner;
+use App\Http\Middleware\BasicAuth;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -16,7 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
         $middleware->alias([
-            'is_owner' => EnsureUserIsProjectOwner::class
+            'is_owner' => EnsureUserIsProjectOwner::class,
+            'basic_auth' => BasicAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

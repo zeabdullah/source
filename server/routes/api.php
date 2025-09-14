@@ -53,10 +53,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Email Templates (per project)
         Route::middleware('is_owner')->group(function () {
-            Route::post('/{projectId}/email-templates', [EmailTemplateController::class, 'createEmailTemplate']);
+            Route::post('/{projectId}/email-templates/import', [EmailTemplateController::class, 'importEmailTemplate']);
             Route::get('/{projectId}/email-templates', [EmailTemplateController::class, 'getProjectEmailTemplates']);
+            Route::put('/{projectId}/email-templates/{emailTemplateId}', [EmailTemplateController::class, 'updateEmailTemplateById']);
+            Route::delete('/{projectId}/email-templates/{emailTemplateId}', [EmailTemplateController::class, 'deleteEmailTemplateById']);
         });
     });
+
+    // Chats (per email template)
+    Route::post('/email-templates/{emailTemplateId}/chats', [AiChatController::class, 'sendEmailTemplateChatMessage']);
+    Route::post('/email-templates/{emailTemplateId}/chats/ai-response-webhook', [AiChatController::class, 'createAiChatResponseForEmailTemplate'])
+        ->middleware('basic_auth')->withoutMiddleware('auth:sanctum');
+    Route::get('/email-templates/{emailTemplateId}/chats', [AiChatController::class, 'getEmailTemplateChatMessages']);
 
     // Releases (by id)
     Route::prefix('releases')->group(function () {
@@ -70,7 +78,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{screenId}/regenerate-description', [ScreenController::class, 'regenerateDescription']);
     });
 
-    // Chats (per commentable, polymorphic)
+    // Chats (per screen)   
     Route::post('/screens/{screenId}/chats', [AiChatController::class, 'sendScreenChatMessage']);
     Route::get('/screens/{screenId}/chats', [AiChatController::class, 'getScreenChatMessages']);
     Route::put('/chats/{chatId}', [AiChatController::class, 'updateChatMessageById']);

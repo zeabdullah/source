@@ -53,7 +53,7 @@ class ScreenController extends Controller
         /** @var string[] */
         $frameIds = $validated['frame_ids'];
 
-        $project = Project::find($projectId);
+        $project = $request->attributes->get('project');
 
         if (!$project->figma_file_key) {
             return $this->forbiddenResponse('You must connect your project to a Figma file first');
@@ -83,7 +83,7 @@ class ScreenController extends Controller
 
     public function getProjectScreens(Request $request, string $projectId): JsonResponse
     {
-        $project = Project::find($projectId);
+        $project = $request->attributes->get('project');
 
         $screensQuery = $project->screens();
         if ($search = $request->query('search')) {

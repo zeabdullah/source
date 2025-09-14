@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\EmailTemplate;
+use App\Models\Screen;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,8 +19,12 @@ class CommentFactory extends Factory
      */
     public function definition(): array
     {
+        $commentable = $this->faker->randomElement([Screen::class, EmailTemplate::class]);
         return [
-            //
+            'user_id' => User::factory(),
+            'content' => $this->faker->paragraph(),
+            'commentable_id' => $commentable::factory(),
+            'commentable_type' => $commentable,
         ];
     }
 }
