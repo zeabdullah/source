@@ -11,7 +11,7 @@ import { HttpErrorResponse } from '@angular/common/http'
 import { Message } from 'primeng/message'
 import { Button } from 'primeng/button'
 import { InputText } from 'primeng/inputtext'
-import { AuthService } from '~/shared/services/auth.service'
+import { AuthService } from '~/core/services/auth.service'
 
 @Component({
     selector: 'app-register-form',
