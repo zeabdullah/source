@@ -23,8 +23,6 @@ class ScreenFactory extends Factory
             'data' => [],
             'figma_node_id' => $this->faker->optional()->uuid(),
             'description' => $this->faker->optional()->sentence(),
-            'created_at' => now(),
-            'updated_at' => now(),
         ];
     }
 }
