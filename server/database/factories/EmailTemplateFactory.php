@@ -19,9 +19,9 @@ class EmailTemplateFactory extends Factory
     {
         return [
             'project_id' => Project::factory(),
-            'section_name' => $this->faker->words(2, true),
+            'section_name' => $this->faker->optional()->word(),
             'campaign_id' => $this->faker->uuid(),
-            'thumbnail_url' => $this->faker->imageUrl(),
+            'thumbnail_url' => $this->faker->optional(0.7)->passthrough('https://picsum.photos/400/300?random=' . $this->faker->randomNumber()),
         ];
     }
 }
