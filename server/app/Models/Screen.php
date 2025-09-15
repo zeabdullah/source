@@ -17,6 +17,7 @@ class Screen extends Model
         'project_id',
         'figma_svg_url',
         'figma_node_id',
+        'figma_file_key',
         'data',
     ];
 
@@ -27,6 +28,7 @@ class Screen extends Model
         'data',
         'figma_svg_url',
         'figma_node_id',
+        'figma_file_key',
         'description',
         'created_at',
         'updated_at',

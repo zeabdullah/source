@@ -21,7 +21,9 @@ class ScreenFactory extends Factory
             'project_id' => Project::factory(),
             'section_name' => $this->faker->optional()->word(),
             'data' => [],
-            'figma_node_id' => $this->faker->optional()->uuid(),
+            'figma_node_id' => $this->faker->uuid(),
+            'figma_file_key' => $this->faker->uuid(),
+            'figma_svg_url' => $this->faker->url(),
             'description' => $this->faker->optional()->sentence(),
         ];
     }

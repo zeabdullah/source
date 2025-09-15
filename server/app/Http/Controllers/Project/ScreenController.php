@@ -15,9 +15,7 @@ class ScreenController extends Controller
     /** @deprecated Use `exportScreens` instead */
     public function createScreen(Request $request, string $projectId): JsonResponse
     {
-        /**
-         * @var \App\Models\Project
-         */
+        /** @var \App\Models\Project */
         $project = $request->attributes->get('project');
 
         $isMember = $project->members()->where('user_id', $request->user()->id)->exists();
@@ -44,26 +42,26 @@ class ScreenController extends Controller
             'frame_ids' => 'required|array|min:1',
             'frame_ids.*' => 'string|distinct|unique:screens,figma_node_id',
             'figma_access_token' => 'required|string',
+            'figma_file_key' => 'required|string',
         ]);
         /** @var string[] */
         $frameIds = $validated['frame_ids'];
-
-        $project = $request->attributes->get('project');
-
-        if (!$project->figma_file_key) {
-            return $this->forbiddenResponse('You must connect your project to a Figma file first');
-        }
+        /** @var string[] */
+        $fileKey = $validated['figma_file_key'];
 
         try {
             $svgUrls = $figmaService->getSvgUrlsForNodes(
                 $frameIds,
-                $project->figma_file_key,
+                $fileKey,
                 $validated['figma_access_token'],
             );
-            $createdScreens = collect($frameIds)->map(function ($frameId) use ($projectId, $svgUrls) {
+
+            // Map over the frame IDs and create a new screen for each one
+            $createdScreens = collect($frameIds)->map(function ($frameId) use ($projectId, $fileKey, $svgUrls) {
                 $data = [
                     'project_id' => $projectId,
                     'figma_node_id' => $frameId,
+                    'figma_file_key' => $fileKey,
                 ];
                 if (isset($svgUrls[$frameId])) {
                     $data['figma_svg_url'] = $svgUrls[$frameId];
