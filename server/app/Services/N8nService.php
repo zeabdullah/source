@@ -14,10 +14,10 @@ class N8nService
         //
     }
 
-    public function generateThumbnail(string $html)
+    public function generateThumbnailFromHtml(string $html)
     {
         $response = Http::post(
-            'http://localhost:5678/webhook/674b0267-0048-4503-89fb-72dc67fced59',
+            env('N8N_URL') . '/webhook/ENDPOINT',
             ['html' => $html]
         )->json();
 

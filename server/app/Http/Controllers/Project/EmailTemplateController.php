@@ -32,14 +32,14 @@ class EmailTemplateController extends Controller
             $emailTemplate->project_id = $project->id;
 
             // send html to n8n workflow, which generates a thumbnail, which is then saved to the email template as a url to the thumbnail
-            $n8nResponse = $n8n->generateThumbnail($campaignContent->html);
+            $n8nResponse = $n8n->generateThumbnailFromHtml($campaignContent->html);
             $emailTemplate->thumbnail_url = $n8nResponse->thumbnail_url;
 
             $emailTemplate->saveOrFail();
 
             return $this->responseJson($emailTemplate, 'Imported Campaign and created Email Template successfully', 201);
         } catch (RequestException $e) {
-            if ($e->getResponse() && $e->getResponse()->getStatusCode() === 404) {
+            if ($e->getResponse()?->getStatusCode() === 404) {
                 return $this->notFoundResponse(message: 'Campaign not found in Mailchimp');
             }
             return $this->serverErrorResponse(message: 'Failed to import email template: ' . $e->getMessage());

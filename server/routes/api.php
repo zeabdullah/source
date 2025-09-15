@@ -35,8 +35,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{projectId}', [ProjectController::class, 'getProjectById']);
             Route::put('/{projectId}', [ProjectController::class, 'updateProjectById']);
             Route::delete('/{projectId}', [ProjectController::class, 'deleteProjectById']);
-            Route::post('/{projectId}/figma/connect', [ProjectController::class, 'connectFigmaFile']);
-            Route::post('/{projectId}/figma/disconnect', [ProjectController::class, 'disconnectFigmaFile']);
         });
 
         // Releases (per project)
@@ -69,10 +67,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/chats/{chatId}', [AiChatController::class, 'deleteChatMessageById']);
     // Chats (per email template)
     Route::post('/email-templates/{emailTemplateId}/chats', [AiChatController::class, 'sendEmailTemplateChatMessage']);
-    Route::get('/email-templates/{emailTemplateId}/chats', [AiChatController::class, 'getEmailTemplateChatMessages']);
+    Route::get('/email-templates/{emailTemplateId}/chats', [AiChatController::class, 'getEmailTemplateChat']);
     // Chats (per screen)
     Route::post('/screens/{screenId}/chats', [AiChatController::class, 'sendScreenChatMessage']);
-    Route::get('/screens/{screenId}/chats', [AiChatController::class, 'getScreenChatMessages']);
+    Route::get('/screens/{screenId}/chats', [AiChatController::class, 'getScreenChat']);
 
     // Releases (by id)
     Route::prefix('releases')->group(function () {
@@ -100,10 +98,9 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::group(['prefix' => 'basic', 'middleware' => 'basic_auth'], function () {
     // Screens
     Route::get('/screens/{screenId}', [ScreenController::class, 'getScreenByIdBasic']);
+    Route::post('/screens/{screenId}/chats/ai-response-webhook', [AiChatController::class, 'createAiChatResponseForScreen']);
 
     // Email Templates
     Route::get('/email-templates/{emailTemplateId}', [EmailTemplateController::class, 'getEmailTemplateByIdBasic']);
-
-    // Chats
     Route::post('/email-templates/{emailTemplateId}/chats/ai-response-webhook', [AiChatController::class, 'createAiChatResponseForEmailTemplate']);
 })->withoutMiddleware('auth:sanctum');

@@ -75,39 +75,4 @@ class ProjectController extends Controller
         return $this->responseJson($project->fresh(), 'Updated successfully');
     }
 
-    public function connectFigmaFile(Request $request, string $projectId, FigmaService $figmaService)
-    {
-        $validated = $request->validate([
-            'figma_access_token' => 'required|string',
-            'figma_file_key' => 'required|string',
-        ]);
-
-        $project = Project::find($projectId);
-
-        try {
-            [$fileKey, $fileName] = $figmaService->connectFigmaFile(
-                $project,
-                $validated['figma_file_key'],
-                $validated['figma_access_token']
-            );
-        } catch (\Exception $e) {
-            return $this->serverErrorResponse(message: "Failed to connect Figma file: " . $e->getMessage());
-        }
-
-        return $this->responseJson(
-            $project->fresh(),
-            "Successfully connected the Figma file '$fileName'"
-        );
-    }
-    public function disconnectFigmaFile(Request $request, string $projectId, FigmaService $figmaService)
-    {
-        $project = Project::find($projectId);
-
-        $figmaService->disconnectFigmaFile($project);
-
-        return $this->responseJson(
-            $project->fresh(),
-            "Successfully disconnected the Figma file"
-        );
-    }
 }
