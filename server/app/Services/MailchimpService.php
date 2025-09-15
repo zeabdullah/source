@@ -2,22 +2,22 @@
 
 namespace App\Services;
 
-use MailchimpMarketing\ApiClient as MailchimpApiClient;
+use MailchimpMarketing\ApiClient as MailchimpClient;
 
 class MailchimpService
 {
-    private MailchimpApiClient $client;
+    private MailchimpClient $client;
 
     public function __construct()
     {
-        $this->client = new MailchimpApiClient();
+        $this->client = new MailchimpClient();
         $this->client->setConfig([
             'apiKey' => env('MAILCHIMP_API_KEY'),
             'server' => env('MAILCHIMP_SERVER_PREFIX'),
         ]);
     }
 
-    public function getClient(): MailchimpApiClient
+    public function getClient(): MailchimpClient
     {
         return $this->client;
     }

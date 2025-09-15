@@ -21,9 +21,6 @@ class Project extends Model
     protected $fillable = [
         'name',
         'description',
-        'figma_file_key',
-        'figma_file_name',
-        'figma_last_synced',
     ];
 
     /**
@@ -36,9 +33,6 @@ class Project extends Model
         'owner_id',
         'name',
         'description',
-        'figma_file_key',
-        'figma_file_name',
-        'figma_last_synced',
     ];
 
     /**
@@ -48,8 +42,6 @@ class Project extends Model
      */
     protected $attributes = [
         'description' => null,
-        'figma_file_key' => null,
-        'figma_file_name' => null,
     ];
 
     /**
@@ -60,7 +52,7 @@ class Project extends Model
     protected function casts(): array
     {
         return [
-            'figma_last_synced' => 'datetime',
+            //
         ];
     }
 
@@ -98,46 +90,5 @@ class Project extends Model
     public function emailTemplates(): HasMany
     {
         return $this->hasMany(EmailTemplate::class);
-    }
-
-    /**
-     * Add a reference to Figma file to this project
-     */
-    public function registerFigmaFile(string $fileKey, string $fileName): bool
-    {
-        return $this->update([
-            'figma_file_key' => $fileKey,
-            'figma_file_name' => $fileName,
-            'figma_last_synced' => now(),
-        ]);
-    }
-
-    /**
-     * Remove reference to Figma file from this project
-     *
-     */
-    public function unregisterFigmaFile(): bool
-    {
-        return $this->update([
-            'figma_file_key' => null,
-            'figma_file_name' => null,
-            'figma_last_synced' => null,
-        ]);
-    }
-
-    /**
-     * Update the last synced timestamp
-     */
-    public function updateLastSynced(): bool
-    {
-        return $this->update(['figma_last_synced' => now()]);
-    }
-
-    /**
-     * Check if project has a connected Figma file
-     */
-    public function hasFigmaFile(): bool
-    {
-        return isset($this->figma_file_key);
     }
 }

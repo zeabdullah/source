@@ -45,7 +45,37 @@ class AiChatController extends Controller
         }
     }
 
-    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId, AiAgentService $aiAgentService): JsonResponse
+    /**
+     * Used for the AI response webhook from N8n.
+     */
+    public function createAiChatResponseForScreen(Request $request, string $screenId): JsonResponse
+    {
+        $validated = $request->validate([
+            'content' => 'required|string',
+        ]);
+        $aiMsg = $validated['content'];
+
+        try {
+            $screen = Screen::find($screenId);
+            if (!$screen) {
+                return $this->notFoundResponse('Screen not found');
+            }
+
+            $chatMsg = new AiChat(['content' => $aiMsg]);
+            $chatMsg->sender = 'ai';
+            $chatMsg->commentable_id = $screenId;
+            $chatMsg->commentable_type = Screen::class;
+
+            $chatMsg->saveOrFail();
+
+            return $this->responseJson($chatMsg->fresh(), 'AI chat message created successfully', 201);
+
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse('Failed to create AI chat message: ' . $th->getMessage());
+        }
+    }
+
+    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId): JsonResponse
     {
         $validated = $request->validate([
             'content' => 'required|string',
@@ -72,7 +102,7 @@ class AiChatController extends Controller
         }
     }
 
-    public function getEmailTemplateChatMessages(Request $request, string $emailTemplateId): JsonResponse
+    public function getEmailTemplateChat(Request $request, string $emailTemplateId): JsonResponse
     {
         try {
             /**
@@ -102,7 +132,7 @@ class AiChatController extends Controller
         }
     }
 
-    public function sendScreenChatMessage(Request $request, string $screenId, AiAgentService $aiAgentService, FigmaService $figmaService): JsonResponse
+    public function sendScreenChatMessage(Request $request, string $screenId, AiAgentService $ai, FigmaService $figma): JsonResponse
     {
         $validated = $request->validate([
             'content' => 'required|string',
@@ -119,7 +149,7 @@ class AiChatController extends Controller
                 return $this->notFoundResponse('Screen not found');
             }
 
-            $result = DB::transaction(function () use ($request, $screen, $screenId, $userMsg, $accessToken, $figmaCacheKey, $aiAgentService, $figmaService) {
+            $result = DB::transaction(function () use ($request, $screen, $screenId, $userMsg, $accessToken, $figmaCacheKey, $ai, $figma) {
                 // create user message
                 $chatMsg = new AiChat([
                     'content' => $userMsg,
@@ -143,13 +173,13 @@ class AiChatController extends Controller
                     ->toArray();
 
                 // Fetch and add Figma data to context messages using cache
-                if ($screen->hasFigmaData() && $screen->project->hasFigmaFile()) {
+                if ($screen->hasFigmaData()) {
                     $figmaNodes = cache()->remember(
                         $figmaCacheKey,
                         now()->addHours(12),
-                        function () use ($accessToken, $screen, $figmaService) {
-                            return $figmaService->getFigmaFrameForAI(
-                                $screen->project->figma_file_key,
+                        function () use ($accessToken, $screen, $figma) {
+                            return $figma->getFigmaFrameForAI(
+                                $screen->figma_file_key,
                                 $screen->figma_node_id,
                                 $accessToken,
                             );
@@ -160,7 +190,7 @@ class AiChatController extends Controller
                     $contextMessages[] = Content::parse($figmaContext, Role::USER); // Add as user role for context
                 }
 
-                $aiReplyText = $aiAgentService->generateReplyFromContext($userMsg, history: $contextMessages);
+                $aiReplyText = $ai->generateReplyFromContext($userMsg, history: $contextMessages);
 
                 // create ai message
                 $aiReply = new AiChat([
@@ -186,7 +216,7 @@ class AiChatController extends Controller
         }
     }
 
-    public function getScreenChatMessages(Request $request, string $screenId): JsonResponse
+    public function getScreenChat(Request $request, string $screenId): JsonResponse
     {
         try {
             $screen = Screen::find($screenId);

@@ -11,12 +11,12 @@ class FigmaService
     /**
      * @return array{string, string}
      */
-    public function connectFigmaFile(Project $project, string $fileKey, string $ACCESS_TOKEN_DO_NOT_COMMIT): array
+    public function connectFigmaFile(Project $project, string $fileKey, string $figmaAccessToken): array
     {
         $client = new HttpClient([
             'base_uri' => 'https://api.figma.com/v1/',
             'headers' => [
-                'X-Figma-Token' => $ACCESS_TOKEN_DO_NOT_COMMIT,
+                'X-Figma-Token' => $figmaAccessToken,
                 'Accept' => 'application/json',
             ],
         ]);
@@ -40,12 +40,12 @@ class FigmaService
      * @throws \Exception
      * @return array<string, string> array of Frame ID keys, URL values
      */
-    public function getSvgUrlsForNodes(array $figmaNodeIds, string $fileKey, string $ACCESS_TOKEN_DO_NOT_COMMIT)
+    public function getSvgUrlsForNodes(array $figmaNodeIds, string $fileKey, string $figmaAccessToken)
     {
         $client = new HttpClient([
             'base_uri' => 'https://api.figma.com/v1/',
             'headers' => [
-                'X-Figma-Token' => $ACCESS_TOKEN_DO_NOT_COMMIT,
+                'X-Figma-Token' => $figmaAccessToken,
                 'Accept' => 'application/json',
             ],
         ]);
@@ -66,12 +66,12 @@ class FigmaService
         }
     }
 
-    public function getFigmaFrameForAI(string $fileKey, string $nodeId, $ACCESS_TOKEN_DO_NOT_COMMIT)
+    public function getFigmaFrameForAI(string $nodeId, string $fileKey, $figmaAccessToken)
     {
         $client = new HttpClient([
             'base_uri' => 'https://api.figma.com/v1/',
             'headers' => [
-                'X-Figma-Token' => $ACCESS_TOKEN_DO_NOT_COMMIT,
+                'X-Figma-Token' => $figmaAccessToken,
                 'Accept' => 'application/json',
             ],
         ]);

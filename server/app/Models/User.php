@@ -44,7 +44,8 @@ class User extends Authenticatable
      * @var array<string, mixed>
      */
     protected $attributes = [
-        'avatar_url' => null
+        'avatar_url' => null,
+        'figma_access_token' => null,
     ];
 
 

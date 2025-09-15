@@ -12,7 +12,6 @@ import { UserHeader } from './UserHeader'
 export default function App() {
     const [selectedFrames, setSelectedFrames] = useState<Array<{ id: string }>>([])
     const { isLoggedIn, setUserSession, setIsLoggedIn } = useAuth()
-    const api = useApi()
 
     useEffect(() => {
         async function handleMessage(event: MessageEvent) {

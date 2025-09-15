@@ -4,7 +4,7 @@ import { Validators, ReactiveFormsModule, NonNullableFormBuilder } from '@angula
 import { HttpErrorResponse } from '@angular/common/http'
 import { Message } from 'primeng/message'
 import { BASE_URL } from '~/shared/constants/http.constants'
-import { AuthService } from '~/shared/services/auth.service'
+import { AuthService } from '~/core/services/auth.service'
 import { Logo } from '~/shared/components/logo/logo'
 import { InputText } from 'primeng/inputtext'
 import { Button } from 'primeng/button'
