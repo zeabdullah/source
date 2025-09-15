@@ -14,13 +14,16 @@ class N8nService
         //
     }
 
-    public function generateThumbnailFromHtml(string $html)
+    public function generateBase64ThumbnailFromHtml(string $html): string
     {
-        $response = Http::post(
-            env('N8N_URL') . '/webhook/ENDPOINT',
-            ['html' => $html]
-        )->json();
+        $username = env('N8N_WEBHOOKS_BASIC_USERNAME');
+        $password = env('N8N_WEBHOOKS_BASIC_PASSWORD');
+        $url = env('N8N_URL') . '/webhook/generate-thumbnail-from-html';
 
-        return $response;
+        $response = Http::withBasicAuth($username, $password)
+            ->post($url, ['html' => $html])
+            ->json();
+
+        return $response['image'];
     }
 }

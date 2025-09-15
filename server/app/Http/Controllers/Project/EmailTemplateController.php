@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\MailchimpService;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Storage;
 
 
 class EmailTemplateController extends Controller
@@ -21,28 +22,30 @@ class EmailTemplateController extends Controller
         $campaignId = $validated['mailchimp_campaign_id'];
 
         try {
-            $campaignContent = $mailchimp->getCampaignContent($campaignId);
-            /**
-             * @var \App\Models\Project
-             */
+            $emailTemplate = EmailTemplate::firstOrNew(['campaign_id' => $campaignId]);
+
+            /** @var \App\Models\Project */
             $project = $request->attributes->get('project');
+            $campaignContent = $mailchimp->getCampaignContent($campaignId);
 
-            $emailTemplate = new EmailTemplate();
-            $emailTemplate->campaign_id = $campaignId;
-            $emailTemplate->project_id = $project->id;
+            $base64Img = $n8n->generateBase64ThumbnailFromHtml($campaignContent->html);
+            $binaryImg = base64_decode($base64Img);
 
-            // send html to n8n workflow, which generates a thumbnail, which is then saved to the email template as a url to the thumbnail
-            $n8nResponse = $n8n->generateThumbnailFromHtml($campaignContent->html);
-            $emailTemplate->thumbnail_url = $n8nResponse->thumbnail_url;
+            $thumbnailPath = 'email-thumbnails/' . uniqid('et_', true) . '.png';
+
+            $emailTemplate->campaign_id ??= $campaignId;
+            $emailTemplate->project_id ??= $project->id;
+            Storage::put($thumbnailPath, $binaryImg);
+            $emailTemplate->thumbnail_url = Storage::url($thumbnailPath);
 
             $emailTemplate->saveOrFail();
 
-            return $this->responseJson($emailTemplate, 'Imported Campaign and created Email Template successfully', 201);
+            return $this->responseJson($emailTemplate->fresh(), 'Imported Campaign and created Email Template successfully', 201);
         } catch (RequestException $e) {
             if ($e->getResponse()?->getStatusCode() === 404) {
                 return $this->notFoundResponse(message: 'Campaign not found in Mailchimp');
             }
-            return $this->serverErrorResponse(message: 'Failed to import email template: ' . $e->getMessage());
+            return $this->responseJson(message: 'Failed to import email template: ' . $e->getMessage(), code: $e->getResponse()?->getStatusCode() ?? 500);
         } catch (\Throwable $th) {
             return $this->serverErrorResponse(message: 'Failed to import email template: ' . $th->getMessage());
         }
@@ -50,9 +53,7 @@ class EmailTemplateController extends Controller
 
     public function getProjectEmailTemplates(Request $request, string $projectId): JsonResponse
     {
-        /**
-         * @var \App\Models\Project
-         */
+        /** @var \App\Models\Project */
         $project = $request->attributes->get('project');
 
         try {
@@ -87,9 +88,7 @@ class EmailTemplateController extends Controller
             'html' => 'nullable|string',
         ]);
 
-        /**
-         * @var \App\Models\Project
-         */
+        /** @var \App\Models\Project */
         $project = $request->attributes->get('project');
 
         try {
@@ -107,6 +106,7 @@ class EmailTemplateController extends Controller
 
     public function deleteEmailTemplateById(Request $request, string $projectId, string $emailTemplateId): JsonResponse
     {
+        /** @var \App\Models\Project */
         $project = $request->attributes->get('project');
 
         try {
