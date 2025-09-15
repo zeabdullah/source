@@ -2,6 +2,7 @@ import {
     Banner,
     Button,
     IconCheck16,
+    IconPage16,
     IconPassword16,
     IconWarning16,
     Stack,
@@ -23,6 +24,7 @@ interface FrameSelectionProps {
 
 export function FrameSelection({ project, selectedFrames, onBack }: FrameSelectionProps) {
     const [isExportSuccess, setIsExportSuccess] = useState(false)
+    const [fileKey, setFileKey] = useState('')
     const [accessToken, setAccessToken] = useState('')
 
     const { userSession } = useAuth()
@@ -36,6 +38,7 @@ export function FrameSelection({ project, selectedFrames, onBack }: FrameSelecti
                 `/projects/${project.id}/screens/export`,
                 {
                     frame_ids: selectedFrames.map(f => f.id),
+                    figma_file_key: fileKey,
                     figma_access_token: accessToken,
                 },
                 { Authorization: `Bearer ${token}` },
@@ -56,6 +59,13 @@ export function FrameSelection({ project, selectedFrames, onBack }: FrameSelecti
                     Click on frames in your Figma file to select them. Only frames can be selected.
                 </p>
 
+                <Textbox
+                    {...useInitialFocus()}
+                    icon={<IconPage16 />}
+                    placeholder="File key again..."
+                    value={fileKey}
+                    onValueInput={setFileKey}
+                />
                 <Textbox
                     {...useInitialFocus()}
                     icon={<IconPassword16 />}
