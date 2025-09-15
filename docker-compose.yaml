@@ -42,7 +42,7 @@ services:
             N8N_HOST: ${N8N_HOST}
             N8N_PORT: ${N8N_PORT}
             N8N_PROTOCOL: ${N8N_PROTOCOL}
-            NODE_ENV: ${NODE_ENV}
+            NODE_ENV: ${N8N_NODE_ENV}
             TZ: UTC
             N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: true
             N8N_RUNNERS_ENABLED: true

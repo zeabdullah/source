@@ -62,6 +62,24 @@ class EmailTemplateController extends Controller
         }
     }
 
+    public function getEmailTemplateById(Request $request, string $projectId, string $emailTemplateId): JsonResponse
+    {
+        try {
+            $emailTemplate = EmailTemplate::find($emailTemplateId);
+            if (!$emailTemplate) {
+                return $this->notFoundResponse(message: 'Email template not found');
+            }
+
+            return $this->responseJson($emailTemplate);
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to get email template: ' . $th->getMessage());
+        }
+    }
+    public function getEmailTemplateByIdBasic(Request $request, string $emailTemplateId): JsonResponse
+    {
+        return $this->getEmailTemplateById($request, '', $emailTemplateId);
+    }
+
     public function updateEmailTemplateById(Request $request, string $projectId, string $emailTemplateId): JsonResponse
     {
         $validated = $request->validate([

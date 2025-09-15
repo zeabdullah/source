@@ -15,18 +15,13 @@ class ScreenController extends Controller
     /** @deprecated Use `exportScreens` instead */
     public function createScreen(Request $request, string $projectId): JsonResponse
     {
+        /**
+         * @var \App\Models\Project
+         */
+        $project = $request->attributes->get('project');
 
-        $project = Project::find($projectId);
-        if (!$project) {
-            return $this->notFoundResponse('Project not found');
-        }
-
-        $user = $request->user();
-
-        $isOwner = $project?->owner_id === $user->id;
-        $isMember = $user->memberProjects()->where('project_id', $projectId)->exists();
-        if (!($isOwner || $isMember)) {
-            // We'll show the same response to avoid info leakage
+        $isMember = $project->members()->where('user_id', $request->user()->id)->exists();
+        if (!$isMember) {
             return $this->notFoundResponse('Project not found');
         }
 
@@ -93,6 +88,24 @@ class ScreenController extends Controller
         $screens = $screensQuery->get();
 
         return $this->responseJson($screens);
+    }
+
+    public function getScreenById(Request $request, string $projectId, string $screenId): JsonResponse
+    {
+        try {
+            $screen = Screen::find($screenId);
+            if (!$screen) {
+                return $this->notFoundResponse('Screen not found');
+            }
+
+            return $this->responseJson($screen);
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to get screen: ' . $th->getMessage());
+        }
+    }
+    public function getScreenByIdBasic(Request $request, string $screenId): JsonResponse
+    {
+        return $this->getScreenById($request, '', $screenId);
     }
 
     public function updateScreenById(Request $request, string $projectId, string $screenId): JsonResponse
