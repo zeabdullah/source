@@ -1,0 +1,26 @@
+<div class="mb-16 flex items-end justify-between gap-4">
+    <p class="max-w-[55ch]">
+        A
+        <strong>release</strong>
+        in Source is a snapshot of your product's experience. screens, flows, emails, and campaigns
+        - captured at a moment in time. Compare, track, and share how your product evolves.
+    </p>
+    <p-button
+        label="New Release"
+        icon="pi pi-plus"
+        iconPos="left"
+        class="shrink-0"
+        (onClick)="openNewReleaseDialog()"
+    />
+</div>
+
+<section class="grid grid-cols-1 gap-6">
+    @for (release of releases; track release.version) {
+    <app-release-card [release]="release" />
+    }
+</section>
+
+<app-new-release-dialog
+    [visible]="showNewReleaseDialog()"
+    (visibleChange)="onDialogVisibleChange($event)"
+/>
