@@ -1,41 +1,34 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core'
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router'
-import { ButtonModule } from 'primeng/button'
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core'
+import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router'
 import { InputIcon } from 'primeng/inputicon'
 import { IconField } from 'primeng/iconfield'
-import { Logo } from '~/shared/components/logo/logo'
-import { InputTextModule } from 'primeng/inputtext'
+import { InputText } from 'primeng/inputtext'
 import { Avatar } from 'primeng/avatar'
+import { Toolbar } from 'primeng/toolbar'
+import { Popover } from 'primeng/popover'
+import { AuthService } from '~/core/services/auth.service'
 
 @Component({
     selector: 'app-dashboard',
-    imports: [
-        ButtonModule,
-        Logo,
-        InputIcon,
-        IconField,
-        InputTextModule,
-        Avatar,
-        RouterOutlet,
-        RouterLink,
-        RouterLinkActive,
-    ],
+    imports: [InputIcon, IconField, InputText, Toolbar, Avatar, Popover, RouterOutlet, RouterLink],
     templateUrl: './dashboard.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {
-    isProjectContext = signal(true)
+    protected router = inject(Router)
+    protected activatedRoute = inject(ActivatedRoute)
+    protected authService = inject(AuthService)
+    protected isInsideProject = signal(false)
 
-    sidebarLinks = computed<{ label: string; icon?: string; path: string }[]>(() =>
-        this.isProjectContext()
-            ? [
-                  { label: 'Screens', path: 'screens' },
-                  { label: 'Email Templates', path: 'email-templates' },
-                  { label: 'Settings', path: 'settings' },
-              ]
-            : [
-                  { label: 'My Projects', icon: 'pi pi-th-large', path: 'projects' },
-                  { label: 'Account', icon: 'pi pi-user', path: 'account' },
-              ],
-    )
+    constructor() {
+        this.router.events.subscribe(event => {
+            if (event instanceof NavigationEnd) {
+                this.isInsideProject.set(
+                    Boolean(
+                        this.activatedRoute.firstChild?.firstChild?.snapshot.params['projectId'],
+                    ),
+                )
+            }
+        })
+    }
 }

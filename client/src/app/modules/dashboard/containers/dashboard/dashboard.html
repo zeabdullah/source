@@ -1,48 +1,77 @@
-<div class="flex h-full min-h-screen">
-    <aside
-        class="flex max-w-[200px] flex-col border-r border-r-black/10 bg-brand-100 px-8 py-6 lg:max-w-[240px]"
-    >
-        <app-logo class="mb-8 block" />
-        <div class="flex grow flex-col">
-            <ul class="grow space-y-8">
-                @for (link of sidebarLinks(); track link.path) {
-                <li>
-                    <a
-                        [routerLink]="[link.path]"
-                        #rla="routerLinkActive"
-                        [routerLinkActiveOptions]="{exact: true}"
-                        routerLinkActive="font-semibold text-brand-500"
-                        class="flex items-center gap-2"
-                        [class.text-gray-700]="!rla.isActive"
-                        [class.font-medium]="!rla.isActive"
-                    >
-                        @if(link.icon) {
-                        <i [class]="link.icon"></i>
-                        } {{link.label}}
-                    </a>
-                </li>
-                }
-            </ul>
-            <button class="group flex items-center gap-2 text-button">
-                <p-avatar label="A" class="bg-gray-700 text-gray-100" shape="circle" />
-                <span class="group-hover:underline">Abdullah Z.</span>
-            </button>
-        </div>
-    </aside>
-
-    <div class="flex h-full flex-1 flex-col">
-        <!-- topbar component -->
-        <header
-            class="flex items-center justify-center border-b border-b-black/10 bg-gray-100 px-4 py-6"
+<div class="flex h-full min-h-screen flex-col">
+    <!-- top nav -->
+    <header class="sticky top-0 z-10 border-b border-b-gray-200 bg-gray-100">
+        <p-toolbar
+            class="mx-auto w-full max-w-[1600px] rounded-none border-none bg-transparent px-4 py-4 lg:px-8"
         >
-            <p-iconfield iconPosition="left">
-                <p-inputicon class="pi pi-search" />
-                <input type="text" name="search" pInputText placeholder="Search" />
-            </p-iconfield>
-        </header>
+            <ng-template #start>
+                @if (isInsideProject()) {
+                <button (click)="projectPopover.toggle($event)" class="flex items-center gap-2">
+                    <img src="/source-logo-brand.svg" alt="Source Logo" class="h-12" alt="Source" />
+                    <i class="pi pi-chevron-down"></i>
+                </button>
+                <p-popover #projectPopover>
+                    <div class="flex w-52 flex-col gap-1 text-sm">
+                        @for (i of [0,1,2]; track $index) {
+                        <a
+                            class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-gray-700 transition-colors hover:bg-gray-100"
+                            routerLink="/dashboard/projects/{{i}}"
+                        >
+                            <i class="pi pi-arrow-left invisible"></i>
+                            Project {{i}}
+                        </a>
+                        }
+                        <a
+                            class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 transition-colors hover:bg-gray-100"
+                            routerLink="/dashboard/projects"
+                        >
+                            <i class="pi pi-arrow-left"></i>
+                            Back to projects
+                        </a>
+                    </div>
+                </p-popover>
+                } @else {
+                <a routerLink="/dashboard">
+                    <img src="/source-logo-brand.svg" alt="Source Logo" class="h-12" alt="Source" />
+                </a>
+                }
+            </ng-template>
 
-        <main class="mx-auto w-full max-w-[1600px] flex-1 overflow-auto px-4 py-8 lg:px-8 lg:py-12">
-            <router-outlet />
-        </main>
-    </div>
+            <ng-template #center>
+                <p-iconfield iconPosition="left">
+                    <p-inputicon class="pi pi-search" />
+                    <input pInputText type="text" name="search" placeholder="Search" />
+                </p-iconfield>
+            </ng-template>
+
+            <ng-template #end>
+                <button class="flex items-center gap-2" (click)="profilePopover.toggle($event)">
+                    <p-avatar label="A" shape="circle" class="bg-gray-700 text-gray-100" />
+                    <p>Abdullah Z.</p>
+                    <i class="pi pi-chevron-down"></i>
+                </button>
+                <p-popover #profilePopover>
+                    <div class="flex w-52 flex-col gap-1 text-sm">
+                        <a
+                            class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-gray-700 transition-colors hover:bg-gray-100"
+                            routerLink="/dashboard/account"
+                        >
+                            <i class="pi pi-user"></i>
+                            Account Settings
+                        </a>
+                        <a
+                            class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-danger-700 transition-colors hover:bg-gray-100"
+                            href="#"
+                            (click)="authService.logout().subscribe()"
+                        >
+                            <i class="pi pi-sign-out"></i>
+                            Log out
+                        </a>
+                    </div>
+                </p-popover>
+            </ng-template>
+        </p-toolbar>
+    </header>
+
+    <router-outlet />
 </div>

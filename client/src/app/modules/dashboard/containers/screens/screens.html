@@ -118,7 +118,7 @@
                     @for (screen of section.screens; track screen.id) {
                     <button
                         (click)="showScreenDetails(screen.id)"
-                        class="group relative min-w-fit overflow-hidden rounded-xl border border-black/10 bg-gray-100 transition-all duration-300 hover:shadow-lg"
+                        class="group relative min-w-fit shrink-0 overflow-hidden rounded-xl border border-black/10 bg-gray-100 transition-all duration-300 hover:shadow-lg"
                     >
                         <img
                             [src]="screen.image"

@@ -101,7 +101,7 @@
                     @for (email of section.emails; track email.id) {
                     <button
                         (click)="showEmailDetails(email.id)"
-                        class="group relative overflow-hidden rounded-xl border border-black/10 bg-gray-100 transition-all duration-300 hover:shadow-lg"
+                        class="group relative shrink-0 overflow-hidden rounded-xl border border-black/10 bg-gray-100 transition-all duration-300 hover:shadow-lg"
                     >
                         <img
                             [src]="email.image"

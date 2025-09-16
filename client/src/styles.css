@@ -120,3 +120,7 @@
         scrollbar-width: none;
     }
 }
+
+.p-popover::after {
+    display: none;
+}
