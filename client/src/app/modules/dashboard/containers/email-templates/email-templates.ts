@@ -256,4 +256,9 @@ export class EmailTemplates {
     getEmailById(id: number) {
         return this.emails.find(e => e.id === id)
     }
+
+    connectToMailChimp() {
+        // TODO: Implement MailChimp connection logic
+        console.log('Connect to MailChimp clicked')
+    }
 }

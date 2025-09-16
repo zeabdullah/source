@@ -93,6 +93,25 @@
             </div>
         </div>
 
+        @if (emailsBySection().length === 0) {
+        <div class="flex flex-col items-center justify-center gap-6 py-16">
+            <div class="flex h-32 w-32 items-center justify-center rounded-full bg-brand-100">
+                <i class="pi pi-envelope text-h1 text-brand-700 opacity-60"></i>
+            </div>
+
+            <div class="text-center">
+                <h2 class="mb-4 text-h3 font-bold">No email templates yet</h2>
+                <p class="text-lg max-w-[35ch]">Connect your MailChimp account to get started.</p>
+            </div>
+
+            <p-button
+                icon="pi pi-envelope"
+                label="Connect to MailChimp"
+                size="large"
+                (onClick)="connectToMailChimp()"
+            />
+        </div>
+        } @else {
         <div class="space-y-12">
             @for (section of emailsBySection(); track section.sectionName) {
             <section>
@@ -120,5 +139,6 @@
             </section>
             }
         </div>
+        }
     </div>
 </div>
