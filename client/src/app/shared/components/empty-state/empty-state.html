@@ -1,0 +1,12 @@
+<div class="flex flex-col items-center justify-center gap-6 py-16">
+    <div class="flex h-32 w-32 items-center justify-center rounded-full bg-brand-100">
+        <i class="pi {{ icon() }} text-h1 text-brand-700 opacity-60"></i>
+    </div>
+
+    <div class="text-center">
+        <h2 class="mb-4 text-h3 font-bold">{{ title() }}</h2>
+        <p class="text-lg max-w-[35ch]">{{ subtitle() }}</p>
+    </div>
+
+    <ng-content />
+</div>

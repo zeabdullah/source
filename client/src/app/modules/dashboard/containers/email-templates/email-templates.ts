@@ -10,6 +10,7 @@ import { ExpandedImage } from '../../components/expanded-image/expanded-image'
 import { TabsModule } from 'primeng/tabs'
 import { Comment } from '../../components/comment/comment'
 import { AiChatMessage } from '../../components/ai-chat-message/ai-chat-message'
+import { EmptyState } from '~/shared/components/empty-state/empty-state'
 
 @Component({
     selector: 'app-email-templates',
@@ -23,6 +24,7 @@ import { AiChatMessage } from '../../components/ai-chat-message/ai-chat-message'
         TabsModule,
         Comment,
         AiChatMessage,
+        EmptyState,
     ],
     templateUrl: './email-templates.html',
     styles: `
