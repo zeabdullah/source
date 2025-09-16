@@ -11,9 +11,11 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router'
     },
 })
 export class ProjectLayout {
-    sidebarLinks = [
-        { label: 'Screens', path: 'screens' },
-        { label: 'Email Templates', path: 'email-templates' },
-        { label: 'Project Settings', path: 'settings' },
+    sidebarLinks: ({ id: number; label: string; path: string } | { id: number })[] = [
+        { id: 1, label: 'Screens', path: 'screens' },
+        { id: 2, label: 'Email Templates', path: 'email-templates' },
+        { id: 3, label: 'Releases', path: 'releases' },
+        { id: 4 },
+        { id: 5, label: 'Project Settings', path: 'settings' },
     ]
 }
