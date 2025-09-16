@@ -2,7 +2,12 @@
     <header class="mb-12 flex items-center justify-between gap-4">
         <h1 class="text-h1 font-extrabold tracking-tighter">Welcome, Abdullah</h1>
         @if (projects.length !== 0) {
-        <p-button icon="pi pi-plus" label="New Project" class="shrink-0" />
+        <p-button
+            icon="pi pi-plus"
+            label="New Project"
+            class="shrink-0"
+            (onClick)="showDialog = true"
+        />
         }
     </header>
 
@@ -19,12 +24,17 @@
             </p>
         </div>
 
-        <p-button icon="pi pi-plus" label="New Project" size="large" />
+        <p-button
+            icon="pi pi-plus"
+            label="New Project"
+            size="large"
+            (onClick)="showDialog = true"
+        />
     </div>
     } @else {
     <section>
         <h2 class="mb-8 text-h3 font-bold">Recents</h2>
-        <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6 lg:gap-8">
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-6 lg:gap-8">
             @for (project of projects; track project.id) {
             <app-project-card [project]="project" />
             }
@@ -32,3 +42,77 @@
     </section>
     }
 </main>
+
+<p-dialog
+    [(visible)]="showDialog"
+    (onHide)="resetForm()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+>
+    <ng-template #header>
+        <div class="flex flex-col gap-2">
+            <h3 class="m-0 text-h3 font-bold text-gray-900">Create a new project</h3>
+            <p class="m-0 max-w-[480px] text-caption/normal text-gray-500">
+                Create a new project to bring all your flows together in one place.
+            </p>
+        </div>
+    </ng-template>
+
+    <form [formGroup]="projectForm" class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1.5">
+            <label class="text-label-text font-semibold" for="name">Name*</label>
+            <div class="relative">
+                <input
+                    pInputText
+                    formControlName="name"
+                    id="name"
+                    name="name"
+                    type="text"
+                    placeholder="Acme Inc's Project"
+                    fluid
+                    [invalid]="projectForm.get('name')?.invalid && projectForm.get('name')?.touched"
+                />
+                @if (projectForm.get('name')?.invalid && projectForm.get('name')?.touched) {
+                <p-message severity="error" variant="simple">Required</p-message>
+                }
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            <label class="text-label-text font-semibold" for="description">Description</label>
+            <textarea
+                pTextarea
+                formControlName="description"
+                id="description"
+                name="description"
+                placeholder="Describe your project..."
+                [rows]="7"
+                class="resize-none"
+                fluid
+            ></textarea>
+        </div>
+    </form>
+
+    <ng-template #footer>
+        <div class="flex justify-end gap-2">
+            <p-button
+                label="Cancel"
+                variant="outlined"
+                severity="secondary"
+                (onClick)="showDialog = false"
+                size="large"
+            />
+            <p-button
+                label="Create"
+                icon="pi pi-check"
+                iconPos="right"
+                (onClick)="createProject()"
+                [disabled]="!projectForm.valid"
+                size="large"
+            />
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-toast position="bottom-right" />
