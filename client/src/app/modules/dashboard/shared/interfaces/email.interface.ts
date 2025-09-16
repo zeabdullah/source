@@ -1,7 +1,9 @@
-export interface Email {
+export interface EmailTemplate {
     id: number
-    name: string
+    project_id: number
     section_name: string
-    image: string
-    release: string
+    campaign_id: string
+    thumbnail_url: string
+    created_at: string
+    updated_at: string
 }

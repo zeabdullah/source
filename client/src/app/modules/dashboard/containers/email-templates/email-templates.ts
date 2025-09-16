@@ -1,31 +1,41 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, signal, inject } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { SelectOption } from '~/modules/dashboard/shared/interfaces/select-option.interface'
-import { Email } from '../../shared/interfaces/email.interface'
+import { HttpClient } from '@angular/common/http'
+import { ActivatedRoute } from '@angular/router'
+import { catchError, of } from 'rxjs'
+import { MessageService } from 'primeng/api'
+import { Toast } from 'primeng/toast'
 import { Button } from 'primeng/button'
 import { Drawer } from 'primeng/drawer'
-import { InputTextModule } from 'primeng/inputtext'
+import { ProgressSpinner } from 'primeng/progressspinner'
+import { InputText } from 'primeng/inputtext'
 import { SelectModule } from 'primeng/select'
-import { ExpandedImage } from '../../components/expanded-image/expanded-image'
 import { TabsModule } from 'primeng/tabs'
+import { SelectOption } from '~/modules/dashboard/shared/interfaces/select-option.interface'
+import { EmailTemplate } from '../../shared/interfaces/email.interface'
+import { ExpandedImage } from '../../components/expanded-image/expanded-image'
 import { Comment } from '../../components/comment/comment'
 import { AiChatMessage } from '../../components/ai-chat-message/ai-chat-message'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
+import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 
 @Component({
     selector: 'app-email-templates',
     imports: [
         FormsModule,
-        InputTextModule,
-        SelectModule,
-        Drawer,
+        InputText,
         Button,
-        ExpandedImage,
+        Drawer,
+        SelectModule,
         TabsModule,
         Comment,
-        AiChatMessage,
+        Toast,
+        ProgressSpinner,
+        ExpandedImage,
         EmptyState,
+        AiChatMessage,
     ],
+    providers: [MessageService],
     templateUrl: './email-templates.html',
     styles: `
         ::ng-deep .p-drawer-content {
@@ -37,6 +47,10 @@ import { EmptyState } from '~/shared/components/empty-state/empty-state'
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmailTemplates {
+    http = inject(HttpClient)
+    route = inject(ActivatedRoute)
+    messageService = inject(MessageService)
+
     releases = [
         { name: 'All', value: 'all' },
         { name: '1.0.2', value: '1.0.2' },
@@ -49,36 +63,39 @@ export class EmailTemplates {
     drawerVisible = false
     activeTab: 'comments' | 'ai-chat' = 'comments'
 
-    emails: Email[] = [
-        {
-            id: 1,
-            name: 'Welcome Email',
-            section_name: 'Signup',
-            image: 'https://placehold.co/300x400.svg',
-            release: '1.0.2',
-        },
-        {
-            id: 2,
-            name: 'Password Reset',
-            section_name: 'Authentication',
-            image: 'https://placehold.co/300x400.svg',
-            release: '1.0.2',
-        },
-        {
-            id: 3,
-            name: 'New Feature Announcement',
-            section_name: 'General',
-            image: 'https://placehold.co/300x400.svg',
-            release: '1.0.1',
-        },
-        {
-            id: 4,
-            name: 'Account Verification',
-            section_name: 'Signup',
-            image: 'https://placehold.co/300x400.svg',
-            release: '1.0.0',
-        },
-    ]
+    emailTemplates = signal<EmailTemplate[]>([])
+    isLoading = signal<boolean>(true)
+    projectId: string | null = null
+
+    constructor() {
+        const projectId = this.route.parent?.snapshot.paramMap.get('projectId')
+        console.log(projectId)
+        if (projectId) {
+            this.loadEmailTemplates(projectId)
+        }
+    }
+
+    loadEmailTemplates(projectId: string) {
+        this.isLoading.set(true)
+        this.http
+            .get<LaravelApiResponse<EmailTemplate[]>>(`/api/projects/${projectId}/email-templates`)
+            .pipe(
+                catchError(err => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Failed to load email templates. ' + err.message,
+                        life: 4000,
+                    })
+                    return of<LaravelApiResponse<EmailTemplate[]>>({ message: '', payload: [] })
+                }),
+            )
+            .subscribe(response => {
+                this.emailTemplates.set(response.payload || [])
+                this.isLoading.set(false)
+            })
+    }
+
     comments = [
         {
             id: 1,
@@ -181,27 +198,28 @@ export class EmailTemplates {
     newMessage = signal('')
     newComment = signal('')
 
-    filteredEmails = computed(() =>
-        this.emails.filter(
-            email => this.selectedRelease() === 'all' || email.release === this.selectedRelease(),
-        ),
-    )
+    filteredEmailTemplates = computed(() => {
+        // Since the backend doesn't have release filtering yet, we'll return all templates
+        // This can be updated when release filtering is implemented
+        return this.emailTemplates()
+    })
 
-    emailsBySection = computed(() => {
-        const grouped = this.filteredEmails().reduce(
-            (acc, email) => {
-                if (!acc[email.section_name]) {
-                    acc[email.section_name] = []
+    emailTemplatesBySection = computed(() => {
+        const grouped = this.filteredEmailTemplates().reduce(
+            (acc, template) => {
+                const sectionName = template.section_name || 'Uncategorized'
+                if (!acc[sectionName]) {
+                    acc[sectionName] = []
                 }
-                acc[email.section_name].push(email)
+                acc[sectionName].push(template)
                 return acc
             },
-            {} as Record<string, Email[]>,
+            {} as Record<string, EmailTemplate[]>,
         )
 
-        return Object.entries(grouped).map(([sectionName, emails]) => ({
+        return Object.entries(grouped).map(([sectionName, templates]) => ({
             sectionName,
-            emails,
+            templates,
         }))
     })
 
@@ -255,8 +273,8 @@ export class EmailTemplates {
         }
     }
 
-    getEmailById(id: number) {
-        return this.emails.find(e => e.id === id)
+    getEmailTemplateById(id: number) {
+        return this.emailTemplates().find(t => t.id === id)
     }
 
     connectToMailChimp() {
