@@ -5,6 +5,7 @@
         in Source is a snapshot of your product's experience. screens, flows, emails, and campaigns
         - captured at a moment in time. Compare, track, and share how your product evolves.
     </p>
+    @if (releases.length > 0) {
     <p-button
         label="New Release"
         icon="pi pi-plus"
@@ -12,13 +13,37 @@
         class="shrink-0"
         (onClick)="openNewReleaseDialog()"
     />
+    }
 </div>
 
+@if (releases.length === 0) {
+<div class="flex flex-col items-center justify-center gap-6 py-16">
+    <div class="flex h-32 w-32 items-center justify-center rounded-full bg-brand-100">
+        <i class="pi pi-list-check text-h1 text-brand-700 opacity-60"></i>
+    </div>
+
+    <div class="text-center">
+        <h2 class="mb-4 text-h3 font-bold">No releases yet</h2>
+        <p class="text-lg max-w-[35ch]">
+            To start viewing and managing your releases of your app, please connect your app store
+            accounts
+        </p>
+    </div>
+
+    <p-button
+        icon="pi pi-plus"
+        label="New Release"
+        size="large"
+        (onClick)="openNewReleaseDialog()"
+    />
+</div>
+} @else {
 <section class="grid grid-cols-1 gap-6">
     @for (release of releases; track release.version) {
     <app-release-card [release]="release" />
     }
 </section>
+}
 
 <app-new-release-dialog
     [visible]="showNewReleaseDialog()"
@@ -27,4 +52,3 @@
 />
 
 <p-toast position="bottom-right" />
-s
