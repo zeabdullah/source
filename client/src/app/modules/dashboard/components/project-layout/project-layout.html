@@ -2,7 +2,7 @@
     class="flex max-w-[220px] shrink-0 grow flex-col border-r border-r-black/10 bg-brand-100 px-8 py-6 lg:max-w-[250px]"
 >
     <ul class="grow space-y-8">
-        @for (link of sidebarLinks; track link.path) {
+        @for (link of sidebarLinks; track link.id) { @if('path' in link) {
         <li>
             <a
                 [routerLink]="[link.path]"
@@ -16,7 +16,9 @@
                 {{link.label}}
             </a>
         </li>
-        }
+        } @else {
+        <hr class="border-black/10" />
+        } }
     </ul>
 </nav>
 

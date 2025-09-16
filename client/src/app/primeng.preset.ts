@@ -32,6 +32,9 @@ export const primengPreset = definePreset(Aura, {
         },
     },
     components: {
+        message: {
+            text: { fontSize: '14px' },
+        },
         dialog: {
             root: { borderRadius: '{borderRadius.2xl}' },
         },
