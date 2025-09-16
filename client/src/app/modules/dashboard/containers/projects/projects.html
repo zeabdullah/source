@@ -16,25 +16,18 @@
         <p-progress-spinner ariaLabel="loading projects" class="text-brand-500" strokeWidth="4" />
     </div>
     } @else if (projects().length === 0) {
-    <div class="flex flex-col items-center justify-center gap-6 py-16">
-        <div class="flex h-32 w-32 items-center justify-center rounded-full bg-brand-100">
-            <i class="pi pi-folder-open text-h1 text-brand-700 opacity-60"></i>
-        </div>
-
-        <div class="text-center">
-            <h2 class="mb-4 text-h3 font-bold">No projects yet</h2>
-            <p class="text-lg max-w-[35ch]">
-                Start by creating your first project to bring all your flows together in one place.
-            </p>
-        </div>
-
+    <app-empty-state
+        icon="pi-folder-open"
+        title="No projects yet"
+        subtitle="Start by creating your first project to bring all your flows together in one place."
+    >
         <p-button
             icon="pi pi-plus"
             label="New Project"
             size="large"
             (onClick)="showDialog = true"
         />
-    </div>
+    </app-empty-state>
     } @else {
     <section>
         <h2 class="mb-8 text-h3 font-bold">Recents</h2>

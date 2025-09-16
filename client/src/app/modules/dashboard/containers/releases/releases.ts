@@ -5,10 +5,11 @@ import { NewReleaseDialog } from '../../components/new-release-dialog/new-releas
 import { Release } from '../../shared/interfaces/release.interface'
 import { MessageService } from 'primeng/api'
 import { Toast } from 'primeng/toast'
+import { EmptyState } from '~/shared/components/empty-state/empty-state'
 
 @Component({
     selector: 'app-releases',
-    imports: [Button, ReleaseCard, NewReleaseDialog, Toast],
+    imports: [Button, ReleaseCard, NewReleaseDialog, Toast, EmptyState],
     providers: [MessageService],
     templateUrl: './releases.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

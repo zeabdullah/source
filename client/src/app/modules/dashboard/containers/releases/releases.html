@@ -17,26 +17,18 @@
 </div>
 
 @if (releases.length === 0) {
-<div class="flex flex-col items-center justify-center gap-6 py-16">
-    <div class="flex h-32 w-32 items-center justify-center rounded-full bg-brand-100">
-        <i class="pi pi-list-check text-h1 text-brand-700 opacity-60"></i>
-    </div>
-
-    <div class="text-center">
-        <h2 class="mb-4 text-h3 font-bold">No releases yet</h2>
-        <p class="text-lg max-w-[35ch]">
-            To start viewing and managing your releases of your app, please connect your app store
-            accounts
-        </p>
-    </div>
-
+<app-empty-state
+    icon="pi-list-check"
+    title="No releases yet"
+    subtitle="Get started by creating your very first release."
+>
     <p-button
         icon="pi pi-plus"
         label="New Release"
         size="large"
         (onClick)="openNewReleaseDialog()"
     />
-</div>
+</app-empty-state>
 } @else {
 <section class="grid grid-cols-1 gap-6">
     @for (release of releases; track release.version) {

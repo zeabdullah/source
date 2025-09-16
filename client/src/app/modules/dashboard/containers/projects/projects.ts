@@ -12,6 +12,7 @@ import { ProgressSpinner } from 'primeng/progressspinner'
 import { HttpClient } from '@angular/common/http'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 import { catchError, of } from 'rxjs'
+import { EmptyState } from '~/shared/components/empty-state/empty-state'
 
 interface Project {
     id: number
@@ -33,6 +34,7 @@ interface Project {
         Message,
         Toast,
         ProgressSpinner,
+        EmptyState,
     ],
     providers: [MessageService],
     templateUrl: './projects.html',
