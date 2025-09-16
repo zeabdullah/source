@@ -1,19 +1,34 @@
 <main class="mx-auto w-full max-w-[1600px] flex-1 px-4 py-8 lg:px-8 lg:py-12">
-    x
     <header class="mb-12 flex items-center justify-between gap-4">
         <h1 class="text-h1 font-extrabold tracking-tighter">Welcome, Abdullah</h1>
+        @if (projects.length !== 0) {
         <p-button icon="pi pi-plus" label="New Project" class="shrink-0" />
+        }
     </header>
 
+    @if (projects.length === 0) {
+    <div class="flex flex-col items-center justify-center gap-6 py-16">
+        <div class="flex h-32 w-32 items-center justify-center rounded-full bg-brand-100">
+            <i class="pi pi-folder-open text-h1 text-brand-700 opacity-60"></i>
+        </div>
+
+        <div class="text-center">
+            <h2 class="mb-4 text-h3 font-bold">No projects yet</h2>
+            <p class="text-lg mb-8 max-w-md">
+                Start by creating your first project to bring all your flows together in one place.
+            </p>
+        </div>
+
+        <p-button icon="pi pi-plus" label="New Project" size="large" />
+    </div>
+    } @else {
     <section>
         <h2 class="mb-8 text-h3 font-bold">Recents</h2>
-
         <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6 lg:gap-8">
-            @for (i of [0,1,2,3,4,5]; track $index) {
-            <app-project-card
-                [project]="{ id: i, name: `Abdullah's Project ${i}`, updated_at: '2 days' }"
-            />
+            @for (project of projects; track project.id) {
+            <app-project-card [project]="project" />
             }
         </div>
     </section>
+    }
 </main>
