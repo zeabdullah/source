@@ -40,9 +40,22 @@
                 formControlName="description"
                 placeholder="Add context about this release (e.g., goals, changes, or scope)."
                 [rows]="7"
-                fluid
                 class="resize-none"
+                fluid
             ></textarea>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            <label for="tags" class="text-label-text font-semibold">Tags</label>
+            <p-autocomplete
+                formControlName="tags"
+                id="tags"
+                name="tags"
+                [typeahead]="false"
+                multiple
+                fluid
+                placeholder="Add tags..."
+            />
         </div>
 
         <div class="flex flex-col gap-1.5">

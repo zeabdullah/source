@@ -4,6 +4,7 @@
         <p class="text-base leading-6">{{ release().description }}</p>
     </div>
 
+    @if (release().tags.length) {
     <div class="flex items-center gap-2 text-caption">
         <i class="pi pi-tag text-[16px] text-gray-700"></i>
         @for (tag of release().tags; track tag) {
@@ -13,16 +14,12 @@
         />
         }
     </div>
+    }
 
     <footer
         class="flex flex-wrap items-center justify-between gap-4 pt-4 text-caption text-gray-500"
     >
         <div class="flex flex-wrap items-center gap-4">
-            <div class="flex items-center gap-1.5">
-                <i class="pi pi-user text-caption"></i>
-                <span class="">{{ release().publisher }}</span>
-            </div>
-
             <div class="flex items-center gap-1.5">
                 <i class="pi pi-desktop text-caption"></i>
                 <span>{{ release().screensCount }} screens</span>
@@ -36,7 +33,7 @@
 
         <div class="flex items-center gap-1.5">
             <i class="pi pi-clock text-caption"></i>
-            <span class="">Created {{ release().createdAt | date: 'MMM d, yyyy, hh:mm a' }}</span>
+            <span class="">Created {{ release().created_at | date: 'MMM d, yyyy, hh:mm a' }}</span>
         </div>
     </footer>
 </div>

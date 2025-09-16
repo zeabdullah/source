@@ -23,4 +23,8 @@
 <app-new-release-dialog
     [visible]="showNewReleaseDialog()"
     (visibleChange)="onDialogVisibleChange($event)"
+    (onNewRelease)="addNewRelease($event)"
 />
+
+<p-toast position="bottom-right" />
+s
