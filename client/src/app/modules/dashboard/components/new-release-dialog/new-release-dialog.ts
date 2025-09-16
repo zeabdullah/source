@@ -77,18 +77,6 @@ export class NewReleaseDialog {
         }
     }
 
-    // toggleAllScreens() {
-    //     if (this.allScreensSelected()) {
-    //         this.dialogForm
-    //             .get('trackableItems')
-    //             ?.setValue(Array(this.trackableItems.length).fill(false))
-    //     } else {
-    //         this.dialogForm
-    //             .get('trackableItems')
-    //             ?.setValue(Array(this.trackableItems.length).fill(true))
-    //     }
-    // }
-
     get screens() {
         return this.trackableItems.filter(item => item.type === 'screen')
     }

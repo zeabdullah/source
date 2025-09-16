@@ -33,7 +33,7 @@ export const primengPreset = definePreset(Aura, {
     },
     components: {
         dialog: {
-            root: { borderRadius: '24px' },
+            root: { borderRadius: '{borderRadius.2xl}' },
         },
         tabs: {
             tabpanel: { padding: '1.5rem 0' },

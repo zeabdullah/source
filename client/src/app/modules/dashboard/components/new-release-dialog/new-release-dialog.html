@@ -4,110 +4,50 @@
     [modal]="true"
     [draggable]="false"
     [resizable]="false"
-    styleClass="w-[940px]"
 >
-    <ng-template pTemplate="header">
+    <ng-template #header>
         <div class="flex flex-col gap-2">
             <h3 class="m-0 text-h3 font-bold text-gray-900">Create a new release</h3>
-            <p class="m-0 max-w-[464px] text-caption text-gray-500">
+            <p class="m-0 max-w-[480px] text-caption/normal text-gray-500">
                 Save a snapshot of your project's current screens, flows, and campaigns to track
                 changes over time.
             </p>
         </div>
     </ng-template>
 
-    <form [formGroup]="dialogForm" class="flex gap-4">
-        <!-- Left Form Section -->
-        <div class="flex w-[440px] flex-col gap-4">
-            <div class="flex flex-col gap-4">
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-label-text font-semibold">Version tag*</label>
-                    <div class="relative">
-                        <input pInputText formControlName="version" placeholder="1.2.1" fluid />
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-label-text font-semibold">Description / Notes</label>
-                    <textarea
-                        pTextarea
-                        formControlName="description"
-                        placeholder="Add context about this release (e.g., goals, changes, or scope)."
-                        [rows]="5"
-                        fluid
-                        class="resize-none"
-                    ></textarea>
-                </div>
-
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-label-text font-semibold">Compare</label>
-                    <div class="flex flex-col gap-1">
-                        <p-select
-                            formControlName="compare"
-                            [options]="compareOptions"
-                            placeholder="Select a previous release"
-                            class="w-full"
-                            appendTo="body"
-                        />
-                        <p class="m-0 text-caption text-gray-500">
-                            Select a previous release to compare against.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- AI Button -->
-                <!-- <div class="flex justify-end">
-                    <button
-                        type="button"
-                        class="flex items-center justify-center gap-1.5 rounded-lg bg-gray-100 p-2 transition-colors hover:bg-gray-200"
-                    >
-                        <i class="pi pi-sparkles"></i>
-                    </button>
-                </div> -->
+    <form [formGroup]="dialogForm" class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1.5">
+            <label class="text-label-text font-semibold">Version tag*</label>
+            <div class="relative">
+                <input pInputText formControlName="version" placeholder="1.2.1" fluid />
             </div>
         </div>
 
-        <!-- Divider -->
-        <div class="w-px bg-gray-200"></div>
+        <div class="flex flex-col gap-1.5">
+            <label class="text-label-text font-semibold">Description / Notes</label>
+            <textarea
+                pTextarea
+                formControlName="description"
+                placeholder="Add context about this release (e.g., goals, changes, or scope)."
+                [rows]="7"
+                fluid
+                class="resize-none"
+            ></textarea>
+        </div>
 
-        <div class="flex flex-1 flex-col gap-6">
-            <h4 class="text-h4 font-bold">Detected Changes</h4>
-
-            <div class="flex flex-col gap-6">
-                <!-- Screens Group -->
-                <div class="flex flex-col gap-3">
-                    <div class="flex items-center gap-3 pl-3">
-                        <p-checkbox
-                            [indeterminate]="someScreensSelected() && !allScreensSelected() "
-                            binary
-                        />
-                        <span class="text-lg font-semibold">Screens</span>
-                    </div>
-
-                    <div class="flex flex-col gap-2">
-                        @for (item of screens; track item.id) {
-                        <div
-                            class="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-2xs"
-                        >
-                            <p-checkbox
-                                [formControlName]="item.id"
-                                [inputId]="item.id.toString()"
-                                binary
-                            />
-                            <div class="flex flex-col">
-                                <label [for]="item.id" class="text-base font-semibold">
-                                    {{ item.name }}
-                                </label>
-                                <span class="text-sm text-gray-500">
-                                    Modified {{ item.modifiedAt }}
-                                </span>
-                            </div>
-                        </div>
-                        }
-                    </div>
-                </div>
-
-                <!-- Emails Group -->
+        <div class="flex flex-col gap-1.5">
+            <label class="text-label-text font-semibold">Compare</label>
+            <div class="flex flex-col gap-1">
+                <p-select
+                    formControlName="compare"
+                    [options]="compareOptions"
+                    placeholder="Select a previous release"
+                    class="w-full"
+                    appendTo="body"
+                />
+                <p class="m-0 text-caption text-gray-500">
+                    Select a previous release to compare against.
+                </p>
             </div>
         </div>
     </form>
