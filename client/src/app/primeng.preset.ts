@@ -16,32 +16,37 @@ export const primengPreset = definePreset(Aura, {
             900: '{purple.900}',
             950: '{purple.950}',
         },
+        borderRadius: {
+            sm: '8px',
+            md: '12px',
+            lg: '14px',
+        },
     },
     components: {
         tabs: {
             tabpanel: { padding: '1.5rem 0' },
         },
         select: {
-            overlay: { borderRadius: '12px' },
-            option: { borderRadius: '8px' },
-            root: { borderRadius: '12px' },
+            overlay: { borderRadius: '{borderRadius.md}' },
+            option: { borderRadius: '{borderRadius.sm}' },
+            root: { borderRadius: '{borderRadius.md}' },
         },
         textarea: {
             root: {
-                borderRadius: '12px',
+                borderRadius: '{borderRadius.md}',
             },
         },
 
         inputtext: {
             root: {
-                borderRadius: '12px',
+                borderRadius: '{borderRadius.md}',
                 paddingY: '10px',
                 paddingX: '16px',
             },
         },
         button: {
             root: {
-                borderRadius: '14px',
+                borderRadius: '{borderRadius.lg}',
             },
         },
     },

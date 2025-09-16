@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router'
 import { Dashboard } from './containers/dashboard/dashboard'
-import { Projects } from './containers/projects/projects'
 
 export const dashboardRoutes: Routes = [
     {
@@ -13,14 +12,24 @@ export const dashboardRoutes: Routes = [
                 pathMatch: 'full',
             },
             {
+                path: 'account',
+                loadComponent: () => import('./containers/account/account').then(m => m.Account),
+            },
+            {
                 path: 'projects',
                 children: [
                     {
                         path: '',
-                        component: Projects,
+                        loadComponent: () =>
+                            import('./containers/projects/projects').then(m => m.Projects),
                     },
                     {
                         path: ':projectId',
+                        loadComponent: () =>
+                            import('./components/project-layout/project-layout').then(
+                                m => m.ProjectLayout,
+                            ),
+
                         children: [
                             {
                                 path: '',
@@ -47,10 +56,6 @@ export const dashboardRoutes: Routes = [
                         ],
                     },
                 ],
-            },
-            {
-                path: 'account',
-                loadComponent: () => import('./containers/account/account').then(m => m.Account),
             },
         ],
     },
