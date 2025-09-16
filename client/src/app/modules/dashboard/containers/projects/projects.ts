@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core'
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
 import { Button } from 'primeng/button'
 import { Dialog } from 'primeng/dialog'
@@ -8,6 +8,10 @@ import { ProjectCard } from '../../components/project-card/project-card'
 import { Message } from 'primeng/message'
 import { MessageService } from 'primeng/api'
 import { Toast } from 'primeng/toast'
+import { ProgressSpinner } from 'primeng/progressspinner'
+import { HttpClient } from '@angular/common/http'
+import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
+import { catchError, of } from 'rxjs'
 
 interface Project {
     id: number
@@ -28,6 +32,7 @@ interface Project {
         Textarea,
         Message,
         Toast,
+        ProgressSpinner,
     ],
     providers: [MessageService],
     templateUrl: './projects.html',
@@ -37,6 +42,7 @@ interface Project {
 export class Projects {
     fb = inject(NonNullableFormBuilder)
     messageService = inject(MessageService)
+    http = inject(HttpClient)
     showDialog = false
 
     projectForm = this.fb.group({
@@ -44,82 +50,73 @@ export class Projects {
         description: [''],
     })
 
+    projects = signal<Project[]>([])
+    isLoading = signal<boolean>(true)
+
+    constructor() {
+        this.loadProjects()
+    }
+
     resetForm() {
         this.projectForm.reset()
     }
-    projects: Project[] = [
-        {
-            id: 1,
-            name: 'Project 1',
-            description: 'Project 1 description',
-            created_at: '2025-01-01T00:00:00.000Z',
-            updated_at: '2025-01-01T00:00:00.000Z',
-        },
-        {
-            id: 2,
-            name: 'Project 2',
-            description: 'Project 2 description',
-            created_at: '2025-01-01T00:00:00.000Z',
-            updated_at: '2025-01-01T00:00:00.000Z',
-        },
-        {
-            id: 3,
-            name: 'Project 3',
-            description: 'Project 3 description',
-            created_at: '2025-01-01T00:00:00.000Z',
-            updated_at: '2025-01-01T00:00:00.000Z',
-        },
-        {
-            id: 4,
-            name: 'Project 4',
-            description: 'Project 4 description',
-            created_at: '2025-01-01T00:00:00.000Z',
-            updated_at: '2025-01-01T00:00:00.000Z',
-        },
-        {
-            id: 5,
-            name: 'Project 5',
-            description: 'Project 5 description',
-            created_at: '2025-01-01T00:00:00.000Z',
-            updated_at: '2025-01-01T00:00:00.000Z',
-        },
-        {
-            id: 6,
-            name: 'Project 6',
-            description: 'Project 6 description',
-            created_at: '2025-01-01T00:00:00.000Z',
-            updated_at: '2025-01-01T00:00:00.000Z',
-        },
-        {
-            id: 7,
-            name: 'Project 7',
-            description: 'Project 7 description',
-            created_at: '2025-01-01T00:00:00.000Z',
-            updated_at: '2025-01-01T00:00:00.000Z',
-        },
-    ]
+
+    loadProjects() {
+        this.isLoading.set(true)
+        this.http
+            .get<LaravelApiResponse<Project[]>>('/api/projects')
+            .pipe(
+                catchError(err => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Failed to load projects. ' + err.message,
+                        life: 4000,
+                    })
+                    return of<LaravelApiResponse<Project[]>>({ message: '', payload: [] })
+                }),
+            )
+            .subscribe(response => {
+                this.projects.set(response.payload || [])
+                this.isLoading.set(false)
+            })
+    }
 
     createProject() {
         if (!this.projectForm.valid) {
             return
         }
 
-        this.projects.push({
-            id: this.projects.length + 1,
-            name: this.projectForm.value.name as string,
-            description: this.projectForm.value.description ?? null,
-            created_at: '2025-01-01T00:00:00.000Z',
-            updated_at: '2025-01-01T00:00:00.000Z',
-        })
+        const formData = new FormData()
+        formData.append('name', this.projectForm.value.name as string)
+        formData.append('description', this.projectForm.value.description || '')
 
-        this.projectForm.reset()
-        this.showDialog = false
+        this.http
+            .post<LaravelApiResponse<Project>>('/api/projects', formData)
+            .pipe(
+                catchError(err => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Failed to create project. ' + err.message,
+                        life: 4000,
+                    })
+                    return of<LaravelApiResponse<Project>>({ message: '', payload: null })
+                }),
+            )
+            .subscribe(response => {
+                if (response.payload) {
+                    this.projects.update(projects => [...projects, response.payload!])
+                    this.projectForm.reset()
+                    this.showDialog = false
 
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Project created successfully',
-            life: 4000,
-        })
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Success',
+                        detail: 'Project created successfully',
+                        life: 4000,
+                    })
+                }
+            })
     }
 }
