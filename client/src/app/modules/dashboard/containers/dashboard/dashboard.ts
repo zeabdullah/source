@@ -20,6 +20,8 @@ export class Dashboard {
     protected authService = inject(AuthService)
     protected isInsideProject = signal(false)
 
+    protected user = this.authService.getUser()
+
     constructor() {
         this.router.events.subscribe(event => {
             if (event instanceof NavigationEnd) {
@@ -30,5 +32,7 @@ export class Dashboard {
                 )
             }
         })
+
+        this.authService.checkIfAuthenticated().subscribe()
     }
 }

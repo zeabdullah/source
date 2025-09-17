@@ -3,14 +3,14 @@ import { FormsModule } from '@angular/forms'
 import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute } from '@angular/router'
 import { catchError, of } from 'rxjs'
-import { MessageService } from 'primeng/api'
 import { Toast } from 'primeng/toast'
 import { Button } from 'primeng/button'
 import { Drawer } from 'primeng/drawer'
-import { ProgressSpinner } from 'primeng/progressspinner'
+import { Select } from 'primeng/select'
 import { InputText } from 'primeng/inputtext'
-import { SelectModule } from 'primeng/select'
 import { TabsModule } from 'primeng/tabs'
+import { MessageService } from 'primeng/api'
+import { ProgressSpinner } from 'primeng/progressspinner'
 import { SelectOption } from '~/modules/dashboard/shared/interfaces/select-option.interface'
 import { EmailTemplate } from '../../shared/interfaces/email.interface'
 import { ExpandedImage } from '../../components/expanded-image/expanded-image'
@@ -26,7 +26,7 @@ import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.int
         InputText,
         Button,
         Drawer,
-        SelectModule,
+        Select,
         TabsModule,
         Comment,
         Toast,
@@ -57,15 +57,14 @@ export class EmailTemplates {
         { name: '1.0.1', value: '1.0.1' },
         { name: '1.0.0', value: '1.0.0' },
     ] as const satisfies SelectOption[]
+
     selectedRelease = signal<(typeof this.releases)[number]['value']>('all')
-
     shownEmailId = signal<number | null>(null)
-    drawerVisible = false
-    activeTab: 'comments' | 'ai-chat' = 'comments'
-
     emailTemplates = signal<EmailTemplate[]>([])
     isLoading = signal<boolean>(true)
-    projectId: string | null = null
+
+    drawerVisible = false
+    activeTab: 'comments' | 'ai-chat' = 'comments'
 
     constructor() {
         const projectId = this.route.parent?.snapshot.paramMap.get('projectId')
