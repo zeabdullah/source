@@ -102,5 +102,6 @@ Route::group(['prefix' => 'basic', 'middleware' => 'basic_auth'], function () {
 
     // Email Templates
     Route::get('/email-templates/{emailTemplateId}', [EmailTemplateController::class, 'getEmailTemplateByIdBasic']);
+    Route::get('/email-templates/{emailTemplateId}/chat', [AiChatController::class, 'getEmailTemplateChatBasic']);
     Route::post('/email-templates/{emailTemplateId}/chats/ai-response-webhook', [AiChatController::class, 'createAiChatResponseForEmailTemplate']);
 });

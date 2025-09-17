@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Services\N8nService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\AiChat;
@@ -75,12 +76,12 @@ class AiChatController extends Controller
         }
     }
 
-    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId): JsonResponse
+    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId, N8nService $n8n): JsonResponse
     {
         $validated = $request->validate([
             'content' => 'required|string',
         ]);
-        $userMsg = $validated['content'];
+        $userPrompt = $validated['content'];
 
         try {
             $emailTemplate = EmailTemplate::find($emailTemplateId);
@@ -88,12 +89,14 @@ class AiChatController extends Controller
                 return $this->notFoundResponse('Email template not found');
             }
 
-            $chatMsg = new AiChat(['content' => $userMsg]);
+            $chatMsg = new AiChat(['content' => $userPrompt]);
             $chatMsg->sender = 'user';
             $chatMsg->user_id = $request->user()->id;
             $chatMsg->commentable_id = $emailTemplateId;
             $chatMsg->commentable_type = EmailTemplate::class;
             $chatMsg->saveOrFail();
+
+            $n8n->generateAgentResponseForEmailTemplate($userPrompt, $emailTemplateId);
 
             return $this->responseJson($chatMsg->fresh(), 'Chat message created successfully', 201);
 
@@ -105,9 +108,6 @@ class AiChatController extends Controller
     public function getEmailTemplateChat(Request $request, string $emailTemplateId): JsonResponse
     {
         try {
-            /**
-             * @var \App\Models\EmailTemplate
-             */
             $template = EmailTemplate::find($emailTemplateId);
             if (!$template) {
                 return $this->notFoundResponse('Email template not found');
@@ -120,6 +120,24 @@ class AiChatController extends Controller
             $isOwner = $project->owner_id === $user->id;
             if (!($isOwner || $isMember)) {
                 return $this->notFoundResponse('Project not found');
+            }
+
+            $chats = $template->aiChats()
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            return $this->responseJson($chats);
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse('Failed to retrieve chat messages: ' . $th->getMessage());
+        }
+    }
+
+    public function getEmailTemplateChatBasic(Request $request, string $emailTemplateId): JsonResponse
+    {
+        try {
+            $template = EmailTemplate::find($emailTemplateId);
+            if (!$template) {
+                return $this->notFoundResponse('Email template not found');
             }
 
             $chats = $template->aiChats()

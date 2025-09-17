@@ -6,24 +6,42 @@ use Illuminate\Support\Facades\Http;
 
 class N8nService
 {
-    /**
-     * Create a new class instance.
-     */
+    private string $username;
+    private string $password;
+
     public function __construct()
     {
-        //
+        if (!env('N8N_WEBHOOKS_BASIC_USERNAME') || !env('N8N_WEBHOOKS_BASIC_PASSWORD')) {
+            throw new \Exception(
+                'N8N_WEBHOOKS_BASIC_USERNAME and N8N_WEBHOOKS_BASIC_PASSWORD are not set. Please set them to use this service.'
+            );
+        }
+        $this->username = env('N8N_WEBHOOKS_BASIC_USERNAME');
+        $this->password = env('N8N_WEBHOOKS_BASIC_PASSWORD');
     }
 
     public function generateBase64ThumbnailFromHtml(string $html): string
     {
-        $username = env('N8N_WEBHOOKS_BASIC_USERNAME');
-        $password = env('N8N_WEBHOOKS_BASIC_PASSWORD');
         $url = env('N8N_URL') . '/webhook/generate-thumbnail-from-html';
 
-        $response = Http::withBasicAuth($username, $password)
+        $response = Http::withBasicAuth($this->username, $this->password)
             ->post($url, ['html' => $html])
             ->json();
 
         return $response['image'];
+    }
+
+    public function generateAgentResponseForEmailTemplate(string $prompt, string $emailTemplateId): string
+    {
+        $url = env('N8N_URL') . '/webhook/chat-email-template';
+
+        $response = Http::withBasicAuth($this->username, $this->password)
+            ->post($url, [
+                'prompt' => $prompt,
+                'email_template_id' => $emailTemplateId,
+            ])
+            ->json();
+
+        return $response['payload']['content'];
     }
 }
