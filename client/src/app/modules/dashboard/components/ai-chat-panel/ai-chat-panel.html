@@ -1,0 +1,30 @@
+<p-toast />
+
+<div class="flex h-full flex-col">
+    <div class="flex-1 space-y-4 overflow-y-auto p-2">
+        @if (isLoading()) {
+        <div class="flex items-center justify-center py-4">
+            <p-progress-spinner ariaLabel="loading chats" strokeWidth="4" />
+        </div>
+        } @else { @for (message of messages(); track message.id) {
+        <app-ai-chat-message [message]="message" />
+        } }
+    </div>
+    <div class="flex gap-2 border-t border-gray-100 pt-3">
+        <input
+            pInputText
+            [(ngModel)]="newMessage"
+            (keydown.enter)="sendMessage()"
+            placeholder="Ask about this email..."
+            class="flex-1"
+            [disabled]="isLoading()"
+        />
+        <p-button
+            (onClick)="sendMessage()"
+            [disabled]="!newMessage().trim() || isLoading()"
+            icon="pi pi-send"
+            size="large"
+            styleClass="rounded-xl"
+        />
+    </div>
+</div>
