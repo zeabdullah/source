@@ -42,7 +42,7 @@ class AiChatController extends Controller
             return $this->responseJson($chatMsg->fresh(), 'AI chat message created successfully', 201);
 
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse('Failed to create AI chat message: ' . $th->getMessage());
+            return $this->serverErrorResponse(message: 'Failed to create AI chat message: ' . $th->getMessage());
         }
     }
 
@@ -72,7 +72,7 @@ class AiChatController extends Controller
             return $this->responseJson($chatMsg->fresh(), 'AI chat message created successfully', 201);
 
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse('Failed to create AI chat message: ' . $th->getMessage());
+            return $this->serverErrorResponse(message: 'Failed to create AI chat message: ' . $th->getMessage());
         }
     }
 
@@ -96,12 +96,17 @@ class AiChatController extends Controller
             $chatMsg->commentable_type = EmailTemplate::class;
             $chatMsg->saveOrFail();
 
-            $n8n->generateAgentResponseForEmailTemplate($userPrompt, $emailTemplateId);
+            $aiResponseContent = $n8n->generateAgentResponseForEmailTemplate($userPrompt, $emailTemplateId);
 
-            return $this->responseJson($chatMsg->fresh(), 'Chat message created successfully', 201);
+            return $this->responseJson([
+                'user' => $chatMsg->fresh(),
+                'ai' => ['content' => $aiResponseContent],
+            ], 'Messages created successfully', 201);
 
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse('Failed to send chat message: ' . $th->getMessage());
+            return $this->serverErrorResponse([
+                'trace' => $th->getTrace(),
+            ], 'Failed to send chat message: ' . $th->getMessage(), );
         }
     }
 
@@ -128,7 +133,7 @@ class AiChatController extends Controller
 
             return $this->responseJson($chats);
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse('Failed to retrieve chat messages: ' . $th->getMessage());
+            return $this->serverErrorResponse(message: 'Failed to retrieve chat messages: ' . $th->getMessage());
         }
     }
 
@@ -146,7 +151,7 @@ class AiChatController extends Controller
 
             return $this->responseJson($chats);
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse('Failed to retrieve chat messages: ' . $th->getMessage());
+            return $this->serverErrorResponse(message: 'Failed to retrieve chat messages: ' . $th->getMessage());
         }
     }
 
@@ -230,7 +235,7 @@ class AiChatController extends Controller
 
             return $this->responseJson($result, 'Created successfully', 201);
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse('Failed to send chat message: ' . $th->getMessage());
+            return $this->serverErrorResponse(message: 'Failed to send chat message: ' . $th->getMessage());
         }
     }
 
@@ -257,7 +262,7 @@ class AiChatController extends Controller
 
             return $this->responseJson($chats);
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse('Failed to retrieve chat messages: ' . $th->getMessage());
+            return $this->serverErrorResponse(message: 'Failed to retrieve chat messages: ' . $th->getMessage());
         }
     }
 
@@ -284,7 +289,7 @@ class AiChatController extends Controller
 
             return $this->responseJson($chatMsg->fresh(), 'Chat message updated');
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse('Failed to update chat message: ' . $th->getMessage());
+            return $this->serverErrorResponse(message: 'Failed to update chat message: ' . $th->getMessage());
         }
     }
 
@@ -305,7 +310,7 @@ class AiChatController extends Controller
 
             return $this->responseJson($chatMsg, 'Chat message deleted');
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse('Failed to delete chat message: ' . $th->getMessage());
+            return $this->serverErrorResponse(message: 'Failed to delete chat message: ' . $th->getMessage());
         }
     }
 }

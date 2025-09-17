@@ -26,6 +26,7 @@ export class AiChatPanel implements OnInit {
     messages = signal<AiChatMessageData[]>([])
     newMessage = signal('')
     isLoading = signal(false)
+    isWaitingForAiResponse = signal(false)
 
     ngOnInit() {
         this.loadMessages()
@@ -57,56 +58,67 @@ export class AiChatPanel implements OnInit {
     }
 
     sendMessage() {
-        if (this.newMessage().trim()) {
-            const messageContent = this.newMessage().trim()
-
-            // Add user message immediately
-            const localUserMsg = {
-                id: Date.now(), // temporary ID
-                user_id: 1,
-                content: messageContent,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-            }
-            this.messages.update(messages => [...messages, localUserMsg])
-
-            const formData = new FormData()
-            formData.set('content', messageContent)
-
-            this.http
-                .post<LaravelApiResponse<AiChatMessageData>>(
-                    `/api/email-templates/${this.emailTemplateId()}/chats`,
-                    formData,
-                )
-                .pipe(
-                    catchError(err => {
-                        console.warn('Failed to send message:', err)
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Error',
-                            detail:
-                                'Failed to send message. ' + err.error
-                                    ? err.error.message
-                                    : err.message,
-                            life: 10_000,
-                        })
-                        return of<LaravelApiResponse<AiChatMessageData>>({
-                            message: '',
-                            payload: null,
-                        })
-                    }),
-                )
-                .subscribe(response => {
-                    if (response.payload) {
-                        // Replace temporary user message with actual response
-                        this.messages.update(messages =>
-                            messages.map(msg =>
-                                msg.id === localUserMsg.id ? response.payload! : msg,
-                            ),
-                        )
-                        this.newMessage.set('')
-                    }
-                })
+        const messageContent = this.newMessage().trim()
+        if (!messageContent) {
+            return
         }
+
+        // Add user message immediately
+        const userMessage: AiChatMessageData = {
+            id: Date.now(),
+            user_id: 1,
+            content: messageContent,
+            sender: 'user',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        }
+
+        this.messages.update(messages => [...messages, userMessage])
+        this.newMessage.set('')
+        this.isWaitingForAiResponse.set(true)
+
+        const formData = new FormData()
+        formData.set('content', messageContent)
+
+        this.http
+            .post<LaravelApiResponse<{ user: AiChatMessageData; ai: { content: string } }>>(
+                `/api/email-templates/${encodeURIComponent(this.emailTemplateId())}/chats`,
+                formData,
+            )
+            .pipe(
+                catchError(err => {
+                    console.warn('Failed to send message:', err)
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail:
+                            'Failed to send message. ' + err.error
+                                ? err.error.message
+                                : err.message,
+                        life: 10_000,
+                    })
+                    return of<
+                        LaravelApiResponse<{ user: AiChatMessageData; ai: { content: string } }>
+                    >({
+                        message: '',
+                        payload: null,
+                    })
+                }),
+            )
+            .subscribe(response => {
+                if (response.payload) {
+                    // Add AI message
+                    const aiMessage: AiChatMessageData = {
+                        id: Date.now() + 1,
+                        user_id: null,
+                        content: response.payload!.ai.content,
+                        sender: 'ai',
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                    }
+                    this.messages.update(messages => [...messages, aiMessage])
+                }
+                this.isWaitingForAiResponse.set(false)
+            })
     }
 }
