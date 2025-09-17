@@ -1,31 +1,35 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
 import { FormsModule } from '@angular/forms'
-import { SelectModule } from 'primeng/select'
-import { InputTextModule } from 'primeng/inputtext'
-import { ButtonModule } from 'primeng/button'
-import { AvatarModule } from 'primeng/avatar'
-import { DrawerModule } from 'primeng/drawer'
+import { ActivatedRoute } from '@angular/router'
+import { catchError, of } from 'rxjs'
+import { Select } from 'primeng/select'
+import { Button } from 'primeng/button'
+import { Drawer } from 'primeng/drawer'
+import { InputText } from 'primeng/inputtext'
+import { TabsModule } from 'primeng/tabs'
+import { MessageService } from 'primeng/api'
 import { SelectOption } from '~/modules/dashboard/shared/interfaces/select-option.interface'
 import { Screen } from '~/modules/dashboard/shared/interfaces/screen.interface'
 import { ExpandedImage } from '../../components/expanded-image/expanded-image'
-import { TabsModule } from 'primeng/tabs'
-import { AiChatMessage } from '../../components/ai-chat-message/ai-chat-message'
 import { Comment } from '../../components/comment/comment'
+import { AiChatPanel } from '../../components/ai-chat-panel/ai-chat-panel'
+import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 
 @Component({
     selector: 'app-screens',
     imports: [
-        InputTextModule,
-        SelectModule,
         FormsModule,
-        DrawerModule,
-        ButtonModule,
-        AvatarModule,
-        ExpandedImage,
+        InputText,
+        Select,
+        Drawer,
+        Button,
         TabsModule,
-        AiChatMessage,
+        ExpandedImage,
         Comment,
+        AiChatPanel,
     ],
+    providers: [MessageService],
     templateUrl: './screens.html',
     styles: `
         ::ng-deep .p-drawer-content {
@@ -37,6 +41,10 @@ import { Comment } from '../../components/comment/comment'
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Screens {
+    http = inject(HttpClient)
+    route = inject(ActivatedRoute)
+    messageService = inject(MessageService)
+
     releases = [
         { name: 'All', value: 'all' },
         { name: '1.0.2', value: '1.0.2' },
@@ -48,198 +56,23 @@ export class Screens {
         { name: 'iPhone 15 Pro', value: 'iphone_15_pro' },
         { name: 'Desktop', value: 'desktop' },
     ] as const satisfies SelectOption[]
+
     selectedDevice = signal<(typeof this.devices)[number]['value']>('iphone_15')
     selectedRelease = signal<(typeof this.releases)[number]['value']>('all')
-
     shownScreenId = signal<number | null>(null)
+    screens = signal<Screen[]>([])
+    isLoading = signal<boolean>(true)
+
     drawerVisible = false
     activeTab: 'comments' | 'ai-chat' = 'comments'
 
-    screens: Screen[] = [
-        // Signup & Onboarding
-        {
-            id: 1,
-            name: 'Welcome Screen',
-            section_name: 'Signup & Onboarding',
-            image: 'https://placehold.co/390x844.svg',
-            device: 'iphone_15',
-            release: '1.0.2',
-        },
-        {
-            id: 2,
-            name: 'Create Account',
-            section_name: 'Signup & Onboarding',
-            image: 'https://placehold.co/390x844.svg',
-            device: 'iphone_15',
-            release: '1.0.2',
-        },
-        {
-            id: 3,
-            name: 'Email Verification',
-            section_name: 'Signup & Onboarding',
-            image: 'https://placehold.co/393x852.svg',
-            device: 'iphone_15_pro',
-            release: '1.0.2',
-        },
-        {
-            id: 4,
-            name: 'Profile Setup',
-            section_name: 'Signup & Onboarding',
-            image: 'https://placehold.co/393x852.svg',
-            device: 'iphone_15_pro',
-            release: '1.0.1',
-        },
-        {
-            id: 5,
-            name: 'Onboarding Tutorial',
-            section_name: 'Signup & Onboarding',
-            image: 'https://placehold.co/390x844.svg',
-            device: 'iphone_15',
-            release: '1.0.1',
-        },
-        {
-            id: 6,
-            name: 'Permissions Request',
-            section_name: 'Signup & Onboarding',
-            image: 'https://placehold.co/393x852.svg',
-            device: 'iphone_15_pro',
-            release: '1.0.0',
-        },
-        {
-            id: 7,
-            name: 'Notification Setup',
-            section_name: 'Signup & Onboarding',
-            image: 'https://placehold.co/390x844.svg',
-            device: 'iphone_15',
-            release: '1.0.0',
-        },
-        {
-            id: 8,
-            name: 'Complete Setup',
-            section_name: 'Signup & Onboarding',
-            image: 'https://placehold.co/393x852.svg',
-            device: 'iphone_15_pro',
-            release: '1.0.2',
-        },
+    constructor() {
+        const projectId = this.route.parent?.snapshot.paramMap.get('projectId')
+        if (projectId) {
+            this.loadScreens(projectId)
+        }
+    }
 
-        // Forgot Password
-        {
-            id: 9,
-            name: 'Forgot Password',
-            section_name: 'Forgot Password',
-            image: 'https://placehold.co/390x844.svg',
-            device: 'iphone_15',
-            release: '1.0.2',
-        },
-        {
-            id: 10,
-            name: 'Reset Code',
-            section_name: 'Forgot Password',
-            image: 'https://placehold.co/393x852.svg',
-            device: 'iphone_15_pro',
-            release: '1.0.1',
-        },
-        {
-            id: 11,
-            name: 'New Password',
-            section_name: 'Forgot Password',
-            image: 'https://placehold.co/390x844.svg',
-            device: 'iphone_15',
-            release: '1.0.1',
-        },
-        {
-            id: 12,
-            name: 'Password Updated',
-            section_name: 'Forgot Password',
-            image: 'https://placehold.co/393x852.svg',
-            device: 'iphone_15_pro',
-            release: '1.0.0',
-        },
-
-        // Authentication
-        {
-            id: 13,
-            name: 'Login Screen',
-            section_name: 'Authentication',
-            image: 'https://placehold.co/390x844.svg',
-            device: 'iphone_15',
-            release: '1.0.2',
-        },
-        {
-            id: 14,
-            name: 'Biometric Login',
-            section_name: 'Authentication',
-            image: 'https://placehold.co/393x852.svg',
-            device: 'iphone_15_pro',
-            release: '1.0.1',
-        },
-        {
-            id: 15,
-            name: 'Two-Factor Auth',
-            section_name: 'Authentication',
-            image: 'https://placehold.co/390x844.svg',
-            device: 'iphone_15',
-            release: '1.0.0',
-        },
-
-        // Main App
-        {
-            id: 16,
-            name: 'Dashboard',
-            section_name: 'Main App',
-            image: 'https://placehold.co/393x852.svg',
-            device: 'iphone_15_pro',
-            release: '1.0.2',
-        },
-        {
-            id: 17,
-            name: 'Profile',
-            section_name: 'Main App',
-            image: 'https://placehold.co/390x844.svg',
-            device: 'iphone_15',
-            release: '1.0.1',
-        },
-        {
-            id: 18,
-            name: 'Settings',
-            section_name: 'Main App',
-            image: 'https://placehold.co/393x852.svg',
-            device: 'iphone_15_pro',
-            release: '1.0.0',
-        },
-        {
-            id: 19,
-            name: 'Notifications',
-            section_name: 'Main App',
-            image: 'https://placehold.co/390x844.svg',
-            device: 'iphone_15',
-            release: '1.0.2',
-        },
-        {
-            id: 20,
-            name: 'Help & Support',
-            section_name: 'Main App',
-            image: 'https://placehold.co/393x852.svg',
-            device: 'iphone_15_pro',
-            release: '1.0.1',
-        },
-        {
-            id: 21,
-            name: 'Desktop Dashboard',
-            section_name: 'Main App',
-            image: 'https://placehold.co/1280x832.svg',
-            device: 'desktop',
-            release: '1.0.1',
-        },
-        {
-            id: 22,
-            name: 'Desktop Settings',
-            section_name: 'Main App',
-            image: 'https://placehold.co/1280x832.svg',
-            device: 'desktop',
-            release: '1.0.1',
-        },
-    ]
     comments = [
         {
             id: 1,
@@ -270,48 +103,21 @@ export class Screens {
         },
     ]
 
-    aiChatMessages = signal([
-        {
-            id: 1,
-            type: 'bot' as const,
-            content:
-                'Hello! I can help you analyze this screen design. What would you like to know?',
-            timestamp: '2024-01-16T10:00:00Z',
-        },
-        {
-            id: 2,
-            type: 'user' as const,
-            content: 'What are the accessibility considerations for this screen?',
-            timestamp: '2024-01-16T10:01:00Z',
-        },
-        {
-            id: 3,
-            type: 'bot' as const,
-            content:
-                'Great question! For this screen, you should consider: 1) Color contrast ratios, 2) Touch target sizes (minimum 44px), 3) Screen reader compatibility, and 4) Keyboard navigation support.',
-            timestamp: '2024-01-16T10:01:30Z',
-        },
-    ])
-    newMessage = signal('')
     newComment = signal('')
 
     filteredScreens = computed(() => {
-        return this.screens.filter(screen => {
-            const deviceMatch = screen.device === this.selectedDevice()
-            const releaseMatch =
-                this.selectedRelease() === 'all' || screen.release === this.selectedRelease()
-            return deviceMatch && releaseMatch
-        })
+        return this.screens()
     })
 
     // Group filtered screens by section
     screensBySection = computed(() => {
         const grouped = this.filteredScreens().reduce(
             (acc, screen) => {
-                if (!acc[screen.section_name]) {
-                    acc[screen.section_name] = []
+                const sectionName = screen.section_name || 'Uncategorized'
+                if (!acc[sectionName]) {
+                    acc[sectionName] = []
                 }
-                acc[screen.section_name].push(screen)
+                acc[sectionName].push(screen)
                 return acc
             },
             {} as Record<string, Screen[]>,
@@ -323,6 +129,27 @@ export class Screens {
         }))
     })
 
+    loadScreens(projectId: string) {
+        this.isLoading.set(true)
+        this.http
+            .get<LaravelApiResponse<Screen[]>>(`/api/projects/${projectId}/screens`)
+            .pipe(
+                catchError(err => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Failed to load screens. ' + err.message,
+                        life: 10_000,
+                    })
+                    return of<LaravelApiResponse<Screen[]>>({ message: '', payload: [] })
+                }),
+            )
+            .subscribe(response => {
+                this.screens.set(response.payload || [])
+                this.isLoading.set(false)
+            })
+    }
+
     showScreenDetails(screenId: number) {
         this.shownScreenId.set(screenId)
         this.drawerVisible = true
@@ -331,30 +158,6 @@ export class Screens {
     closeExpandedScreen() {
         this.shownScreenId.set(null)
         this.drawerVisible = false
-    }
-
-    sendMessage() {
-        if (this.newMessage().trim()) {
-            const newMsg = {
-                id: this.aiChatMessages().length + 1,
-                type: 'user' as const,
-                content: this.newMessage(),
-                timestamp: new Date().toISOString(),
-            }
-            this.aiChatMessages.update(messages => [...messages, newMsg])
-            this.newMessage.set('')
-
-            setTimeout(() => {
-                const botResponse = {
-                    id: this.aiChatMessages().length + 1,
-                    type: 'bot' as const,
-                    content:
-                        "Thanks for your message! I'm here to help with any questions about this screen design.",
-                    timestamp: new Date().toISOString(),
-                }
-                this.aiChatMessages.update(messages => [...messages, botResponse])
-            }, 1000)
-        }
     }
 
     sendComment() {
@@ -374,6 +177,6 @@ export class Screens {
     }
 
     getScreenById(id: number) {
-        return this.screens.find(screen => screen.id === id)
+        return this.screens().find(screen => screen.id === id)
     }
 }

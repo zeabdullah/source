@@ -15,4 +15,4 @@ RUN pnpm run build
 
 EXPOSE 4000
 
-CMD ["pnpm", "serve:ssr"]
+CMD ["pnpm", "serve:ssr", "--host", "0.0.0.0"]

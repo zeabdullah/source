@@ -3,19 +3,19 @@ import { FormsModule } from '@angular/forms'
 import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute } from '@angular/router'
 import { catchError, of } from 'rxjs'
-import { MessageService } from 'primeng/api'
 import { Toast } from 'primeng/toast'
 import { Button } from 'primeng/button'
 import { Drawer } from 'primeng/drawer'
-import { ProgressSpinner } from 'primeng/progressspinner'
+import { Select } from 'primeng/select'
 import { InputText } from 'primeng/inputtext'
-import { SelectModule } from 'primeng/select'
 import { TabsModule } from 'primeng/tabs'
+import { MessageService } from 'primeng/api'
+import { ProgressSpinner } from 'primeng/progressspinner'
 import { SelectOption } from '~/modules/dashboard/shared/interfaces/select-option.interface'
 import { EmailTemplate } from '../../shared/interfaces/email.interface'
 import { ExpandedImage } from '../../components/expanded-image/expanded-image'
 import { Comment } from '../../components/comment/comment'
-import { AiChatMessage } from '../../components/ai-chat-message/ai-chat-message'
+import { AiChatPanel } from '../../components/ai-chat-panel/ai-chat-panel'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 
@@ -26,14 +26,14 @@ import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.int
         InputText,
         Button,
         Drawer,
-        SelectModule,
+        Select,
         TabsModule,
         Comment,
         Toast,
         ProgressSpinner,
         ExpandedImage,
         EmptyState,
-        AiChatMessage,
+        AiChatPanel,
     ],
     providers: [MessageService],
     templateUrl: './email-templates.html',
@@ -57,19 +57,17 @@ export class EmailTemplates {
         { name: '1.0.1', value: '1.0.1' },
         { name: '1.0.0', value: '1.0.0' },
     ] as const satisfies SelectOption[]
-    selectedRelease = signal<(typeof this.releases)[number]['value']>('all')
 
+    selectedRelease = signal<(typeof this.releases)[number]['value']>('all')
     shownEmailId = signal<number | null>(null)
+    emailTemplates = signal<EmailTemplate[]>([])
+    isLoading = signal<boolean>(true)
+
     drawerVisible = false
     activeTab: 'comments' | 'ai-chat' = 'comments'
 
-    emailTemplates = signal<EmailTemplate[]>([])
-    isLoading = signal<boolean>(true)
-    projectId: string | null = null
-
     constructor() {
         const projectId = this.route.parent?.snapshot.paramMap.get('projectId')
-        console.log(projectId)
         if (projectId) {
             this.loadEmailTemplates(projectId)
         }
@@ -180,22 +178,6 @@ export class EmailTemplates {
         },
     ]
 
-    aiChatMessages = signal([
-        {
-            id: 1,
-            type: 'bot' as const,
-            content:
-                'Hello! I can help you analyze this email design. What would you like to know?',
-            timestamp: '2024-01-16T10:00:00Z',
-        },
-        {
-            id: 2,
-            type: 'user' as const,
-            content: 'What are the accessibility considerations for this email?',
-            timestamp: '2024-01-16T10:01:00Z',
-        },
-    ])
-    newMessage = signal('')
     newComment = signal('')
 
     filteredEmailTemplates = computed(() => {
@@ -231,30 +213,6 @@ export class EmailTemplates {
     closeExpandedEmail() {
         this.shownEmailId.set(null)
         this.drawerVisible = false
-    }
-
-    sendMessage() {
-        if (this.newMessage().trim()) {
-            const newMsg = {
-                id: this.aiChatMessages().length + 1,
-                type: 'user' as const,
-                content: this.newMessage(),
-                timestamp: new Date().toISOString(),
-            }
-            this.aiChatMessages.update(messages => [...messages, newMsg])
-            this.newMessage.set('')
-
-            setTimeout(() => {
-                const botResponse = {
-                    id: this.aiChatMessages().length + 1,
-                    type: 'bot' as const,
-                    content:
-                        "Thanks for your message! I'm here to help with any questions about this email design.",
-                    timestamp: new Date().toISOString(),
-                }
-                this.aiChatMessages.update(messages => [...messages, botResponse])
-            }, 1000)
-        }
     }
 
     sendComment() {
