@@ -11,6 +11,7 @@ import { ExpandedImage } from '../../components/expanded-image/expanded-image'
 import { TabsModule } from 'primeng/tabs'
 import { AiChatMessage } from '../../components/ai-chat-message/ai-chat-message'
 import { Comment } from '../../components/comment/comment'
+import { AiChatMessageData } from '../../shared/interfaces/ai-chat-message-data.interface'
 
 @Component({
     selector: 'app-screens',
@@ -270,26 +271,32 @@ export class Screens {
         },
     ]
 
-    aiChatMessages = signal([
+    aiChatMessages = signal<AiChatMessageData[]>([
         {
             id: 1,
-            type: 'bot' as const,
+            user_id: null,
+            sender: 'ai' as const,
             content:
                 'Hello! I can help you analyze this screen design. What would you like to know?',
-            timestamp: '2024-01-16T10:00:00Z',
+            created_at: '2024-01-16T10:00:00Z',
+            updated_at: '2024-01-16T10:00:00Z',
         },
         {
             id: 2,
-            type: 'user' as const,
+            user_id: 1,
+            sender: 'user' as const,
             content: 'What are the accessibility considerations for this screen?',
-            timestamp: '2024-01-16T10:01:00Z',
+            created_at: '2024-01-16T10:01:00Z',
+            updated_at: '2024-01-16T10:00:00Z',
         },
         {
             id: 3,
-            type: 'bot' as const,
+            user_id: null,
+            sender: 'ai' as const,
             content:
                 'Great question! For this screen, you should consider: 1) Color contrast ratios, 2) Touch target sizes (minimum 44px), 3) Screen reader compatibility, and 4) Keyboard navigation support.',
-            timestamp: '2024-01-16T10:01:30Z',
+            created_at: '2024-01-16T10:01:30Z',
+            updated_at: '2024-01-16T10:00:00Z',
         },
     ])
     newMessage = signal('')
@@ -335,22 +342,26 @@ export class Screens {
 
     sendMessage() {
         if (this.newMessage().trim()) {
-            const newMsg = {
+            const newMsg: AiChatMessageData = {
                 id: this.aiChatMessages().length + 1,
-                type: 'user' as const,
+                user_id: 1,
+                sender: 'user' as const,
                 content: this.newMessage(),
-                timestamp: new Date().toISOString(),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
             }
             this.aiChatMessages.update(messages => [...messages, newMsg])
             this.newMessage.set('')
 
             setTimeout(() => {
-                const botResponse = {
+                const botResponse: AiChatMessageData = {
                     id: this.aiChatMessages().length + 1,
-                    type: 'bot' as const,
+                    user_id: null,
+                    sender: 'ai' as const,
                     content:
                         "Thanks for your message! I'm here to help with any questions about this screen design.",
-                    timestamp: new Date().toISOString(),
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
                 }
                 this.aiChatMessages.update(messages => [...messages, botResponse])
             }, 1000)

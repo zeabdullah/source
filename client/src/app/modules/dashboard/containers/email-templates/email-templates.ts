@@ -15,7 +15,7 @@ import { SelectOption } from '~/modules/dashboard/shared/interfaces/select-optio
 import { EmailTemplate } from '../../shared/interfaces/email.interface'
 import { ExpandedImage } from '../../components/expanded-image/expanded-image'
 import { Comment } from '../../components/comment/comment'
-import { AiChatMessage } from '../../components/ai-chat-message/ai-chat-message'
+import { AiChatPanel } from '../../components/ai-chat-panel/ai-chat-panel'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 
@@ -33,7 +33,7 @@ import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.int
         ProgressSpinner,
         ExpandedImage,
         EmptyState,
-        AiChatMessage,
+        AiChatPanel,
     ],
     providers: [MessageService],
     templateUrl: './email-templates.html',
@@ -69,7 +69,6 @@ export class EmailTemplates {
 
     constructor() {
         const projectId = this.route.parent?.snapshot.paramMap.get('projectId')
-        console.log(projectId)
         if (projectId) {
             this.loadEmailTemplates(projectId)
         }
@@ -180,22 +179,6 @@ export class EmailTemplates {
         },
     ]
 
-    aiChatMessages = signal([
-        {
-            id: 1,
-            type: 'bot' as const,
-            content:
-                'Hello! I can help you analyze this email design. What would you like to know?',
-            timestamp: '2024-01-16T10:00:00Z',
-        },
-        {
-            id: 2,
-            type: 'user' as const,
-            content: 'What are the accessibility considerations for this email?',
-            timestamp: '2024-01-16T10:01:00Z',
-        },
-    ])
-    newMessage = signal('')
     newComment = signal('')
 
     filteredEmailTemplates = computed(() => {
@@ -231,30 +214,6 @@ export class EmailTemplates {
     closeExpandedEmail() {
         this.shownEmailId.set(null)
         this.drawerVisible = false
-    }
-
-    sendMessage() {
-        if (this.newMessage().trim()) {
-            const newMsg = {
-                id: this.aiChatMessages().length + 1,
-                type: 'user' as const,
-                content: this.newMessage(),
-                timestamp: new Date().toISOString(),
-            }
-            this.aiChatMessages.update(messages => [...messages, newMsg])
-            this.newMessage.set('')
-
-            setTimeout(() => {
-                const botResponse = {
-                    id: this.aiChatMessages().length + 1,
-                    type: 'bot' as const,
-                    content:
-                        "Thanks for your message! I'm here to help with any questions about this email design.",
-                    timestamp: new Date().toISOString(),
-                }
-                this.aiChatMessages.update(messages => [...messages, botResponse])
-            }, 1000)
-        }
     }
 
     sendComment() {
