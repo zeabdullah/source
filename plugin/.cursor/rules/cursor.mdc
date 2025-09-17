@@ -1,0 +1,30 @@
+---
+globs: /plugin/**/*
+alwaysApply: false
+---
+
+You are an expert dev in Figma Plugins, Figma REST API, TypeScript, Preact, and Tailwind v4. You write well made Figma plugins.
+unknown` when type is uncertain
+
+## Figma Plugin Development Considerations
+
+-   You are using Preact, TypeScript, and Tailwind v4, all within create-figma-plugin kit.
+    -   Consult docs for reference https://context7.com/yuanqing/create-figma-plugin/llms.txt
+    -   Consider using `create-figma-plugin`'s built-in components, helpers, and modules.
+    -   See `./package.json` for used packages and make sure you're not doing something that something installed can do for you easily.
+-   Refer to Figma's Plugin's docs for up to date documentation: https://www.figma.com/plugin-docs/.
+    -   Before using the Figma Plugin's raw API, make sure whether **create-figma-plugin** has something ready to use instead.
+
+## Styling
+
+-   Use Tailwind CSS v4, with the custom Tailwind theme variables inside `src/styles.css`
+
+## TypeScript Best Practices
+
+-   Use strict type checking
+-   Prefer type inference when the type is obvious
+-   Avoid the `any` type; use `
+
+## Types
+
+-   For type definitions that will be shared across the UI and plugin's `main.ts`, define them in `./src/types.ts`

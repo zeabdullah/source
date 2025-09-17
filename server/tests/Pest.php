@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -12,7 +15,7 @@
 */
 
 pest()->extend(Tests\TestCase::class)
- // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -41,7 +44,15 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Summary of createTestRequestAndRoute
+ * @return array{Request,Route}
+ */
+function createTestRequestAndRoute()
 {
-    // ..
+    $request = Request::create('/_test');
+    $route = new Route(['GET'], '/_test', []);
+    $route->bind($request);
+
+    return [$request, $route];
 }

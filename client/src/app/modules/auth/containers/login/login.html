@@ -1,0 +1,71 @@
+<div class="flex min-h-full flex-col items-stretch justify-center gap-y-8 p-4">
+    <app-logo class="mx-auto" />
+
+    <div class="mx-auto w-full max-w-[580px] rounded-3xl border border-gray-200 p-14 shadow-xs">
+        <h1 class="mb-14 text-center text-h2 font-bold tracking-tight">Log in to your account</h1>
+
+        @if (errorMessage()) {
+        <div class="mb-4">
+            <p-message severity="error"> {{ errorMessage() }} </p-message>
+        </div>
+        }
+
+        <form class="mb-8 space-y-8" [formGroup]="loginForm" (ngSubmit)="login()">
+            <fieldset class="space-y-4" [disabled]="isLoading()">
+                <div class="flex flex-col gap-1">
+                    <label for="email" class="text-label-text">Email Address</label>
+                    <input
+                        pInputText
+                        id="email"
+                        formControlName="email"
+                        type="email"
+                        name="email"
+                        class="w-full"
+                        placeholder="john@example.com"
+                        [invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+                    />
+                    @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+                    <p-message severity="error" variant="simple">
+                        Must be a valid email.
+                    </p-message>
+                    }
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label for="password" class="text-label-text">Password</label>
+                    <input
+                        pInputText
+                        id="password"
+                        formControlName="password"
+                        type="password"
+                        name="password"
+                        class="w-full"
+                        [invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+                    />
+                    @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+                    <p-message severity="error" variant="simple">Password is required.</p-message>
+                    }
+                </div>
+
+                <div class="text-end">
+                    <a
+                        routerLink="/auth/forgot-password"
+                        class="text-button font-bold text-brand-500 hover:underline"
+                    >
+                        Forgot password?
+                    </a>
+                </div>
+            </fieldset>
+
+            <p-button type="submit" fluid [disabled]="!loginForm.valid" [loading]="isLoading()">
+                @if (isLoading()) { Logging in... } @else { Log in }
+            </p-button>
+        </form>
+
+        <div class="text-center text-button text-gray-700">
+            Don't have an account?
+            <a routerLink="/auth/register" class="font-bold text-brand-500 hover:underline"
+                >Create an account</a
+            >.
+        </div>
+    </div>
+</div>

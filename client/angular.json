@@ -1,104 +1,141 @@
 {
-  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-  "version": 1,
-  "newProjectRoot": "projects",
-  "projects": {
-    "source-client": {
-      "projectType": "application",
-      "schematics": {},
-      "root": "",
-      "sourceRoot": "src",
-      "prefix": "app",
-      "architect": {
-        "build": {
-          "builder": "@angular/build:application",
-          "options": {
-            "browser": "src/main.ts",
-            "tsConfig": "tsconfig.app.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
-              "src/styles.css"
-            ],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
-          },
-          "configurations": {
-            "production": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+    "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+    "version": 1,
+    "newProjectRoot": "projects",
+    "projects": {
+        "source-client": {
+            "projectType": "application",
+            "schematics": {
+                "@schematics/angular:component": {
+                    "path": "src/app",
+                    "style": "none",
+                    "skipTests": true,
+                    "inlineStyle": false,
+                    "inlineTemplate": false,
+                    "changeDetection": "OnPush"
                 },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                "@schematics/angular:guard": {
+                    "path": "src/app",
+                    "typeSeparator": ".",
+                    "skipTests": true
+                },
+                "@schematics/angular:service": {
+                    "path": "src/app",
+                    "type": "service",
+                    "skipTests": true
+                },
+                "@schematics/angular:pipe": {
+                    "path": "src/app/pipes",
+                    "typeSeparator": ".",
+                    "skipTests": true
+                },
+                "@schematics/angular:directive": {
+                    "path": "src/app/directives",
+                    "type": "directive"
+                },
+                "@schematics/angular:resolver": {
+                    "path": "src/app/shared/resolvers",
+                    "typeSeparator": ".",
+                    "skipTests": true
+                },
+                "@schematics/angular:interceptor": {
+                    "path": "src/app/shared/interceptors",
+                    "typeSeparator": ".",
+                    "skipTests": true
+                },
+                "@schematics/angular:interface": {
+                    "path": "src/app/shared/interfaces",
+                    "type": "interface"
                 }
-              ],
-              "outputHashing": "all"
             },
-            "development": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true
+            "root": "",
+            "sourceRoot": "src",
+            "prefix": "app",
+            "architect": {
+                "build": {
+                    "builder": "@angular/build:application",
+                    "options": {
+                        "browser": "src/main.ts",
+                        "tsConfig": "tsconfig.app.json",
+                        "assets": [
+                            {
+                                "glob": "**/*",
+                                "input": "public"
+                            }
+                        ],
+                        "styles": ["src/styles.css"],
+                        "server": "src/main.server.ts",
+                        "outputMode": "server",
+                        "ssr": {
+                            "entry": "src/server.ts"
+                        }
+                    },
+                    "configurations": {
+                        "production": {
+                            "budgets": [
+                                {
+                                    "type": "initial",
+                                    "maximumWarning": "500kB",
+                                    "maximumError": "1MB"
+                                },
+                                {
+                                    "type": "anyComponentStyle",
+                                    "maximumWarning": "4kB",
+                                    "maximumError": "8kB"
+                                }
+                            ],
+                            "outputHashing": "all"
+                        },
+                        "development": {
+                            "optimization": false,
+                            "extractLicenses": false,
+                            "sourceMap": true
+                        }
+                    },
+                    "defaultConfiguration": "production"
+                },
+                "serve": {
+                    "builder": "@angular/build:dev-server",
+                    "configurations": {
+                        "production": {
+                            "buildTarget": "source-client:build:production"
+                        },
+                        "development": {
+                            "buildTarget": "source-client:build:development"
+                        }
+                    },
+                    "options": {
+                        "host": "0.0.0.0"
+                    },
+                    "defaultConfiguration": "development"
+                },
+                "extract-i18n": {
+                    "builder": "@angular/build:extract-i18n"
+                },
+                "test": {
+                    "builder": "@angular/build:karma",
+                    "options": {
+                        "tsConfig": "tsconfig.spec.json",
+                        "assets": [
+                            {
+                                "glob": "**/*",
+                                "input": "public"
+                            }
+                        ],
+                        "styles": ["src/styles.css"]
+                    }
+                },
+                "lint": {
+                    "builder": "@angular-eslint/builder:lint",
+                    "options": {
+                        "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+                    }
+                }
             }
-          },
-          "defaultConfiguration": "production"
-        },
-        "serve": {
-          "builder": "@angular/build:dev-server",
-          "configurations": {
-            "production": {
-              "buildTarget": "source-client:build:production"
-            },
-            "development": {
-              "buildTarget": "source-client:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "extract-i18n": {
-          "builder": "@angular/build:extract-i18n"
-        },
-        "test": {
-          "builder": "@angular/build:karma",
-          "options": {
-            "tsConfig": "tsconfig.spec.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
-              "src/styles.css"
-            ]
-          }
-        },
-        "lint": {
-          "builder": "@angular-eslint/builder:lint",
-          "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
-            ]
-          }
         }
-      }
+    },
+    "cli": {
+        "packageManager": "pnpm",
+        "schematicCollections": ["angular-eslint"]
     }
-  },
-  "cli": {
-    "schematicCollections": [
-      "angular-eslint"
-    ]
-  }
 }

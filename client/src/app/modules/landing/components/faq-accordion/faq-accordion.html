@@ -1,0 +1,28 @@
+<div class="rounded-2xl bg-brand-100 p-6 text-brand-900 transition-colors hover:text-brand-500">
+    <button (click)="toggleOpen()" class="flex w-full items-center justify-between text-left">
+        <h3 class="font-bold">{{ question() }}</h3>
+
+        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center">
+            @if (isOpen()) {
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                <path d="M5 11h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            } @else {
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                <path
+                    d="M11 5v12M5 11h12"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                />
+            </svg>
+            }
+        </div>
+    </button>
+
+    @if (isOpen()) {
+    <div class="mt-5 text-brand-900">
+        <p>{{ answer() }}</p>
+    </div>
+    }
+</div>

@@ -1,5 +1,6 @@
 ---
-alwaysApply: true
+globs: /client/**/*
+alwaysApply: false
 ---
 
 You are an expert in TypeScript, Angular, and scalable web application development. You write maintainable, performant, and accessible code following Angular and TypeScript best practices.
@@ -12,24 +13,49 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ## Angular Best Practices
 
+- You're using Angular v20.
+- Double check the Angular v20 docs whether the feature to be used is needed anymore or there's a newer alternative: https://context7.com/llmstxt/context7_websites_angular_dev_llms_txt/llms.txt.
 - Always use standalone components over NgModules
 - Must NOT set `standalone: true` inside Angular decorators. It's the default.
 - Use signals for state management
 - Implement lazy loading for feature routes
 - Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
 - Use `NgOptimizedImage` for all static images.
-  - `NgOptimizedImage` does not work for inline base64 images.
+    - `NgOptimizedImage` does not work for inline base64 images.
+
+## Styling
+
+- Use Tailwind CSS v4, with the custom Tailwind theme variables inside `src/styles.css`
+- Some of Tailwind's default classes are not available due to the custom theme variables, so make sure a class exists before writing it.
+
+## Consistency
+
+- When in doubt, prefer and follow convention and consistency based on the file/folder structure around you.
+- Refer to `/eslint.config.js` for lint rules, and make sure to ALWAYS abide by them.
+- ALWAYS prefer to use Angular's schematics over manually creating files, using `ng generate`.
+    - E.g. To create an interface, use:
+        - ng g interface `<interface-name>`
+    - E.g. To create a guard, use:
+        - ng g guard `<guard-name>`
+    - Refer to `/angular.json` for details about the their configurations
 
 ## Components
 
 - Keep components small and focused on a single responsibility
+- Use primeng and primeicons, in combination with Tailwind, when creating components, when possible
+    - Consider PrimeNG before making any components from scratch
+    - Refer to `src/app/primeng.preset.ts` for the style presets, in addition to `src/app/app.config.ts` for configurations
 - Use `input()` and `output()` functions instead of decorators
 - Use `computed()` for derived state
 - Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component` decorator
-- Prefer inline templates for small components
+- Prefer inline templates for tiny components.
 - Prefer Reactive forms instead of Template-driven ones
 - Do NOT use `ngClass`, use `class` bindings instead
 - Do NOT use `ngStyle`, use `style` bindings instead
+- Use `ng g c <component-name>` command to create a component
+- Components should be named with **PascalCase**, without a `Component` suffix.
+    - Example: `ProfilePhoto`, `Button`
+        - NOT `ProfilePhotoComponent`, `ButtonComponent`
 
 ## State Management
 

@@ -1,0 +1,142 @@
+@let id = shownScreenId();
+<!--  -->
+@if (id !== null) {
+<!--  -->
+@let item = getScreenById(id) ?? { name: '', image: '' };
+
+<div class="fixed inset-0 z-[1102] flex items-center justify-center bg-black/20">
+    <div class="relative isolate h-full w-full" (click)="closeExpandedScreen()">
+        <div class="absolute inset-0 isolate -z-10 bg-black/10"></div>
+        <app-expanded-image [item]="{ name: item.name, image: item.image }" />
+    </div>
+</div>
+}
+
+<p-drawer
+    [(visible)]="drawerVisible"
+    header="Screen Details"
+    position="right"
+    closable="false"
+    closeOnEscape="false"
+    styleClass="w-full max-w-[450px]"
+    [baseZIndex]="1100"
+>
+    <p-tabs [(value)]="activeTab" class="flex h-full flex-col">
+        <p-tablist>
+            <p-tab value="comments">Comments</p-tab>
+            <p-tab value="ai-chat">AI Chat</p-tab>
+        </p-tablist>
+        <p-tabpanels class="flex-1 overflow-y-auto pe-4">
+            <p-tabpanel value="comments" class="flex flex-col">
+                <div class="flex-1 space-y-4 overflow-y-auto p-2">
+                    @for (comment of comments; track comment.id) {
+                    <app-comment [comment]="comment" />
+                    }
+                </div>
+                <div class="flex gap-2 border-t border-gray-100 pt-3">
+                    <input
+                        pInputText
+                        [(ngModel)]="newComment"
+                        (keydown.enter)="sendComment()"
+                        placeholder="Add a comment..."
+                        class="flex-1"
+                    />
+                    <p-button
+                        (onClick)="sendComment()"
+                        [disabled]="!newComment().trim()"
+                        icon="pi pi-send"
+                        size="large"
+                        styleClass="rounded-xl"
+                    />
+                </div>
+            </p-tabpanel>
+            <p-tabpanel
+                value="ai-chat"
+                class="flex flex-col"
+                [class.h-full]="activeTab === 'ai-chat'"
+            >
+                <div class="flex-1 space-y-4 overflow-y-auto p-2">
+                    @for (message of aiChatMessages(); track message.id) {
+                    <app-ai-chat-message [message]="message" />
+                    }
+                </div>
+                <div class="flex gap-2 border-t border-gray-100 pt-3">
+                    <input
+                        pInputText
+                        [(ngModel)]="newMessage"
+                        (keydown.enter)="sendMessage()"
+                        placeholder="Ask about this screen..."
+                        class="flex-1"
+                    />
+                    <p-button
+                        (onClick)="sendMessage()"
+                        [disabled]="!newMessage().trim()"
+                        icon="pi pi-send"
+                        size="large"
+                        styleClass="rounded-xl"
+                    />
+                </div>
+            </p-tabpanel>
+        </p-tabpanels>
+    </p-tabs>
+</p-drawer>
+
+<div class="flex flex-1 flex-col">
+    <div class="flex-shrink-0">
+        <div class="mb-16 flex gap-4">
+            <div class="flex flex-col gap-1">
+                <label for="release">Release</label>
+                <p-select
+                    [options]="releases"
+                    [(ngModel)]="selectedRelease"
+                    [checkmark]="true"
+                    optionLabel="name"
+                    optionValue="value"
+                    placeholder="Release..."
+                    class="w-44 basis-full lg:w-56"
+                />
+            </div>
+            <div class="flex flex-col gap-1">
+                <label for="device">Device</label>
+                <p-select
+                    [options]="devices"
+                    [(ngModel)]="selectedDevice"
+                    [checkmark]="true"
+                    optionLabel="name"
+                    optionValue="value"
+                    placeholder="Device..."
+                    class="w-44 basis-full lg:w-56"
+                />
+            </div>
+        </div>
+
+        <div class="space-y-12">
+            @for (section of screensBySection(); track section.sectionName) {
+            <section>
+                <h3 class="mb-4 font-bold">{{ section.sectionName }}</h3>
+                <div class="scrollbar-hidden flex w-full gap-4 overflow-x-auto">
+                    @for (screen of section.screens; track screen.id) {
+                    <button
+                        (click)="showScreenDetails(screen.id)"
+                        class="group relative min-w-fit shrink-0 overflow-hidden rounded-xl border border-black/10 bg-gray-100 transition-all duration-300 hover:shadow-lg"
+                    >
+                        <img
+                            [src]="screen.image"
+                            [alt]="screen.name"
+                            width="200"
+                            class="h-80 w-[260px] object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                        <!-- Floating name overlay -->
+                        <div
+                            class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                        >
+                            <p class="text-center font-semibold text-white">{{ screen.name }}</p>
+                        </div>
+                    </button>
+                    }
+                </div>
+            </section>
+            }
+        </div>
+    </div>
+</div>

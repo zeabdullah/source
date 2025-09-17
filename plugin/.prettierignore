@@ -1,0 +1,18 @@
+# Node
+*.log
+*.log.*
+node_modules
+
+package.json
+
+# lockfiles
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+
+out/
+dist/
+code.js
+
+manifest.json

@@ -1,0 +1,44 @@
+{
+    "dependencies": {
+        "@create-figma-plugin/ui": "^4.0.3",
+        "@create-figma-plugin/utilities": "^4.0.3",
+        "preact": ">=10"
+    },
+    "devDependencies": {
+        "@create-figma-plugin/build": "^4.0.3",
+        "@create-figma-plugin/tsconfig": "^4.0.3",
+        "@figma/plugin-typings": "1.109.0",
+        "@j/cli": ">=4",
+        "concurrently": ">=9",
+        "tailwindcss": ">=4",
+        "typescript": ">=5"
+    },
+    "scripts": {
+        "build": "npm run build:css && npm run build:js",
+        "build:css": "npx @tailwindcss/cli --input ./src/input.css --output ./src/output.css",
+        "build:js": "build-figma-plugin --typecheck --minify",
+        "watch": "npm run build:css && concurrently npm:watch:css npm:watch:js",
+        "watch:css": "npx @tailwindcss/cli --input ./src/input.css --output ./src/output.css --watch",
+        "watch:js": "build-figma-plugin --typecheck --watch"
+    },
+    "figma-plugin": {
+        "editorType": [
+            "figma"
+        ],
+        "id": "plugin",
+        "name": "Plugin",
+        "main": "src/main.ts",
+        "ui": "src/ui.tsx",
+        "networkAccess": {
+            "allowedDomains": [
+                "https://*.pravatar.cc"
+            ],
+            "reasoning": "",
+            "devAllowedDomains": [
+                "http://localhost:8000",
+                "http://localhost:4000",
+                "http://localhost:4200"
+            ]
+        }
+    }
+}

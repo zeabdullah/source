@@ -1,0 +1,47 @@
+# Ignore dependencies that will be installed inside container
+vendor
+node_modules
+
+# Ignore environment files (contain sensitive info)
+.env
+.env.*.local
+
+# Ignore storage cache/logs (will be created at runtime)
+storage/*.key
+storage/*.log
+storage/debugbar
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+storage/logs
+
+# Ignore build output and generated assets
+public/hot
+public/storage
+public/mix-manifest.json
+public/js
+public/css
+
+# Ignore IDE/editor files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Tests and coverage files
+tests
+phpunit.xml
+phpunit.xml.dist
+coverage
+
+# Misc
+*.log
+*.cache
+*.bak
+*.old
+*.zip
+*.tar.gz
