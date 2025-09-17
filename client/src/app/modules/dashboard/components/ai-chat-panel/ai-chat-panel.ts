@@ -21,7 +21,9 @@ import { AiChatMessageData } from '../../shared/interfaces/ai-chat-message-data.
 export class AiChatPanel implements OnInit {
     http = inject(HttpClient)
     messageService = inject(MessageService)
-    emailTemplateId = input.required<number>()
+
+    emailTemplateId = input<number | undefined>()
+    screenId = input<number | undefined>()
 
     messages = signal<AiChatMessageData[]>([])
     newMessage = signal('')
@@ -32,11 +34,21 @@ export class AiChatPanel implements OnInit {
         this.loadMessages()
     }
 
+    get chatId(): number {
+        return this.emailTemplateId() ?? this.screenId() ?? 0
+    }
+
+    get chatType(): string {
+        return this.emailTemplateId() ? 'email-templates' : 'screens'
+    }
+
     loadMessages() {
+        if (!this.chatId) return
+
         this.isLoading.set(true)
         this.http
             .get<LaravelApiResponse<AiChatMessageData[]>>(
-                `/api/email-templates/${encodeURIComponent(this.emailTemplateId())}/chats`,
+                `/api/${this.chatType}/${encodeURIComponent(this.chatId)}/chats`,
             )
             .pipe(
                 catchError(err => {
@@ -59,7 +71,7 @@ export class AiChatPanel implements OnInit {
 
     sendMessage() {
         const messageContent = this.newMessage().trim()
-        if (!messageContent) {
+        if (!messageContent || !this.chatId) {
             return
         }
 
@@ -82,7 +94,7 @@ export class AiChatPanel implements OnInit {
 
         this.http
             .post<LaravelApiResponse<{ user: AiChatMessageData; ai: { content: string } }>>(
-                `/api/email-templates/${encodeURIComponent(this.emailTemplateId())}/chats`,
+                `/api/${this.chatType}/${encodeURIComponent(this.chatId)}/chats`,
                 formData,
             )
             .pipe(

@@ -8,9 +8,9 @@ import { TabsModule } from 'primeng/tabs'
 import { SelectOption } from '~/modules/dashboard/shared/interfaces/select-option.interface'
 import { Screen } from '~/modules/dashboard/shared/interfaces/screen.interface'
 import { ExpandedImage } from '../../components/expanded-image/expanded-image'
-import { AiChatMessage } from '../../components/ai-chat-message/ai-chat-message'
 import { Comment } from '../../components/comment/comment'
 import { AiChatMessageData } from '../../shared/interfaces/ai-chat-message-data.interface'
+import { AiChatPanel } from '../../components/ai-chat-panel/ai-chat-panel'
 
 @Component({
     selector: 'app-screens',
@@ -22,8 +22,8 @@ import { AiChatMessageData } from '../../shared/interfaces/ai-chat-message-data.
         Button,
         TabsModule,
         ExpandedImage,
-        AiChatMessage,
         Comment,
+        AiChatPanel,
     ],
     templateUrl: './screens.html',
     styles: `
