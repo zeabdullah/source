@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AiChatController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Common\AuthController;
 use App\Http\Controllers\Project\ProjectController;
@@ -85,13 +86,18 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 
-    // // Comments (per screen, polymorphic but scoped here)
-    // Route::get('/screens/{screenId}/comments', [CommentController::class, 'index']);
-    // Route::post('/screens/{screenId}/comments', [CommentController::class, 'store']);
-    // Route::get('/comments/{commentId}', [CommentController::class, 'show']);
-    // Route::put('/comments/{commentId}', [CommentController::class, 'update']);
-    // Route::patch('/comments/{commentId}', [CommentController::class, 'update']);
-    // Route::delete('/comments/{commentId}', [CommentController::class, 'destroy']);
+    // Comments (per screen, polymorphic but scoped here)
+    Route::get('/screens/{screenId}/comments', [CommentController::class, 'getScreenComments']);
+    Route::post('/screens/{screenId}/comments', [CommentController::class, 'createScreenComment']);
+
+    // Comments (per email template, polymorphic but scoped here)
+    Route::get('/email-templates/{emailTemplateId}/comments', [CommentController::class, 'getEmailTemplateComments']);
+    Route::post('/email-templates/{emailTemplateId}/comments', [CommentController::class, 'createEmailTemplateComment']);
+
+    // Comments (by id)
+    Route::get('/comments/{commentId}', [CommentController::class, 'getCommentById']);
+    Route::put('/comments/{commentId}', [CommentController::class, 'updateCommentById']);
+    Route::delete('/comments/{commentId}', [CommentController::class, 'deleteCommentById']);
 });
 
 // BASIC auth routes

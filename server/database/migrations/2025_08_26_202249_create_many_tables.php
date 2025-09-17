@@ -45,15 +45,6 @@ return new class extends Migration {
             $table->string('thumbnail_url')->nullable();
             $table->timestamps();
         });
-
-        Schema::create('comments', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('commentable_id')->constrained('screens')->onDelete('cascade');
-            $table->string('commentable_type');
-            $table->text('content');
-            $table->timestamps();
-        });
     }
 
     /**
@@ -61,7 +52,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('comments');
         Schema::dropIfExists('email_templates');
         Schema::dropIfExists('screens');
         Schema::dropIfExists('releases');
