@@ -1,14 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { SelectModule } from 'primeng/select'
-import { InputTextModule } from 'primeng/inputtext'
-import { ButtonModule } from 'primeng/button'
-import { AvatarModule } from 'primeng/avatar'
-import { DrawerModule } from 'primeng/drawer'
+import { Select } from 'primeng/select'
+import { InputText } from 'primeng/inputtext'
+import { Button } from 'primeng/button'
+import { Drawer } from 'primeng/drawer'
+import { TabsModule } from 'primeng/tabs'
 import { SelectOption } from '~/modules/dashboard/shared/interfaces/select-option.interface'
 import { Screen } from '~/modules/dashboard/shared/interfaces/screen.interface'
 import { ExpandedImage } from '../../components/expanded-image/expanded-image'
-import { TabsModule } from 'primeng/tabs'
 import { AiChatMessage } from '../../components/ai-chat-message/ai-chat-message'
 import { Comment } from '../../components/comment/comment'
 import { AiChatMessageData } from '../../shared/interfaces/ai-chat-message-data.interface'
@@ -16,14 +15,13 @@ import { AiChatMessageData } from '../../shared/interfaces/ai-chat-message-data.
 @Component({
     selector: 'app-screens',
     imports: [
-        InputTextModule,
-        SelectModule,
         FormsModule,
-        DrawerModule,
-        ButtonModule,
-        AvatarModule,
-        ExpandedImage,
+        InputText,
+        Select,
+        Drawer,
+        Button,
         TabsModule,
+        ExpandedImage,
         AiChatMessage,
         Comment,
     ],

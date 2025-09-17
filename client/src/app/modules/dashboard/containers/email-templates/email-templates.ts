@@ -9,7 +9,7 @@ import { Button } from 'primeng/button'
 import { Drawer } from 'primeng/drawer'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { InputText } from 'primeng/inputtext'
-import { SelectModule } from 'primeng/select'
+import { Select } from 'primeng/select'
 import { TabsModule } from 'primeng/tabs'
 import { SelectOption } from '~/modules/dashboard/shared/interfaces/select-option.interface'
 import { EmailTemplate } from '../../shared/interfaces/email.interface'
@@ -26,7 +26,7 @@ import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.int
         InputText,
         Button,
         Drawer,
-        SelectModule,
+        Select,
         TabsModule,
         Comment,
         Toast,
