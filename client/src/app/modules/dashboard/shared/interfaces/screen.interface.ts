@@ -1,8 +1,14 @@
 export interface Screen {
     id: number
-    name: string
-    section_name: string
-    image: string
-    device: string
-    release: string
+    project_id: number
+    section_name: string | null
+    figma_svg_url: string | null
+    figma_node_id: string
+    figma_file_key: string
+    data: unknown
+    description: string | null
+    created_at: string
+    updated_at: string
+    // device?: string
+    // release?: string
 }

@@ -5,36 +5,7 @@
             class="mx-auto w-full max-w-[1600px] rounded-none border-none bg-transparent px-4 py-4 lg:px-8"
         >
             <ng-template #start>
-                @if (isInsideProject()) {
-                <button (click)="projectPopover.toggle($event)" class="flex items-center gap-2">
-                    <img src="/source-logo-brand.svg" alt="Source Logo" class="h-12" alt="Source" />
-                    <i class="pi pi-chevron-down"></i>
-                </button>
-                <p-popover #projectPopover>
-                    <div class="flex w-52 flex-col gap-1 text-sm">
-                        @for (i of [0,1,2]; track $index) {
-                        <a
-                            class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-gray-700 transition-colors hover:bg-gray-100"
-                            routerLink="/dashboard/projects/{{i}}"
-                        >
-                            <i class="pi pi-arrow-left invisible"></i>
-                            Project {{i}}
-                        </a>
-                        }
-                        <a
-                            class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 transition-colors hover:bg-gray-100"
-                            routerLink="/dashboard/projects"
-                        >
-                            <i class="pi pi-arrow-left"></i>
-                            Back to projects
-                        </a>
-                    </div>
-                </p-popover>
-                } @else {
-                <a routerLink="/dashboard">
-                    <img src="/source-logo-brand.svg" alt="Source Logo" class="h-12" alt="Source" />
-                </a>
-                }
+                <img src="/source-logo-brand.svg" alt="Source Logo" class="h-12" alt="Source" />
             </ng-template>
 
             <ng-template #center>
@@ -45,12 +16,17 @@
             </ng-template>
 
             <ng-template #end>
-                <button class="flex items-center gap-2" (click)="profilePopover.toggle($event)">
-                    <p-avatar label="A" shape="circle" class="bg-gray-700 text-gray-100" />
-                    <p>Abdullah Z.</p>
+                <button class="flex items-center gap-2" (click)="popover.toggle($event)">
+                    <p-avatar
+                        [label]="user()?.avatar_url ? undefined : 'A'"
+                        [image]="user()?.avatar_url || undefined"
+                        shape="circle"
+                        class="bg-gray-700 text-gray-100"
+                    />
+                    <p class="text-button">{{user()?.name}}</p>
                     <i class="pi pi-chevron-down"></i>
                 </button>
-                <p-popover #profilePopover>
+                <p-popover #popover>
                     <div class="flex w-52 flex-col gap-1 text-sm">
                         <a
                             class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-gray-700 transition-colors hover:bg-gray-100"
@@ -58,6 +34,13 @@
                         >
                             <i class="pi pi-user"></i>
                             Account Settings
+                        </a>
+                        <a
+                            class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-gray-700 transition-colors hover:bg-gray-100"
+                            routerLink="/dashboard/projects"
+                        >
+                            <i class="pi pi-arrow-left"></i>
+                            Back to projects
                         </a>
                         <a
                             class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-danger-700 transition-colors hover:bg-gray-100"

@@ -11,6 +11,7 @@ import { baseInterceptor } from './shared/interceptors/base.interceptor'
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
 import { providePrimeNG } from 'primeng/config'
 import { primengPreset } from './primeng.preset'
+import { provideMarkdown } from 'ngx-markdown'
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -19,6 +20,7 @@ export const appConfig: ApplicationConfig = {
         provideRouter(routes),
         provideClientHydration(withEventReplay()),
         provideHttpClient(withInterceptors([baseInterceptor]), withFetch()),
+        provideMarkdown(),
         provideAnimationsAsync(),
         providePrimeNG({
             theme: {
