@@ -159,10 +159,14 @@ class AiChatController extends Controller
     {
         $validated = $request->validate([
             'content' => 'required|string',
-            'figma_access_token' => 'required|string',
         ]);
+        $accessToken = $request->user()->figma_access_token;
+
+        if (!$accessToken) {
+            return $this->forbiddenResponse('You must set a valid Figma access token to your account to send an AI chat message');
+        }
+
         $userMsg = $validated['content'];
-        $accessToken = $validated['figma_access_token'];
 
         $figmaCacheKey = "figma_frame_data_{$screenId}";
 

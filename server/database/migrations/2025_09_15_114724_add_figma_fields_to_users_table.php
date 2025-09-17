@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::table('users', function (Blueprint $table) {
             // Since we need to access on behalf of the user, we need to store the access token
-            $table->string('figma_access_token')->nullable();
+            $table->text('figma_access_token')->nullable();
         });
     }
 

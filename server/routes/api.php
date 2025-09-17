@@ -25,8 +25,9 @@ Route::prefix('plugin')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     // Users
     Route::get('/users/{userId}', [UserController::class, 'getUserById']);
-    Route::get('/profile', [UserController::class, 'getOwnProfile']);
+    // Route::get('/profile', [UserController::class, 'getOwnProfile']);
     Route::put('/profile', [UserController::class, 'updateOwnProfile']);
+    Route::post('/profile/figma-token', [UserController::class, 'storeFigmaToken']);
 
     Route::prefix('projects')->group(function () {
 
