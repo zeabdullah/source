@@ -54,9 +54,27 @@
                 class="flex flex-col"
                 [class.h-full]="activeTab === 'ai-chat'"
             >
-                @if (id !== null){
-                <app-ai-chat-panel [emailTemplateId]="id" />
-                }
+                <div class="flex-1 space-y-4 overflow-y-auto p-2">
+                    @for (message of aiChatMessages(); track message.id) {
+                    <app-ai-chat-message [message]="message" />
+                    }
+                </div>
+                <div class="flex gap-2 border-t border-gray-100 pt-3">
+                    <input
+                        pInputText
+                        [(ngModel)]="newMessage"
+                        (keydown.enter)="sendMessage()"
+                        placeholder="Ask about this email..."
+                        class="flex-1"
+                    />
+                    <p-button
+                        (onClick)="sendMessage()"
+                        [disabled]="!newMessage().trim()"
+                        icon="pi pi-send"
+                        size="large"
+                        styleClass="rounded-xl"
+                    />
+                </div>
             </p-tabpanel>
         </p-tabpanels>
     </p-tabs>
@@ -81,7 +99,7 @@
 
         @if (isLoading()) {
         <div class="flex items-center justify-center py-8">
-            <p-progress-spinner ariaLabel="loading" strokeWidth="4" />
+            <p-progressSpinner />
         </div>
         } @else if (emailTemplatesBySection().length === 0) {
         <app-empty-state

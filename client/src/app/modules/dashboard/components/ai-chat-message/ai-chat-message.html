@@ -1,10 +1,10 @@
-<div [class]="message().user_id === null ? 'flex justify-start' : 'flex justify-end'">
+<div [class]="message().type === 'user' ? 'flex justify-end' : 'flex justify-start'">
     <div
-        [class]="message().user_id === null
-                        ? 'max-w-4/5 bg-gray-100 border border-gray-200 text-gray-700'
-                        : 'max-w-4/5 bg-brand-500 text-white border-brand-500'"
+        [class]="message().type === 'user'
+                        ? 'max-w-4/5 bg-brand-500 text-white border-brand-500'
+                        : 'max-w-4/5 bg-gray-100 border border-gray-200 text-gray-700'"
         class="rounded-2xl p-4"
     >
-        <markdown [data]="message().content" class="prose prose-sm max-w-none text-sm" />
+        <p class="text-sm">{{ message().content }}</p>
     </div>
 </div>
