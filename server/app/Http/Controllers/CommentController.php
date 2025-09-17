@@ -13,9 +13,20 @@ class CommentController extends Controller
     public function getScreenComments(Request $request, string $screenId): JsonResponse
     {
         try {
-            $comments = Comment::where('commentable_id', $screenId)
-                ->where('commentable_type', Screen::class)
+            $screen = Screen::find($screenId);
+            if (!$screen) {
+                return $this->notFoundResponse('Screen not found');
+            }
+
+            $comments = $screen->comments()
+                ->with('user')
+                ->orderByDesc('created_at')
                 ->get();
+
+            $comments->each(function (Comment $comment) {
+                $comment->makeHidden('user_id');
+                $comment->makeVisible('user');
+            });
 
             return $this->responseJson($comments);
         } catch (\Throwable $th) {
@@ -38,6 +49,10 @@ class CommentController extends Controller
                 'commentable_id' => $screenId,
                 'commentable_type' => Screen::class,
             ]);
+            $comment->user = $request->user();
+            $comment->makeHidden('user_id');
+            $comment->makeVisible('user');
+
             return $this->responseJson($comment, 'Created successfully', 201);
         } catch (\Throwable $th) {
             return $this->serverErrorResponse(
@@ -49,9 +64,20 @@ class CommentController extends Controller
     public function getEmailTemplateComments(Request $request, string $emailTemplateId): JsonResponse
     {
         try {
-            $comments = Comment::where('commentable_id', $emailTemplateId)
-                ->where('commentable_type', EmailTemplate::class)
+            $template = EmailTemplate::find($emailTemplateId);
+            if (!$template) {
+                return $this->notFoundResponse('Email template not found');
+            }
+
+            $comments = $template->comments()
+                ->with('user')
+                ->orderByDesc('created_at')
                 ->get();
+
+            $comments->each(function (Comment $comment) {
+                $comment->makeHidden('user_id');
+                $comment->makeVisible('user');
+            });
 
             return $this->responseJson($comments);
         } catch (\Throwable $th) {
@@ -74,6 +100,10 @@ class CommentController extends Controller
                 'commentable_id' => $emailTemplateId,
                 'commentable_type' => EmailTemplate::class,
             ]);
+            $comment->user = $request->user();
+            $comment->makeHidden('user_id');
+            $comment->makeVisible('user');
+
             return $this->responseJson($comment, 'Created successfully', 201);
         } catch (\Throwable $th) {
             return $this->serverErrorResponse(

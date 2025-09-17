@@ -1,34 +1,22 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
-import { FormsModule } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { catchError, of } from 'rxjs'
 import { Select } from 'primeng/select'
-import { Button } from 'primeng/button'
 import { Drawer } from 'primeng/drawer'
-import { InputText } from 'primeng/inputtext'
 import { TabsModule } from 'primeng/tabs'
 import { MessageService } from 'primeng/api'
 import { SelectOption } from '~/modules/dashboard/shared/interfaces/select-option.interface'
 import { Screen } from '~/modules/dashboard/shared/interfaces/screen.interface'
 import { ExpandedImage } from '../../components/expanded-image/expanded-image'
-import { Comment } from '../../components/comment/comment'
+import { CommentsPanel } from '../../components/comments-panel/comments-panel'
 import { AiChatPanel } from '../../components/ai-chat-panel/ai-chat-panel'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
+import { FormsModule } from '@angular/forms'
 
 @Component({
     selector: 'app-screens',
-    imports: [
-        FormsModule,
-        InputText,
-        Select,
-        Drawer,
-        Button,
-        TabsModule,
-        ExpandedImage,
-        Comment,
-        AiChatPanel,
-    ],
+    imports: [Select, Drawer, FormsModule, TabsModule, ExpandedImage, CommentsPanel, AiChatPanel],
     providers: [MessageService],
     templateUrl: './screens.html',
     styles: `
@@ -72,38 +60,6 @@ export class Screens {
             this.loadScreens(projectId)
         }
     }
-
-    comments = [
-        {
-            id: 1,
-            user: {
-                name: 'John Doe',
-                avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face',
-            },
-            date: '2024-01-15T10:30:00Z',
-            content: 'This screen looks great! The layout is clean and intuitive.',
-        },
-        {
-            id: 2,
-            user: {
-                name: 'Sarah Wilson',
-                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face',
-            },
-            date: '2024-01-15T14:22:00Z',
-            content: 'I think we should consider adding a loading state for this screen.',
-        },
-        {
-            id: 3,
-            user: {
-                name: 'Mike Chen',
-                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face',
-            },
-            date: '2024-01-16T09:15:00Z',
-            content: 'The color scheme works well with our brand guidelines.',
-        },
-    ]
-
-    newComment = signal('')
 
     filteredScreens = computed(() => {
         return this.screens()
@@ -158,22 +114,6 @@ export class Screens {
     closeExpandedScreen() {
         this.shownScreenId.set(null)
         this.drawerVisible = false
-    }
-
-    sendComment() {
-        if (this.newComment().trim()) {
-            const newComment = {
-                id: this.comments.length + 1,
-                user: {
-                    name: 'Current User',
-                    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face',
-                },
-                date: new Date().toISOString(),
-                content: this.newComment(),
-            }
-            this.comments.push(newComment)
-            this.newComment.set('')
-        }
     }
 
     getScreenById(id: number) {

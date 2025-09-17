@@ -29,28 +29,14 @@
             <p-tab value="ai-chat">AI Chat</p-tab>
         </p-tablist>
         <p-tabpanels class="flex-1 overflow-y-auto pe-4">
-            <p-tabpanel value="comments" class="flex flex-col">
-                <div class="flex-1 space-y-4 overflow-y-auto p-2">
-                    @for (comment of comments; track comment.id) {
-                    <app-comment [comment]="comment" />
-                    }
-                </div>
-                <div class="flex gap-2 border-t border-gray-100 pt-3">
-                    <input
-                        pInputText
-                        [(ngModel)]="newComment"
-                        (keydown.enter)="sendComment()"
-                        placeholder="Add a comment..."
-                        class="flex-1"
-                    />
-                    <p-button
-                        (onClick)="sendComment()"
-                        [disabled]="!newComment().trim()"
-                        icon="pi pi-send"
-                        size="large"
-                        styleClass="rounded-xl"
-                    />
-                </div>
+            <p-tabpanel
+                value="comments"
+                class="flex flex-col"
+                [class.h-full]="activeTab === 'comments'"
+            >
+                @if (id !== null) {
+                <app-comments-panel [screenId]="id" />
+                }
             </p-tabpanel>
             <p-tabpanel
                 value="ai-chat"
