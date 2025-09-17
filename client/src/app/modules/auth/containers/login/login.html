@@ -6,7 +6,7 @@
 
         @if (errorMessage()) {
         <div class="mb-4">
-            <p-message severity="error">{{ errorMessage() }}</p-message>
+            <p-message severity="error"> {{ errorMessage() }} </p-message>
         </div>
         }
 
@@ -25,7 +25,9 @@
                         [invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
                     />
                     @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
-                    <p-message severity="error" variant="simple">Must be a valid email.</p-message>
+                    <p-message severity="error" variant="simple">
+                        Must be a valid email.
+                    </p-message>
                     }
                 </div>
                 <div class="flex flex-col gap-1">
@@ -55,16 +57,15 @@
             </fieldset>
 
             <p-button type="submit" fluid [disabled]="!loginForm.valid" [loading]="isLoading()">
-                Log in
+                @if (isLoading()) { Logging in... } @else { Log in }
             </p-button>
         </form>
 
         <div class="text-center text-button text-gray-700">
             Don't have an account?
-            <a routerLink="/auth/register" class="font-bold text-brand-500 hover:underline">
-                Create an account
-            </a>
-            .
+            <a routerLink="/auth/register" class="font-bold text-brand-500 hover:underline"
+                >Create an account</a
+            >.
         </div>
     </div>
 </div>

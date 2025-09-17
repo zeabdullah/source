@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AiChatController;
-use App\Http\Controllers\CommentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Common\AuthController;
 use App\Http\Controllers\Project\ProjectController;
@@ -25,9 +24,8 @@ Route::prefix('plugin')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     // Users
     Route::get('/users/{userId}', [UserController::class, 'getUserById']);
-    // Route::get('/profile', [UserController::class, 'getOwnProfile']);
+    Route::get('/profile', [UserController::class, 'getOwnProfile']);
     Route::put('/profile', [UserController::class, 'updateOwnProfile']);
-    Route::post('/profile/figma-token', [UserController::class, 'storeFigmaToken']);
 
     Route::prefix('projects')->group(function () {
 
@@ -87,18 +85,13 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 
-    // Comments (per screen, polymorphic but scoped here)
-    Route::get('/screens/{screenId}/comments', [CommentController::class, 'getScreenComments']);
-    Route::post('/screens/{screenId}/comments', [CommentController::class, 'createScreenComment']);
-
-    // Comments (per email template, polymorphic but scoped here)
-    Route::get('/email-templates/{emailTemplateId}/comments', [CommentController::class, 'getEmailTemplateComments']);
-    Route::post('/email-templates/{emailTemplateId}/comments', [CommentController::class, 'createEmailTemplateComment']);
-
-    // Comments (by id)
-    Route::get('/comments/{commentId}', [CommentController::class, 'getCommentById']);
-    Route::put('/comments/{commentId}', [CommentController::class, 'updateCommentById']);
-    Route::delete('/comments/{commentId}', [CommentController::class, 'deleteCommentById']);
+    // // Comments (per screen, polymorphic but scoped here)
+    // Route::get('/screens/{screenId}/comments', [CommentController::class, 'index']);
+    // Route::post('/screens/{screenId}/comments', [CommentController::class, 'store']);
+    // Route::get('/comments/{commentId}', [CommentController::class, 'show']);
+    // Route::put('/comments/{commentId}', [CommentController::class, 'update']);
+    // Route::patch('/comments/{commentId}', [CommentController::class, 'update']);
+    // Route::delete('/comments/{commentId}', [CommentController::class, 'destroy']);
 });
 
 // BASIC auth routes
@@ -109,6 +102,5 @@ Route::group(['prefix' => 'basic', 'middleware' => 'basic_auth'], function () {
 
     // Email Templates
     Route::get('/email-templates/{emailTemplateId}', [EmailTemplateController::class, 'getEmailTemplateByIdBasic']);
-    Route::get('/email-templates/{emailTemplateId}/chat', [AiChatController::class, 'getEmailTemplateChatBasic']);
     Route::post('/email-templates/{emailTemplateId}/chats/ai-response-webhook', [AiChatController::class, 'createAiChatResponseForEmailTemplate']);
 });

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\N8nService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\AiChat;
@@ -42,7 +41,7 @@ class AiChatController extends Controller
             return $this->responseJson($chatMsg->fresh(), 'AI chat message created successfully', 201);
 
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to create AI chat message: ' . $th->getMessage());
+            return $this->serverErrorResponse('Failed to create AI chat message: ' . $th->getMessage());
         }
     }
 
@@ -72,16 +71,16 @@ class AiChatController extends Controller
             return $this->responseJson($chatMsg->fresh(), 'AI chat message created successfully', 201);
 
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to create AI chat message: ' . $th->getMessage());
+            return $this->serverErrorResponse('Failed to create AI chat message: ' . $th->getMessage());
         }
     }
 
-    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId, N8nService $n8n): JsonResponse
+    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId): JsonResponse
     {
         $validated = $request->validate([
             'content' => 'required|string',
         ]);
-        $userPrompt = $validated['content'];
+        $userMsg = $validated['content'];
 
         try {
             $emailTemplate = EmailTemplate::find($emailTemplateId);
@@ -89,30 +88,26 @@ class AiChatController extends Controller
                 return $this->notFoundResponse('Email template not found');
             }
 
-            $chatMsg = new AiChat(['content' => $userPrompt]);
+            $chatMsg = new AiChat(['content' => $userMsg]);
             $chatMsg->sender = 'user';
             $chatMsg->user_id = $request->user()->id;
             $chatMsg->commentable_id = $emailTemplateId;
             $chatMsg->commentable_type = EmailTemplate::class;
             $chatMsg->saveOrFail();
 
-            $aiResponseContent = $n8n->generateAgentResponseForEmailTemplate($userPrompt, $emailTemplateId);
-
-            return $this->responseJson([
-                'user' => $chatMsg->fresh(),
-                'ai' => ['content' => $aiResponseContent],
-            ], 'Messages created successfully', 201);
+            return $this->responseJson($chatMsg->fresh(), 'Chat message created successfully', 201);
 
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse([
-                'trace' => $th->getTrace(),
-            ], 'Failed to send chat message: ' . $th->getMessage(), );
+            return $this->serverErrorResponse('Failed to send chat message: ' . $th->getMessage());
         }
     }
 
     public function getEmailTemplateChat(Request $request, string $emailTemplateId): JsonResponse
     {
         try {
+            /**
+             * @var \App\Models\EmailTemplate
+             */
             $template = EmailTemplate::find($emailTemplateId);
             if (!$template) {
                 return $this->notFoundResponse('Email template not found');
@@ -133,25 +128,7 @@ class AiChatController extends Controller
 
             return $this->responseJson($chats);
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to retrieve chat messages: ' . $th->getMessage());
-        }
-    }
-
-    public function getEmailTemplateChatBasic(Request $request, string $emailTemplateId): JsonResponse
-    {
-        try {
-            $template = EmailTemplate::find($emailTemplateId);
-            if (!$template) {
-                return $this->notFoundResponse('Email template not found');
-            }
-
-            $chats = $template->aiChats()
-                ->orderBy('created_at', 'asc')
-                ->get();
-
-            return $this->responseJson($chats);
-        } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to retrieve chat messages: ' . $th->getMessage());
+            return $this->serverErrorResponse('Failed to retrieve chat messages: ' . $th->getMessage());
         }
     }
 
@@ -159,14 +136,10 @@ class AiChatController extends Controller
     {
         $validated = $request->validate([
             'content' => 'required|string',
+            'figma_access_token' => 'required|string',
         ]);
-        $accessToken = $request->user()->figma_access_token;
-
-        if (!$accessToken) {
-            return $this->forbiddenResponse('You must set a valid Figma access token to your account to send an AI chat message');
-        }
-
         $userMsg = $validated['content'];
+        $accessToken = $validated['figma_access_token'];
 
         $figmaCacheKey = "figma_frame_data_{$screenId}";
 
@@ -239,7 +212,7 @@ class AiChatController extends Controller
 
             return $this->responseJson($result, 'Created successfully', 201);
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to send chat message: ' . $th->getMessage());
+            return $this->serverErrorResponse('Failed to send chat message: ' . $th->getMessage());
         }
     }
 
@@ -266,7 +239,7 @@ class AiChatController extends Controller
 
             return $this->responseJson($chats);
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to retrieve chat messages: ' . $th->getMessage());
+            return $this->serverErrorResponse('Failed to retrieve chat messages: ' . $th->getMessage());
         }
     }
 
@@ -293,7 +266,7 @@ class AiChatController extends Controller
 
             return $this->responseJson($chatMsg->fresh(), 'Chat message updated');
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to update chat message: ' . $th->getMessage());
+            return $this->serverErrorResponse('Failed to update chat message: ' . $th->getMessage());
         }
     }
 
@@ -314,7 +287,7 @@ class AiChatController extends Controller
 
             return $this->responseJson($chatMsg, 'Chat message deleted');
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to delete chat message: ' . $th->getMessage());
+            return $this->serverErrorResponse('Failed to delete chat message: ' . $th->getMessage());
         }
     }
 }
