@@ -1,15 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core'
 import { DatePipe } from '@angular/common'
 import { Avatar } from 'primeng/avatar'
-
-interface CommentType {
-    user: {
-        name: string
-        avatar: string
-    }
-    date: string
-    content: string
-}
+import { CommentData } from '../../shared/interfaces/comment.interface'
 
 @Component({
     selector: 'app-comment',
@@ -19,5 +11,5 @@ interface CommentType {
     host: { class: 'block' },
 })
 export class Comment {
-    comment = input.required<CommentType>()
+    comment = input.required<CommentData>()
 }

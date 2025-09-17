@@ -1,0 +1,27 @@
+<div class="flex h-full flex-col">
+    <div class="flex-1 space-y-4 overflow-y-auto p-2">
+        @if (isLoading()) {
+        <div class="flex justify-center py-8">
+            <p-progressSpinner size="small" />
+        </div>
+        } @else { @for (comment of comments(); track comment.id) {
+        <app-comment [comment]="comment" />
+        } }
+    </div>
+    <div class="flex gap-2 border-t border-gray-100 pt-3">
+        <input
+            pInputText
+            [(ngModel)]="newComment"
+            (keydown.enter)="sendComment()"
+            placeholder="Add a comment..."
+            class="flex-1"
+        />
+        <p-button
+            (onClick)="sendComment()"
+            [disabled]="!newComment().trim()"
+            icon="pi pi-send"
+            size="large"
+            styleClass="rounded-xl"
+        />
+    </div>
+</div>
