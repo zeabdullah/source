@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\DB;
 use Gemini\Data\Content;
 use Gemini\Enums\Role;
 use Illuminate\Support\Facades\Log;
+use App\Services\BrevoService;
+use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Storage;
 
 class AiChatController extends Controller
 {
@@ -92,6 +95,8 @@ class AiChatController extends Controller
 
             $result = DB::transaction(function () use ($request, $emailTemplate, $emailTemplateId, $userPrompt) {
                 $ai = new AiAgentService();
+                $brevo = new BrevoService();
+                $n8n = new N8nService();
 
                 // create user message
                 $userAiChat = new AiChat(['content' => $userPrompt]);
@@ -99,7 +104,6 @@ class AiChatController extends Controller
                 $userAiChat->user_id = $request->user()->id;
                 $userAiChat->commentable_id = $emailTemplateId;
                 $userAiChat->commentable_type = EmailTemplate::class;
-
 
                 // feed history of messages as ai context
                 $contextMessages = $emailTemplate->aiChats()
@@ -119,9 +123,57 @@ class AiChatController extends Controller
                 $aiReplyText = $aiResponse['chat_message'];
                 $updatedHtml = $aiResponse['updated_html'];
 
+                $brevoUpdated = false;
+                $thumbnailUpdated = false;
                 if ($updatedHtml !== null) {
                     $emailTemplate->html_content = $updatedHtml;
+
+                    // Generate new thumbnail from updated HTML
+                    try {
+                        $base64Img = $n8n->generateBase64ThumbnailFromHtml($updatedHtml);
+                        if ($base64Img) {
+                            $binaryImg = base64_decode($base64Img);
+                            if ($binaryImg !== false) {
+                                // Delete old thumbnail if exists
+                                if (!empty($emailTemplate->thumbnail_url)) {
+                                    $oldPath = str_replace(asset('storage') . '/', '', $emailTemplate->thumbnail_url);
+                                    if (Storage::exists($oldPath)) {
+                                        Storage::delete($oldPath);
+                                    }
+                                }
+                                $thumbnailPath = 'email-thumbnails/' . uniqid('et_', true) . '.png';
+                                Storage::put($thumbnailPath, $binaryImg);
+                                $emailTemplate->thumbnail_url = Storage::url($thumbnailPath);
+                                $thumbnailUpdated = true;
+                            }
+                        }
+                    } catch (\Throwable $thumbnailException) {
+                        Log::warning('Failed to generate thumbnail: ' . $thumbnailException->getMessage(), [
+                            'email_template_id' => $emailTemplateId,
+                        ]);
+                        // Continue execution even if thumbnail generation fails
+                    }
+
                     $emailTemplate->save();
+
+                    // Update Brevo template if linked and user has API token
+                    $user = $request->user();
+                    if ($user->brevo_api_token && $emailTemplate->brevo_template_id) {
+                        try {
+                            $brevoTemplateData = [
+                                'htmlContent' => $updatedHtml,
+                            ];
+                            $brevo->updateTemplate($user->brevo_api_token, $emailTemplate->brevo_template_id, $brevoTemplateData);
+                            $brevoUpdated = true;
+                        } catch (RequestException $e) {
+                            Log::warning('Failed to update Brevo template: ' . $e->getMessage(), [
+                                'email_template_id' => $emailTemplateId,
+                                'brevo_template_id' => $emailTemplate->brevo_template_id,
+                                'user_id' => $user->id,
+                            ]);
+                            // Continue execution even if Brevo update fails
+                        }
+                    }
                 }
 
                 // create ai message
@@ -140,6 +192,8 @@ class AiChatController extends Controller
                     'user' => $userAiChat->fresh(),
                     'ai' => $aiReply->fresh(),
                     'template_updated' => $updatedHtml !== null,
+                    'brevo_updated' => $brevoUpdated,
+                    'thumbnail_updated' => $thumbnailUpdated,
                 ];
             }, attempts: 2);
 

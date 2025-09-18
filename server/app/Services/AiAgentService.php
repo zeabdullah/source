@@ -156,16 +156,4 @@ You must respond with a JSON object containing:
             ];
         }
     }
-
-    /**
-     * Legacy method for backward compatibility
-     * @deprecated Use generateFigmaReply() instead
-     *
-     * @param string|array $userMessages
-     * @param \Gemini\Data\Content[] $chatHistory
-     */
-    public function generateReplyFromContext(string|array $userMessages, array $chatHistory): string
-    {
-        return $this->generateFigmaReply($userMessages, $chatHistory);
-    }
 }

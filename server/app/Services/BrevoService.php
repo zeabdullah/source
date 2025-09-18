@@ -102,7 +102,7 @@ class BrevoService
     /**
      * Update an existing email template in Brevo
      */
-    public function updateTemplate(string $apiKey, string $templateId, array $templateData): array
+    public function updateTemplate(string $apiKey, string $templateId, array $templateData): bool
     {
         try {
             $response = $this->client->put("smtp/templates/{$templateId}", [
@@ -113,7 +113,7 @@ class BrevoService
                 'json' => $templateData,
             ]);
 
-            return json_decode($response->getBody()->getContents(), true);
+            return $response->getStatusCode() === 204;
         } catch (RequestException $e) {
             Log::error('Brevo API Error - Update Template: ' . $e->getMessage());
             throw $e;
