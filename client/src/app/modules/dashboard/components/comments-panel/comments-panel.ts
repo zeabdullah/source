@@ -98,7 +98,6 @@ export class CommentsPanel implements OnInit {
             .subscribe(response => {
                 this.isSubmitting.set(false)
                 if (response.payload) {
-                    console.log(response.payload)
                     this.comments.update(comments => [...comments, response.payload!])
                     this.newComment.set('')
                 }
