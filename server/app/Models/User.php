@@ -29,6 +29,8 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar_url',
+        'figma_access_token',
+        'brevo_api_token',
     ];
 
     protected $visible = [
@@ -46,9 +48,8 @@ class User extends Authenticatable
     protected $attributes = [
         'avatar_url' => null,
         'figma_access_token' => null,
+        'brevo_api_token' => null,
     ];
-
-
 
     /**
      * Get the attributes that should be cast.
@@ -61,6 +62,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'figma_access_token' => 'encrypted',
+            'brevo_api_token' => 'encrypted',
         ];
     }
 

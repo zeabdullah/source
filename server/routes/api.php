@@ -28,6 +28,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::get('/profile', [UserController::class, 'getOwnProfile']);
     Route::put('/profile', [UserController::class, 'updateOwnProfile']);
     Route::post('/profile/figma-token', [UserController::class, 'storeFigmaToken']);
+    Route::post('/profile/brevo-token', [UserController::class, 'storeBrevoApiToken']);
+    Route::delete('/profile/figma-token', [UserController::class, 'removeFigmaToken']);
+    Route::delete('/profile/brevo-token', [UserController::class, 'removeBrevoApiToken']);
+
+    // Brevo Templates (general)
+    Route::get('/brevo-templates', [EmailTemplateController::class, 'getBrevoTemplates']);
 
     Route::prefix('projects')->group(function () {
 
@@ -55,7 +61,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Email Templates (per project)
         Route::middleware('is_owner')->group(function () {
+            // Legacy Mailchimp routes (kept for backward compatibility)
             Route::post('/{projectId}/email-templates/import', [EmailTemplateController::class, 'importEmailTemplate']);
+
+            // Brevo integration routes
+            Route::post('/{projectId}/email-templates/import-brevo', [EmailTemplateController::class, 'importBrevoTemplate']);
+            Route::post('/{projectId}/email-templates/{emailTemplateId}/sync-brevo', [EmailTemplateController::class, 'syncWithBrevo']);
+            Route::put('/{projectId}/email-templates/{emailTemplateId}/update-brevo', [EmailTemplateController::class, 'updateInBrevo']);
+
+            // General email template routes
             Route::get('/{projectId}/email-templates', [EmailTemplateController::class, 'getProjectEmailTemplates']);
             Route::get('/{projectId}/email-templates/{emailTemplateId}', [EmailTemplateController::class, 'getEmailTemplateById']);
             Route::put('/{projectId}/email-templates/{emailTemplateId}', [EmailTemplateController::class, 'updateEmailTemplateById']);
