@@ -68,7 +68,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{projectId}/email-templates/import-brevo', [EmailTemplateController::class, 'importBrevoTemplate']);
             Route::post('/{projectId}/email-templates/{emailTemplateId}/sync-brevo', [EmailTemplateController::class, 'syncWithBrevo']);
             Route::put('/{projectId}/email-templates/{emailTemplateId}/update-brevo', [EmailTemplateController::class, 'updateInBrevo']);
-            Route::post('/{projectId}/email-templates/{emailTemplateId}/update-with-ai', [EmailTemplateController::class, 'updateTemplateWithAI']);
 
             // General email template routes
             Route::get('/{projectId}/email-templates', [EmailTemplateController::class, 'getProjectEmailTemplates']);
@@ -83,11 +82,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/chats/{chatId}', [AiChatController::class, 'updateChatMessageById']);
     Route::delete('/chats/{chatId}', [AiChatController::class, 'deleteChatMessageById']);
     // Chats (per email template)
-    Route::post('/email-templates/{emailTemplateId}/chats', [AiChatController::class, 'sendEmailTemplateChatMessage']);
     Route::get('/email-templates/{emailTemplateId}/chats', [AiChatController::class, 'getEmailTemplateChat']);
+    Route::post('/email-templates/{emailTemplateId}/chats', [AiChatController::class, 'sendEmailTemplateChatMessage']);
     // Chats (per screen)
-    Route::post('/screens/{screenId}/chats', [AiChatController::class, 'sendScreenChatMessage']);
     Route::get('/screens/{screenId}/chats', [AiChatController::class, 'getScreenChat']);
+    Route::post('/screens/{screenId}/chats', [AiChatController::class, 'sendScreenChatMessage']);
 
     // Releases (by id)
     Route::prefix('releases')->group(function () {
