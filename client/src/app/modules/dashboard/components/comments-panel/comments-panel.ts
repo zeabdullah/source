@@ -9,10 +9,11 @@ import { ProgressSpinner } from 'primeng/progressspinner'
 import { Comment } from '../comment/comment'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 import { CommentData } from '../../shared/interfaces/comment.interface'
+import { EmptyState } from '~/shared/components/empty-state/empty-state'
 
 @Component({
     selector: 'app-comments-panel',
-    imports: [FormsModule, InputText, Button, ProgressSpinner, Comment],
+    imports: [FormsModule, InputText, Button, ProgressSpinner, Comment, EmptyState],
     providers: [MessageService],
     templateUrl: './comments-panel.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

@@ -10,10 +10,11 @@ import { AiChatMessage } from '../ai-chat-message/ai-chat-message'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 import { Toast } from 'primeng/toast'
 import { AiChatMessageData } from '../../shared/interfaces/ai-chat-message-data.interface'
+import { EmptyState } from '~/shared/components/empty-state/empty-state'
 
 @Component({
     selector: 'app-ai-chat-panel',
-    imports: [FormsModule, InputText, Button, ProgressSpinner, AiChatMessage, Toast],
+    imports: [FormsModule, InputText, Button, ProgressSpinner, AiChatMessage, Toast, EmptyState],
     providers: [MessageService],
     templateUrl: './ai-chat-panel.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
