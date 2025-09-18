@@ -252,7 +252,7 @@ class AiChatController extends Controller
         }
     }
 
-    public function sendScreenChatMessage(Request $request, string $screenId, AiAgentService $ai, FigmaService $figma): JsonResponse
+    public function sendScreenChatMessage(Request $request, string $screenId): JsonResponse
     {
         $validated = $request->validate([
             'content' => 'required|string',
@@ -273,7 +273,10 @@ class AiChatController extends Controller
                 return $this->notFoundResponse('Screen not found');
             }
 
-            $result = DB::transaction(function () use ($request, $screen, $screenId, $userMsg, $accessToken, $figmaCacheKey, $ai, $figma) {
+            $result = DB::transaction(function () use ($request, $screen, $screenId, $userMsg, $accessToken, $figmaCacheKey) {
+                $ai = new AiAgentService();
+                $figma = new FigmaService();
+
                 // create user message
                 $chatMsg = new AiChat([
                     'content' => $userMsg,
@@ -296,6 +299,7 @@ class AiChatController extends Controller
                     ))
                     ->toArray();
 
+                $figmaNodes = null;
                 // Fetch and add Figma data to context messages using cache
                 if ($screen->hasFigmaData()) {
                     $figmaNodes = cache()->remember(
@@ -303,22 +307,19 @@ class AiChatController extends Controller
                         now()->addHours(12),
                         function () use ($accessToken, $screen, $figma) {
                             return $figma->getFigmaFrameForAI(
-                                $screen->figma_file_key,
                                 $screen->figma_node_id,
+                                $screen->figma_file_key,
                                 $accessToken,
                             );
                         }
                     );
-
-                    $figmaContext = "Figma Frame Data: " . json_encode($figmaNodes);
-                    $contextMessages[] = Content::parse($figmaContext, Role::USER); // Add as user role for context
                 }
 
-                $aiReplyText = $ai->generateReplyFromContext($userMsg, $contextMessages);
+                $aiReply = $ai->generateFigmaReply($userMsg, $contextMessages, $figmaNodes);
 
                 // create ai message
                 $aiReply = new AiChat([
-                    'content' => $aiReplyText,
+                    'content' => $aiReply['chat_message'],
                 ]);
                 $aiReply->user_id = null;
                 $aiReply->sender = 'ai';
@@ -326,6 +327,10 @@ class AiChatController extends Controller
                 $aiReply->commentable_type = $chatMsg->commentable_type;
 
                 $chatMsg->saveOrFail();
+
+                // Ensure AI reply has a later timestamp
+                // since transactions don't guarantee sequential order of timestamps
+                $aiReply->created_at = now()->addSecond();
                 $aiReply->saveOrFail();
 
                 return [

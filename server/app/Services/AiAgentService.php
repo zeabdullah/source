@@ -94,13 +94,49 @@ You must respond with a JSON object containing:
      *
      * @param string|array $userMessages
      * @param \Gemini\Data\Content[] $chatHistory
+     * @param array|null $figmaNodes
      */
-    public function generateFigmaReply(string|array $userMessages, array $chatHistory = []): string
+    public function generateFigmaReply(string|array $userMessages, array $chatHistory = [], ?array $figmaNodes = null): array
     {
-        $model = $this->baseModel->withSystemInstruction($this->getFigmaSystemInstruction());
-        $result = $model->startChat($chatHistory)->sendMessage($userMessages);
+        $systemInstruction = $this->getFigmaSystemInstruction();
 
-        return $result->text();
+        // Add Figma context if provided
+        if ($figmaNodes) {
+            $systemInstruction = Content::parse(
+                $systemInstruction->parts[0]->text . "\n\n**Figma Frame Data:**\n" . json_encode($figmaNodes)
+            );
+        }
+
+        $model = $this->baseModel
+            ->withSystemInstruction($systemInstruction)
+            ->withGenerationConfig(
+                new GenerationConfig(
+                    responseMimeType: ResponseMimeType::APPLICATION_JSON,
+                    responseSchema: new Schema(
+                        DataType::OBJECT,
+                        properties: [
+                            'chat_message' => new Schema(
+                                DataType::STRING,
+                                description: 'Conversational response explaining what was done or why no changes were needed'
+                            )
+                        ],
+                        required: ['chat_message']
+                    )
+                )
+            );
+
+        try {
+            $result = $model->startChat($chatHistory)->sendMessage($userMessages);
+            $response = $result->json(true);
+
+            return [
+                'chat_message' => $response['chat_message'] ?? 'No response generated',
+            ];
+        } catch (\Throwable $th) {
+            return [
+                'chat_message' => "AI failed to respond: " . $th->getMessage(),
+            ];
+        }
     }
 
     public function generateEmailTemplateReply(
