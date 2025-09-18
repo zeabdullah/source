@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Project;
 
 use App\Http\Controllers\Controller;
 use App\Models\EmailTemplate;
+use App\Models\Project;
 use App\Services\N8nService;
 use App\Services\BrevoService;
 use Illuminate\Http\JsonResponse;
@@ -131,14 +132,13 @@ class EmailTemplateController extends Controller
     public function importBrevoTemplate(Request $request, string $projectId, BrevoService $brevo, N8nService $n8n): JsonResponse
     {
         $validated = $request->validate([
-            'brevo_template_id' => 'required|string',
+            'brevo_template_id' => 'required|integer',
         ]);
 
         $brevoTemplateId = $validated['brevo_template_id'];
         $user = auth()->user();
-
         if (!$user->brevo_api_token) {
-            return $this->badRequestResponse('Brevo API token not configured for user');
+            return $this->forbiddenResponse('Brevo API token not configured for user');
         }
 
         try {
@@ -157,11 +157,42 @@ class EmailTemplateController extends Controller
                 return $this->responseJson($emailTemplate, 'Template already imported');
             }
 
+            // Defensive: Ensure required Brevo fields exist
+            if (
+                !isset($brevoTemplate['htmlContent']) ||
+                empty($brevoTemplate['htmlContent'])
+            ) {
+                return $this->responseJson(
+                    message: 'Brevo template does not contain HTML content.',
+                    code: 422
+                );
+            }
+
             // Generate thumbnail from HTML content
-            $base64Img = $n8n->generateBase64ThumbnailFromHtml($brevoTemplate['htmlContent']);
-            $binaryImg = base64_decode($base64Img);
-            $thumbnailPath = 'email-thumbnails/' . uniqid('et_', true) . '.png';
-            Storage::put($thumbnailPath, $binaryImg);
+            try {
+                $base64Img = $n8n->generateBase64ThumbnailFromHtml($brevoTemplate['htmlContent']);
+                if (!$base64Img) {
+                    return $this->responseJson(
+                        message: 'Failed to generate thumbnail from Brevo template HTML.',
+                        code: 500
+                    );
+                }
+                $binaryImg = base64_decode($base64Img);
+                if ($binaryImg === false) {
+                    return $this->responseJson(
+                        message: 'Failed to decode generated thumbnail image.',
+                        code: 500
+                    );
+                }
+                $thumbnailPath = 'email-thumbnails/' . uniqid('et_', true) . '.png';
+                Storage::put($thumbnailPath, $binaryImg);
+                $thumbnailUrl = Storage::url($thumbnailPath);
+            } catch (\Throwable $thumbEx) {
+                return $this->responseJson(
+                    message: 'Error generating thumbnail: ' . $thumbEx->getMessage(),
+                    code: 500
+                );
+            }
 
             // Create email template record
             $emailTemplate = EmailTemplate::create([
@@ -169,17 +200,30 @@ class EmailTemplateController extends Controller
                 'section_name' => $brevoTemplate['templateName'] ?? 'Imported Template',
                 'brevo_template_id' => $brevoTemplateId,
                 'html_content' => $brevoTemplate['htmlContent'],
-                'thumbnail_url' => Storage::url($thumbnailPath),
+                'thumbnail_url' => $thumbnailUrl ?? null,
             ]);
+
+            if (!$emailTemplate) {
+                return $this->serverErrorResponse(message: 'Failed to create email template record');
+            }
 
             return $this->responseJson($emailTemplate->fresh(), 'Brevo template imported successfully', 201);
         } catch (RequestException $e) {
-            if ($e->getResponse()?->getStatusCode() === 404) {
+            $status = $e->getResponse()?->getStatusCode();
+            if ($status === 404) {
                 return $this->notFoundResponse(message: 'Template not found in Brevo');
             }
-            return $this->responseJson(message: 'Failed to import Brevo template: ' . $e->getMessage(), code: $e->getResponse()?->getStatusCode() ?? 500);
+            // Always return a JSON response with a message
+            return $this->responseJson(
+                message: 'Failed to import Brevo template: ' . $e->getMessage(),
+                code: $status ?? 500
+            );
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to import Brevo template: ' . $th->getMessage());
+            // Always return a JSON response with a message
+            return $this->responseJson(
+                message: 'Failed to import Brevo template: ' . $th->getMessage(),
+                code: 500
+            );
         }
     }
 
@@ -191,7 +235,7 @@ class EmailTemplateController extends Controller
         $user = auth()->user();
 
         if (!$user->brevo_api_token) {
-            return $this->badRequestResponse('Brevo API token not configured for user');
+            return $this->forbiddenResponse('Brevo API token not configured for user');
         }
 
         /** @var \App\Models\Project */
@@ -240,7 +284,7 @@ class EmailTemplateController extends Controller
         $user = auth()->user();
 
         if (!$user->brevo_api_token) {
-            return $this->badRequestResponse('Brevo API token not configured for user');
+            return $this->forbiddenResponse('Brevo API token not configured for user');
         }
 
         /** @var \App\Models\Project */
@@ -292,7 +336,7 @@ class EmailTemplateController extends Controller
         $user = auth()->user();
 
         if (!$user->brevo_api_token) {
-            return $this->badRequestResponse('Brevo API token not configured for user');
+            return $this->forbiddenResponse('Brevo API token not configured for user');
         }
 
         try {

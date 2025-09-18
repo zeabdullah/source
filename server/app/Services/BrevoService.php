@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class BrevoService
 {
     private Client $client;
-    private string $baseUrl = 'https://api.brevo.com/v3';
+    private string $baseUrl = 'https://api.brevo.com/v3/';
 
     public function __construct()
     {
@@ -25,16 +25,35 @@ class BrevoService
     public function getTemplates(string $apiKey): array
     {
         try {
-            $response = $this->client->get('/smtp/templates', [
+            // Try the correct endpoint for email templates
+            $response = $this->client->get('smtp/templates', [
                 'headers' => [
                     'api-key' => $apiKey,
                     'Content-Type' => 'application/json',
                 ],
             ]);
 
-            return json_decode($response->getBody()->getContents(), true);
+            $body = $response->getBody()->getContents();
+            $data = json_decode($body, true);
+
+            // Log successful response for debugging
+            Log::info('Brevo API Success - Get Templates', [
+                'status_code' => $response->getStatusCode(),
+                'response_size' => strlen($body),
+                'template_count' => is_array($data) ? count($data) : 'unknown',
+            ]);
+
+            return $data;
         } catch (RequestException $e) {
-            Log::error('Brevo API Error - Get Templates: ' . $e->getMessage());
+            $status = $e->getResponse()?->getStatusCode();
+            $responseBody = $e->getResponse()?->getBody()?->getContents();
+
+            Log::error('Brevo API Error - Get Templates', [
+                'status_code' => $status,
+                'message' => $e->getMessage(),
+                'response_body' => $responseBody,
+                'endpoint' => 'smtp/templates',
+            ]);
             throw $e;
         }
     }
@@ -45,7 +64,7 @@ class BrevoService
     public function getTemplate(string $apiKey, string $templateId): array
     {
         try {
-            $response = $this->client->get("/smtp/templates/{$templateId}", [
+            $response = $this->client->get("smtp/templates/{$templateId}", [
                 'headers' => [
                     'api-key' => $apiKey,
                     'Content-Type' => 'application/json',
@@ -65,7 +84,7 @@ class BrevoService
     public function createTemplate(string $apiKey, array $templateData): array
     {
         try {
-            $response = $this->client->post('/smtp/templates', [
+            $response = $this->client->post('smtp/templates', [
                 'headers' => [
                     'api-key' => $apiKey,
                     'Content-Type' => 'application/json',
@@ -86,7 +105,7 @@ class BrevoService
     public function updateTemplate(string $apiKey, string $templateId, array $templateData): array
     {
         try {
-            $response = $this->client->put("/smtp/templates/{$templateId}", [
+            $response = $this->client->put("smtp/templates/{$templateId}", [
                 'headers' => [
                     'api-key' => $apiKey,
                     'Content-Type' => 'application/json',
@@ -107,7 +126,7 @@ class BrevoService
     public function deleteTemplate(string $apiKey, string $templateId): bool
     {
         try {
-            $response = $this->client->delete("/smtp/templates/{$templateId}", [
+            $response = $this->client->delete("smtp/templates/{$templateId}", [
                 'headers' => [
                     'api-key' => $apiKey,
                     'Content-Type' => 'application/json',
@@ -127,7 +146,7 @@ class BrevoService
     public function sendTestTemplate(string $apiKey, string $templateId, array $testData): array
     {
         try {
-            $response = $this->client->post("/smtp/templates/{$templateId}/sendTest", [
+            $response = $this->client->post("smtp/templates/{$templateId}/sendTest", [
                 'headers' => [
                     'api-key' => $apiKey,
                     'Content-Type' => 'application/json',
@@ -148,7 +167,7 @@ class BrevoService
     public function generateTemplatePreview(string $apiKey, string $templateId, array $previewData = []): array
     {
         try {
-            $response = $this->client->post("/smtp/templates/{$templateId}/preview", [
+            $response = $this->client->post("smtp/templates/{$templateId}/preview", [
                 'headers' => [
                     'api-key' => $apiKey,
                     'Content-Type' => 'application/json',

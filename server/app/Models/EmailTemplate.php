@@ -19,9 +19,11 @@ class EmailTemplate extends Model
      */
     protected $fillable = [
         'section_name',
-        'thumbnail_url',
+        'project_id',
+        'campaign_id',
         'brevo_template_id',
-        'html_content'
+        'html_content',
+        'thumbnail_url'
     ];
 
     /**

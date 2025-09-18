@@ -12,15 +12,15 @@ export class UserService {
     protected http = inject(HttpClient)
 
     storeFigmaToken(token: string): Observable<StoreFigmaTokenResponse> {
-        return this.http.post<StoreFigmaTokenResponse>('/api/profile/figma-token', {
-            figma_access_token: token,
-        })
+        const formData = new FormData()
+        formData.append('figma_access_token', token)
+        return this.http.post<StoreFigmaTokenResponse>('/api/profile/figma-token', formData)
     }
 
     storeBrevoToken(token: string): Observable<StoreBrevoTokenResponse> {
-        return this.http.post<StoreBrevoTokenResponse>('/api/profile/brevo-token', {
-            brevo_api_token: token,
-        })
+        const formData = new FormData()
+        formData.append('brevo_api_token', token)
+        return this.http.post<StoreBrevoTokenResponse>('/api/profile/brevo-token', formData)
     }
 
     removeFigmaToken(): Observable<DeleteTokenResponse> {

@@ -15,6 +15,7 @@ import { EmailTemplate } from '../../shared/interfaces/email.interface'
 import { ExpandedImage } from '../../components/expanded-image/expanded-image'
 import { CommentsPanel } from '../../components/comments-panel/comments-panel'
 import { AiChatPanel } from '../../components/ai-chat-panel/ai-chat-panel'
+import { BrevoTemplateSelector } from '../../components/brevo-template-selector/brevo-template-selector'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 
@@ -32,6 +33,7 @@ import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.int
         EmptyState,
         CommentsPanel,
         AiChatPanel,
+        BrevoTemplateSelector,
     ],
     providers: [MessageService],
     templateUrl: './email-templates.html',
@@ -63,6 +65,7 @@ export class EmailTemplates {
 
     drawerVisible = false
     activeTab: 'comments' | 'ai-chat' = 'comments'
+    brevoSelectorVisible = signal<boolean>(false) // TODO: this needs to be a banana in a box and used with an ngModel
 
     filteredEmailTemplates = computed(() => {
         // Since the backend doesn't have release filtering yet, we'll return all templates
@@ -134,5 +137,30 @@ export class EmailTemplates {
     connectToMailChimp() {
         // TODO: Implement MailChimp connection logic
         console.log('Connect to MailChimp clicked')
+    }
+
+    openBrevoTemplateSelector() {
+        this.brevoSelectorVisible.set(true)
+    }
+
+    onBrevoSelectorVisibleChange(visible: boolean) {
+        this.brevoSelectorVisible.set(visible)
+    }
+
+    onTemplatesImported(importedTemplates: EmailTemplate[]) {
+        // Add the newly imported templates to the existing list
+        const currentTemplates = this.emailTemplates()
+        this.emailTemplates.set([...currentTemplates, ...importedTemplates])
+
+        this.messageService.add({
+            severity: 'success',
+            summary: 'Templates Imported',
+            detail: `Successfully imported ${importedTemplates.length} template(s) from Brevo!`,
+            life: 4000,
+        })
+    }
+
+    getProjectId(): string {
+        return this.route.parent?.snapshot.paramMap.get('projectId') || ''
     }
 }
