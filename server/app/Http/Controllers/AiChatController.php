@@ -14,6 +14,7 @@ use App\Services\FigmaService;
 use Illuminate\Support\Facades\DB;
 use Gemini\Data\Content;
 use Gemini\Enums\Role;
+use Illuminate\Support\Facades\Log;
 
 class AiChatController extends Controller
 {
@@ -76,12 +77,14 @@ class AiChatController extends Controller
         }
     }
 
-    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId, N8nService $n8n): JsonResponse
+    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId, N8nService $n8n, AiAgentService $ai): JsonResponse
     {
         $validated = $request->validate([
             'content' => 'required|string',
+            'update_template' => 'boolean',
         ]);
         $userPrompt = $validated['content'];
+        $updateTemplate = $validated['update_template'] ?? false;
 
         try {
             $emailTemplate = EmailTemplate::find($emailTemplateId);
@@ -96,17 +99,41 @@ class AiChatController extends Controller
             $chatMsg->commentable_type = EmailTemplate::class;
             $chatMsg->saveOrFail();
 
-            $aiResponseContent = $n8n->generateAgentResponseForEmailTemplate($userPrompt, $emailTemplateId);
+            if ($updateTemplate && $emailTemplate->brevo_template_id) {
+                // Use Gemini AI to update the template
+                try {
+                    $aiResponse = $ai->generateEmailTemplateUpdate($userPrompt, $emailTemplate->html_content ?? '', $emailTemplateId);
+
+                    // Update the template with AI-generated content
+                    $emailTemplate->update([
+                        'html_content' => $aiResponse['updated_html'],
+                        'section_name' => $aiResponse['updated_name'] ?? $emailTemplate->section_name,
+                    ]);
+
+                    $aiResponseContent = $aiResponse['explanation'];
+                } catch (\Throwable $aiTh) {
+                    Log::error('Failed to generate AI email template update: ' . $aiTh->getMessage(), [
+                        'trace' => $aiTh->getTrace(),
+                    ]);
+                    $aiResponseContent = 'Failed to generate AI email template update. Please check the logs for more details.';
+                }
+            } else {
+                // Return a non-AI response indicating missing requirements
+                $aiResponseContent = 'AI response is unavailable because the required information or configuration is missing.';
+            }
 
             return $this->responseJson([
                 'user' => $chatMsg->fresh(),
                 'ai' => ['content' => $aiResponseContent],
+                'template_updated' => $updateTemplate,
             ], 'Messages created successfully', 201);
 
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse([
+            Log::error('Failed to send chat message: ' . $th->getMessage(), [
                 'trace' => $th->getTrace(),
-            ], 'Failed to send chat message: ' . $th->getMessage(), );
+            ]);
+
+            return $this->serverErrorResponse('Failed to send chat message: ' . $th->getMessage());
         }
     }
 

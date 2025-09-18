@@ -68,6 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{projectId}/email-templates/import-brevo', [EmailTemplateController::class, 'importBrevoTemplate']);
             Route::post('/{projectId}/email-templates/{emailTemplateId}/sync-brevo', [EmailTemplateController::class, 'syncWithBrevo']);
             Route::put('/{projectId}/email-templates/{emailTemplateId}/update-brevo', [EmailTemplateController::class, 'updateInBrevo']);
+            Route::post('/{projectId}/email-templates/{emailTemplateId}/update-with-ai', [EmailTemplateController::class, 'updateTemplateWithAI']);
 
             // General email template routes
             Route::get('/{projectId}/email-templates', [EmailTemplateController::class, 'getProjectEmailTemplates']);

@@ -7,10 +7,12 @@ use App\Models\EmailTemplate;
 use App\Models\Project;
 use App\Services\N8nService;
 use App\Services\BrevoService;
+use App\Services\AiAgentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\MailchimpService;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -347,6 +349,89 @@ class EmailTemplateController extends Controller
             return $this->responseJson(message: 'Failed to fetch Brevo templates: ' . $e->getMessage(), code: $e->getResponse()?->getStatusCode() ?? 500);
         } catch (\Throwable $th) {
             return $this->serverErrorResponse(message: 'Failed to fetch Brevo templates: ' . $th->getMessage());
+        }
+    }
+
+    /**
+     * AI-powered template update endpoint
+     */
+    public function updateTemplateWithAI(Request $request, string $projectId, string $emailTemplateId, BrevoService $brevo, N8nService $n8n, AiAgentService $aiAgent): JsonResponse
+    {
+        $validated = $request->validate([
+            'prompt' => 'required|string|max:1000',
+            'update_brevo' => 'boolean',
+        ]);
+
+        $user = auth()->user();
+        if (!$user->brevo_api_token) {
+            return $this->forbiddenResponse('Brevo API token not configured for user');
+        }
+
+        /** @var \App\Models\Project */
+        $project = $request->attributes->get('project');
+
+        try {
+            $emailTemplate = $project->emailTemplates()->find($emailTemplateId);
+            if (!$emailTemplate) {
+                return $this->notFoundResponse('Email template not found');
+            }
+
+            if (!$emailTemplate->brevo_template_id) {
+                return $this->badRequestResponse('Email template is not linked to Brevo');
+            }
+
+            // Get current template content from Brevo
+            $currentBrevoTemplate = $brevo->getTemplate($user->brevo_api_token, $emailTemplate->brevo_template_id);
+
+            $aiResponse = $aiAgent->generateEmailTemplateUpdate($validated['prompt'], $currentBrevoTemplate['htmlContent'], $emailTemplateId);
+
+            // Update local template with new HTML content
+            $emailTemplate->update([
+                'html_content' => $aiResponse['updated_html'],
+                'section_name' => $aiResponse['updated_name'] ?? $emailTemplate->section_name,
+            ]);
+
+            // Update in Brevo if requested
+            if ($validated['update_brevo'] ?? false) {
+                $brevo->updateTemplate($user->brevo_api_token, $emailTemplate->brevo_template_id, [
+                    'htmlContent' => $aiResponse['updated_html'],
+                    'templateName' => $aiResponse['updated_name'] ?? $emailTemplate->section_name,
+                ]);
+            }
+
+            // Generate new thumbnail
+            try {
+                $base64Img = $n8n->generateBase64ThumbnailFromHtml($aiResponse['updated_html']);
+                if ($base64Img) {
+                    $binaryImg = base64_decode($base64Img);
+                    if ($binaryImg !== false) {
+                        $thumbnailPath = 'email-thumbnails/' . uniqid('et_', true) . '.png';
+                        Storage::put($thumbnailPath, $binaryImg);
+                        $emailTemplate->update(['thumbnail_url' => Storage::url($thumbnailPath)]);
+                    }
+                }
+            } catch (\Throwable $thumbEx) {
+                // Log but don't fail the update
+                Log::warning('Failed to generate thumbnail for AI-updated template: ' . $thumbEx->getMessage());
+            }
+
+            return $this->responseJson([
+                'template' => $emailTemplate->fresh(),
+                'ai_response' => $aiResponse['explanation'],
+                'updated_in_brevo' => $validated['update_brevo'] ?? false,
+            ], 'Template updated successfully with AI');
+
+        } catch (RequestException $e) {
+            $status = $e->getResponse()?->getStatusCode();
+            if ($status === 404) {
+                return $this->notFoundResponse('Template not found in Brevo');
+            }
+            return $this->responseJson(
+                message: 'Failed to update template: ' . $e->getMessage(),
+                code: $status ?? 500
+            );
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to update template: ' . $th->getMessage());
         }
     }
 }
