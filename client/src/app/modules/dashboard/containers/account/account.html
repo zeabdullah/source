@@ -1,65 +1,144 @@
+<p-toast position="bottom-right" />
+<p-confirmpopup />
+
 <main class="mx-auto h-full w-full max-w-[1600px] flex-1 px-4 py-8 lg:px-8 lg:py-12">
     <div class="mb-8">
         <h1 class="text-h2 font-bold tracking-tight text-gray-900">Account Settings</h1>
         <p class="text-gray-600 mt-2">Manage your account preferences and integrations</p>
     </div>
 
-    <p-card header="Figma Integration" class="space-y-4">
-        <div class="space-y-4">
-            <p>Connect your Figma account to enable AI-powered features for your screens.</p>
+    <div class="space-y-6">
+        <!-- Figma Integration -->
+        <p-card header="Figma Integration" class="space-y-4">
+            <div class="space-y-4">
+                <p>Connect your Figma account to enable AI-powered features for your screens.</p>
 
-            @if (successMessage(); as message) {
-            <p-message severity="success" class="block">{{ message }}</p-message>
-            } @if (errorMessage(); as message) {
-            <p-message severity="error" class="block">{{ message }}</p-message>
-            }
+                <form [formGroup]="figmaForm" (ngSubmit)="submitToken()" class="space-y-4">
+                    <div>
+                        <label
+                            for="figma-token"
+                            class="mb-2 block text-sm font-medium text-gray-700"
+                        >
+                            Figma Access Token
+                        </label>
+                        <input
+                            pInputText
+                            formControlName="figma_access_token"
+                            id="figma-token"
+                            type="password"
+                            placeholder="Enter your Figma access token"
+                            fluid
+                        />
+                        @if (figmaForm.get('figma_access_token')?.invalid &&
+                        figmaForm.get('figma_access_token')?.touched) {
+                        <p-message severity="error" variant="simple">
+                            Figma access token is required
+                        </p-message>
+                        }
+                    </div>
 
-            <form [formGroup]="form" (ngSubmit)="submitToken()" class="space-y-4">
-                <div>
-                    <label for="figma-token" class="mb-2 block text-sm font-medium text-gray-700">
-                        Figma Access Token
-                    </label>
-                    <input
-                        pInputText
-                        formControlName="figma_access_token"
-                        id="figma-token"
-                        type="password"
-                        placeholder="Enter your Figma access token"
-                        fluid
-                    />
-                    @if (form.get('figma_access_token')?.invalid &&
-                    form.get('figma_access_token')?.touched) {
-                    <p-message severity="error" variant="simple">
-                        Figma access token is required
-                    </p-message>
-                    }
+                    <div class="flex gap-3">
+                        <p-button
+                            type="submit"
+                            label="Save Token"
+                            [loading]="isSubmitting()"
+                            [disabled]="figmaForm.invalid || isSubmitting()"
+                        />
+                        <p-button
+                            type="button"
+                            label="Delete Token"
+                            severity="danger"
+                            [outlined]="true"
+                            [loading]="isSubmitting()"
+                            [disabled]="isSubmitting()"
+                            (onClick)="confirmDeleteFigmaToken($event)"
+                        />
+                    </div>
+                </form>
+
+                <div class="bg-blue-50 mt-4 rounded-lg p-4">
+                    <h4 class="text-blue-900 mb-2 font-medium">
+                        How to get your Figma access token:
+                    </h4>
+                    <ol class="text-blue-800 list-inside list-decimal space-y-1 text-sm">
+                        <li>Go to your Figma account settings</li>
+                        <li>Navigate to "Personal access tokens"</li>
+                        <li>Click "Generate new token"</li>
+                        <li>Copy the generated token and paste it above</li>
+                        <li>
+                            Make sure to select "Read" permission for each of the following:
+                            <ul class="list-inside list-disc space-y-1 ps-4 text-sm">
+                                <li>File</li>
+                                <li>Comments</li>
+                                <li>Current User</li>
+                            </ul>
+                        </li>
+                    </ol>
                 </div>
-
-                <p-button
-                    type="submit"
-                    label="Save Token"
-                    [loading]="isSubmitting()"
-                    [disabled]="form.invalid || isSubmitting()"
-                />
-            </form>
-
-            <div class="bg-blue-50 mt-4 rounded-lg p-4">
-                <h4 class="text-blue-900 mb-2 font-medium">How to get your Figma access token:</h4>
-                <ol class="text-blue-800 list-inside list-decimal space-y-1 text-sm">
-                    <li>Go to your Figma account settings</li>
-                    <li>Navigate to "Personal access tokens"</li>
-                    <li>Click "Generate new token"</li>
-                    <li>Copy the generated token and paste it above</li>
-                    <li>
-                        Make sure to select "Read" permission for each of the following:
-                        <ul class="list-inside list-disc space-y-1 ps-4 text-sm">
-                            <li>File</li>
-                            <li>Comments</li>
-                            <li>Current User</li>
-                        </ul>
-                    </li>
-                </ol>
             </div>
-        </div>
-    </p-card>
+        </p-card>
+
+        <!-- Brevo Integration -->
+        <p-card header="Brevo Integration" class="space-y-4">
+            <div class="space-y-4">
+                <p>Connect your Brevo account to manage email templates for your projects.</p>
+
+                <form [formGroup]="brevoForm" (ngSubmit)="submitBrevoToken()" class="space-y-4">
+                    <div>
+                        <label
+                            for="brevo-token"
+                            class="mb-2 block text-sm font-medium text-gray-700"
+                        >
+                            Brevo API Token
+                        </label>
+                        <input
+                            pInputText
+                            formControlName="brevo_api_token"
+                            id="brevo-token"
+                            type="password"
+                            placeholder="Enter your Brevo API token"
+                            fluid
+                        />
+                        @if (brevoForm.get('brevo_api_token')?.invalid &&
+                        brevoForm.get('brevo_api_token')?.touched) {
+                        <p-message severity="error" variant="simple">
+                            Brevo API token is required
+                        </p-message>
+                        }
+                    </div>
+
+                    <div class="flex gap-3">
+                        <p-button
+                            type="submit"
+                            label="Save Token"
+                            [loading]="isSubmitting()"
+                            [disabled]="brevoForm.invalid || isSubmitting()"
+                        />
+                        <p-button
+                            type="button"
+                            label="Delete Token"
+                            severity="danger"
+                            [outlined]="true"
+                            [loading]="isSubmitting()"
+                            [disabled]="isSubmitting()"
+                            (onClick)="confirmDeleteBrevoToken($event)"
+                        />
+                    </div>
+                </form>
+
+                <div class="bg-green-50 mt-4 rounded-lg p-4">
+                    <h4 class="text-green-900 mb-2 font-medium">
+                        How to get your Brevo API token:
+                    </h4>
+                    <ol class="text-green-800 list-inside list-decimal space-y-1 text-sm">
+                        <li>Log in to your Brevo account</li>
+                        <li>Go to Settings → API Keys</li>
+                        <li>Click "Create a new API key"</li>
+                        <li>Give it a name and select the required permissions</li>
+                        <li>Copy the generated API key and paste it above</li>
+                    </ol>
+                </div>
+            </div>
+        </p-card>
+    </div>
 </main>
