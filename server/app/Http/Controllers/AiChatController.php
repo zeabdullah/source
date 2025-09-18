@@ -77,14 +77,12 @@ class AiChatController extends Controller
         }
     }
 
-    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId, N8nService $n8n, AiAgentService $ai): JsonResponse
+    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId): JsonResponse
     {
         $validated = $request->validate([
             'content' => 'required|string',
-            'update_template' => 'boolean',
         ]);
         $userPrompt = $validated['content'];
-        $updateTemplate = $validated['update_template'] ?? false;
 
         try {
             $emailTemplate = EmailTemplate::find($emailTemplateId);
@@ -92,42 +90,60 @@ class AiChatController extends Controller
                 return $this->notFoundResponse('Email template not found');
             }
 
-            $chatMsg = new AiChat(['content' => $userPrompt]);
-            $chatMsg->sender = 'user';
-            $chatMsg->user_id = $request->user()->id;
-            $chatMsg->commentable_id = $emailTemplateId;
-            $chatMsg->commentable_type = EmailTemplate::class;
-            $chatMsg->saveOrFail();
+            $result = DB::transaction(function () use ($request, $emailTemplate, $emailTemplateId, $userPrompt) {
+                $ai = new AiAgentService();
 
-            if ($updateTemplate && $emailTemplate->brevo_template_id) {
-                // Use Gemini AI to update the template
-                try {
-                    $aiResponse = $ai->generateEmailTemplateUpdate($userPrompt, $emailTemplate->html_content ?? '', $emailTemplateId);
+                // create user message
+                $userAiChat = new AiChat(['content' => $userPrompt]);
+                $userAiChat->sender = 'user';
+                $userAiChat->user_id = $request->user()->id;
+                $userAiChat->commentable_id = $emailTemplateId;
+                $userAiChat->commentable_type = EmailTemplate::class;
 
-                    // Update the template with AI-generated content
-                    $emailTemplate->update([
-                        'html_content' => $aiResponse['updated_html'],
-                        'section_name' => $aiResponse['updated_name'] ?? $emailTemplate->section_name,
-                    ]);
 
-                    $aiResponseContent = $aiResponse['explanation'];
-                } catch (\Throwable $aiTh) {
-                    Log::error('Failed to generate AI email template update: ' . $aiTh->getMessage(), [
-                        'trace' => $aiTh->getTrace(),
-                    ]);
-                    $aiResponseContent = 'Failed to generate AI email template update. Please check the logs for more details.';
+                // feed history of messages as ai context
+                $contextMessages = $emailTemplate->aiChats()
+                    ->orderBy('created_at', 'desc')
+                    ->limit(15)
+                    ->get(['sender', 'content'])
+                    ->reverse()
+                    ->values()
+                    ->map(fn($msg) => Content::parse(
+                        $msg->content,
+                        $msg->sender === 'user' ? Role::USER : Role::MODEL
+                    ))
+                    ->toArray();
+
+                // Get AI response with structured output
+                $aiResponse = $ai->generateEmailTemplateReply($userPrompt, $contextMessages, $emailTemplate->html_content);
+                $aiReplyText = $aiResponse['chat_message'];
+                $updatedHtml = $aiResponse['updated_html'];
+
+                if ($updatedHtml !== null) {
+                    $emailTemplate->html_content = $updatedHtml;
+                    $emailTemplate->save();
                 }
-            } else {
-                // Return a non-AI response indicating missing requirements
-                $aiResponseContent = 'AI response is unavailable because the required information or configuration is missing.';
-            }
 
-            return $this->responseJson([
-                'user' => $chatMsg->fresh(),
-                'ai' => ['content' => $aiResponseContent],
-                'template_updated' => $updateTemplate,
-            ], 'Messages created successfully', 201);
+                // create ai message
+                $aiReply = new AiChat([
+                    'content' => $aiReplyText,
+                ]);
+                $aiReply->user_id = null;
+                $aiReply->sender = 'ai';
+                $aiReply->commentable_id = $userAiChat->commentable_id;
+                $aiReply->commentable_type = $userAiChat->commentable_type;
 
+                $userAiChat->saveOrFail();
+                $aiReply->saveOrFail();
+
+                return [
+                    'user' => $userAiChat->fresh(),
+                    'ai' => $aiReply->fresh(),
+                    'template_updated' => $updatedHtml !== null,
+                ];
+            }, attempts: 2);
+
+            return $this->responseJson($result, 'Chat message created successfully', 201);
         } catch (\Throwable $th) {
             Log::error('Failed to send chat message: ' . $th->getMessage(), [
                 'trace' => $th->getTrace(),
@@ -244,7 +260,7 @@ class AiChatController extends Controller
                     $contextMessages[] = Content::parse($figmaContext, Role::USER); // Add as user role for context
                 }
 
-                $aiReplyText = $ai->generateReplyFromContext($userMsg, history: $contextMessages);
+                $aiReplyText = $ai->generateReplyFromContext($userMsg, $contextMessages);
 
                 // create ai message
                 $aiReply = new AiChat([

@@ -144,7 +144,6 @@ class EmailTemplateController extends Controller
         }
 
         try {
-            // Get template from Brevo
             $brevoTemplate = $brevo->getTemplate($user->brevo_api_token, $brevoTemplateId);
             /** @var \App\Models\Project */
             $project = $request->attributes->get('project');
@@ -155,7 +154,7 @@ class EmailTemplateController extends Controller
                 ->first();
 
             if ($emailTemplate) {
-                return $this->responseJson($emailTemplate, 'Template already imported');
+                return $this->responseJson(message: 'Template already imported', code: 409);
             }
 
             // Defensive: Ensure required Brevo fields exist
@@ -181,19 +180,15 @@ class EmailTemplateController extends Controller
 
                 $binaryImg = base64_decode($base64Img);
                 if ($binaryImg === false) {
-                    return $this->responseJson(
-                        message: 'Failed to decode generated thumbnail image.',
-                        code: 500
-                    );
+                    return $this->serverErrorResponse('Failed to decode generated thumbnail image.');
                 }
 
                 $thumbnailPath = 'email-thumbnails/' . uniqid('et_', true) . '.png';
                 Storage::put($thumbnailPath, $binaryImg);
                 $thumbnailUrl = Storage::url($thumbnailPath);
             } catch (\Throwable $thumbnailException) {
-                return $this->responseJson(
-                    message: 'Error generating thumbnail: ' . $thumbnailException->getMessage(),
-                    code: 500
+                return $this->serverErrorResponse(
+                    'Error generating thumbnail: ' . $thumbnailException->getMessage()
                 );
             }
 

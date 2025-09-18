@@ -4,6 +4,10 @@ namespace App\Services;
 
 use Gemini;
 use Gemini\Data\Content;
+use Gemini\Data\GenerationConfig;
+use Gemini\Data\Schema;
+use Gemini\Enums\DataType;
+use Gemini\Enums\ResponseMimeType;
 
 class AiAgentService
 {
@@ -57,17 +61,17 @@ Always provide clear, implementable recommendations that help improve the design
         );
     }
 
-    private function getEmailTemplateSystemInstruction(string $currentHtml, string $prompt): Content
+    private function getEmailTemplateSystemInstruction(): Content
     {
         return Content::parse(
             "You are an expert email template designer and developer. Your task is to update email templates based on user requests while maintaining professional email design standards.
 
 **Your responsibilities:**
-- Analyze the current HTML email template
-- Understand the user's update request
+- Analyze the current HTML email template provided in context
+- Understand the user's update request from their prompt
 - Generate improved HTML that maintains email client compatibility
-- Provide a clear explanation of the changes made
-- Suggest an appropriate section name if the content changes significantly
+- Provide a clear explanation of the changes made in your chat response
+- Only update the HTML if changes are actually needed
 
 **Email Template Guidelines:**
 - Use inline CSS for maximum email client compatibility
@@ -76,12 +80,12 @@ Always provide clear, implementable recommendations that help improve the design
 - Keep HTML structure clean and semantic
 - Test for common email client rendering issues
 
-Current HTML template:
-```html
-{$currentHtml}
-```
+**Response Format:**
+You must respond with a JSON object containing:
+- 'chat_message': A conversational response explaining what you did or why no changes were needed
+- 'updated_html': The new HTML content (only if changes were made, otherwise return null)
 
-User request: {$prompt}"
+**Important:** Only modify the HTML if the user's request actually requires changes to the template. If they're just asking questions or the current template is already appropriate, set 'updated_html' to null."
         );
     }
 
@@ -89,60 +93,66 @@ User request: {$prompt}"
      * Generate AI response for Figma design analysis
      *
      * @param string|array $userMessages
-     * @param \Gemini\Data\Content[] $history
+     * @param \Gemini\Data\Content[] $chatHistory
      */
-    public function generateFigmaReply(string|array $userMessages, array $history = []): string
+    public function generateFigmaReply(string|array $userMessages, array $chatHistory = []): string
     {
         $model = $this->baseModel->withSystemInstruction($this->getFigmaSystemInstruction());
-        $result = $model->startChat($history)->sendMessage($userMessages);
+        $result = $model->startChat($chatHistory)->sendMessage($userMessages);
 
         return $result->text();
     }
 
-    /**
-     * Generate AI response for email template updates
-     *
-     * @param string $prompt User's update request
-     * @param string $currentHtml Current HTML template
-     * @param string $emailTemplateId Template ID for context
-     */
-    public function generateEmailTemplateUpdate(string $prompt, string $currentHtml, string $emailTemplateId): array
-    {
-        $systemInstruction = $this->getEmailTemplateSystemInstruction($currentHtml, $prompt);
-        $model = $this->baseModel->withSystemInstruction($systemInstruction);
+    public function generateEmailTemplateReply(
+        string|array $userMessages,
+        array $chatHistory = [],
+        ?string $htmlContext = null
+    ): array {
+        $systemInstruction = $this->getEmailTemplateSystemInstruction();
+
+        // Add HTML context to system instruction if provided
+        if ($htmlContext) {
+            $systemInstruction = Content::parse(
+                $systemInstruction->parts[0]->text . "\n\n**Current Email Template HTML:**\n" . $htmlContext
+            );
+        }
+
+        $model = $this->baseModel
+            ->withSystemInstruction($systemInstruction)
+            ->withGenerationConfig(
+                new GenerationConfig(
+                    responseMimeType: ResponseMimeType::APPLICATION_JSON,
+                    responseSchema: new Schema(
+                        DataType::OBJECT,
+                        properties: [
+                            'chat_message' => new Schema(
+                                DataType::STRING,
+                                description: 'Conversational response explaining what was done or why no changes were needed'
+                            ),
+                            'updated_html' => new Schema(
+                                DataType::STRING,
+                                description: 'New HTML content if changes were made, otherwise null',
+                                nullable: true
+                            )
+                        ],
+                        required: ['chat_message', 'updated_html']
+                    )
+                )
+            );
 
         try {
-            $result = $model->startChat([])->sendMessage($prompt);
-            $normalAiResponse = $result->text();
+            $result = $model->startChat($chatHistory)->sendMessage($userMessages);
+            $response = $result->json(true);
 
-            $formattedAiResponse = $model->startChat([])->sendMessage("You are to respond with a JSON object with the following structure:
-            {
-                \"explanation\": \"AI's reply without the HTML\",
-                \"updated_html\": \"The updated HTML content\",
-                \"updated_name\": \"An appropriate section name, if the content changes significantly.  If not, omit this field.\"
-            }
-            Ensure the JSON is valid and parsable. Here is the response to parse to JSON: $normalAiResponse");
-
-            // Parse the JSON response
-            $aiResponse = json_decode($formattedAiResponse->text(), true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \Exception('Invalid JSON response from AI: ' . json_last_error_msg());
-            }
-
-            // Validate required fields
-            if (!isset($aiResponse['updated_html'])) {
-                throw new \Exception('AI response missing required field: updated_html');
-            }
-
-            return $aiResponse;
+            return [
+                'chat_message' => $response['chat_message'] ?? 'No response generated',
+                'updated_html' => $response['updated_html'] ?? null
+            ];
 
         } catch (\Throwable $th) {
-            // Fallback response if AI fails
             return [
-                'updated_html' => $currentHtml,
-                'updated_name' => null,
-                'explanation' => 'AI template update failed: ' . $th->getMessage() . '. Template remains unchanged.'
+                'chat_message' => "AI failed to respond: " . $th->getMessage(),
+                'updated_html' => null
             ];
         }
     }
@@ -152,10 +162,10 @@ User request: {$prompt}"
      * @deprecated Use generateFigmaReply() instead
      *
      * @param string|array $userMessages
-     * @param \Gemini\Data\Content[] $history
+     * @param \Gemini\Data\Content[] $chatHistory
      */
-    public function generateReplyFromContext(string|array $userMessages, array $history): string
+    public function generateReplyFromContext(string|array $userMessages, array $chatHistory): string
     {
-        return $this->generateFigmaReply($userMessages, $history);
+        return $this->generateFigmaReply($userMessages, $chatHistory);
     }
 }
