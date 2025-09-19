@@ -10,32 +10,48 @@ use App\Services\ScreenService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @OA\Tag(
+ *     name="Screens",
+ *     description="Screen management endpoints for projects"
+ * )
+ */
 class ScreenController extends Controller
 {
-    /** @deprecated Use `exportScreens` instead */
-    public function createScreen(Request $request, string $projectId): JsonResponse
-    {
-        /** @var \App\Models\Project */
-        $project = $request->attributes->get('project');
-
-        $isMember = $project->members()->where('user_id', $request->user()->id)->exists();
-        if (!$isMember) {
-            return $this->notFoundResponse('Project not found');
-        }
-
-        $validated = $request->validate([
-            'section_name' => 'nullable|string|max:255',
-            'data' => 'nullable|array',
-        ]);
-
-        try {
-            $screen = Screen::create(array_merge($validated, ['project_id' => $projectId]));
-            return $this->responseJson($screen, 'Created successfully', 201);
-        } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to save Screen to database: ' . $th->getMessage());
-        }
-    }
-
+    /**
+     * @OA\Post(
+     *     path="/projects/{projectId}/screens/export",
+     *     summary="Export screens from Figma",
+     *     description="Export multiple Figma frames as screens for a project",
+     *     tags={"Screens"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="frame_ids", type="array", @OA\Items(type="string"), example={"1:23", "1:24"}),
+     *             @OA\Property(property="figma_access_token", type="string", example="figd_abc123..."),
+     *             @OA\Property(property="figma_file_key", type="string", example="abc123def456")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Screens exported successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Screen")
+     *         )
+     *     ),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function exportScreens(Request $request, string $projectId, FigmaService $figmaService): JsonResponse
     {
         $validated = $request->validate([
@@ -80,6 +96,38 @@ class ScreenController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/projects/{projectId}/screens",
+     *     summary="Get project screens",
+     *     description="Get all screens for a project with optional search",
+     *     tags={"Screens"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         description="Search screens by name or description",
+     *         required=false,
+     *         @OA\Schema(type="string", example="login")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of project screens",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Screen")
+     *         )
+     *     ),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function getProjectScreens(Request $request, string $projectId): JsonResponse
     {
         $project = $request->attributes->get('project');
@@ -94,6 +142,36 @@ class ScreenController extends Controller
         return $this->responseJson($screens);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/projects/{projectId}/screens/{screenId}",
+     *     summary="Get screen by ID",
+     *     description="Get a specific screen by its ID",
+     *     tags={"Screens"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="screenId",
+     *         in="path",
+     *         description="Screen ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Screen data",
+     *         @OA\JsonContent(ref="#/components/schemas/Screen")
+     *     ),
+     *     @OA\Response(response=404, description="Screen not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function getScreenById(Request $request, string $projectId, string $screenId): JsonResponse
     {
         try {
@@ -107,11 +185,72 @@ class ScreenController extends Controller
             return $this->serverErrorResponse(message: 'Failed to get screen: ' . $th->getMessage());
         }
     }
+
+    /**
+     * @OA\Get(
+     *     path="/basic/screens/{screenId}",
+     *     summary="Get screen by ID (Basic)",
+     *     description="Get a specific screen by its ID without project context",
+     *     tags={"Screens"},
+     *     security={{"basic_auth": {}}},
+     *     @OA\Parameter(
+     *         name="screenId",
+     *         in="path",
+     *         description="Screen ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Screen data",
+     *         @OA\JsonContent(ref="#/components/schemas/Screen")
+     *     ),
+     *     @OA\Response(response=404, description="Screen not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function getScreenByIdBasic(Request $request, string $screenId): JsonResponse
     {
         return $this->getScreenById($request, '', $screenId);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/projects/{projectId}/screens/{screenId}",
+     *     summary="Update screen",
+     *     description="Update a screen by its ID",
+     *     tags={"Screens"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="screenId",
+     *         in="path",
+     *         description="Screen ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="section_name", type="string", nullable=true, example="Updated Screen Name")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Screen updated successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Screen")
+     *     ),
+     *     @OA\Response(response=404, description="Screen not found"),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function updateScreenById(Request $request, string $projectId, string $screenId): JsonResponse
     {
         $validated = $request->validate([
@@ -134,6 +273,36 @@ class ScreenController extends Controller
 
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/projects/{projectId}/screens/{screenId}",
+     *     summary="Delete screen",
+     *     description="Delete a screen by its ID",
+     *     tags={"Screens"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="screenId",
+     *         in="path",
+     *         description="Screen ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Screen deleted successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Screen")
+     *     ),
+     *     @OA\Response(response=404, description="Screen not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function deleteScreenById(Request $request, string $projectId, string $screenId): JsonResponse
     {
         $screen = Screen::find($screenId);
@@ -149,10 +318,5 @@ class ScreenController extends Controller
             return $this->serverErrorResponse(message: 'Failed to delete screen: ' . $th->getMessage());
         }
 
-    }
-
-    public function regenerateDescription(Request $request, string $projectId, string $screenId, ScreenService $screenService): JsonResponse
-    {
-        return $this->notImplementedResponse();
     }
 }

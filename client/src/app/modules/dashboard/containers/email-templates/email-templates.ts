@@ -134,11 +134,6 @@ export class EmailTemplates {
         return this.emailTemplates().find(t => t.id === id)
     }
 
-    connectToMailChimp() {
-        // TODO: Implement MailChimp connection logic
-        console.log('Connect to MailChimp clicked')
-    }
-
     openBrevoTemplateSelector() {
         this.brevoSelectorVisible.set(true)
     }

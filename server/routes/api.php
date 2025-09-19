@@ -26,7 +26,6 @@ Route::prefix('plugin')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     // Users
     Route::get('/users/{userId}', [UserController::class, 'getUserById']);
-    // Route::get('/profile', [UserController::class, 'getOwnProfile']);
     Route::put('/profile', [UserController::class, 'updateOwnProfile']);
     Route::post('/profile/figma-token', [UserController::class, 'storeFigmaToken']);
     Route::post('/profile/brevo-token', [UserController::class, 'storeBrevoApiToken']);
@@ -51,7 +50,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{projectId}/releases', [ReleaseController::class, 'getProjectReleases']);
 
         // Screens (per project)
-        Route::post('/{projectId}/screens', [ScreenController::class, 'createScreen']); // deprecated
         Route::middleware('is_owner')->group(function () {
             Route::post('/{projectId}/screens/export', [ScreenController::class, 'exportScreens']);
             Route::get('/{projectId}/screens', [ScreenController::class, 'getProjectScreens']);
@@ -102,12 +100,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{releaseId}', [ReleaseController::class, 'updateReleaseById']);
         Route::delete('/{releaseId}', [ReleaseController::class, 'deleteReleaseById']);
     });
-
-    // Screens (by id)
-    Route::prefix('screens')->group(function () {
-        Route::post('/{screenId}/regenerate-description', [ScreenController::class, 'regenerateDescription']);
-    });
-
 
     // Comments (per screen, polymorphic but scoped here)
     Route::get('/screens/{screenId}/comments', [CommentController::class, 'getScreenComments']);
