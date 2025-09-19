@@ -43,18 +43,15 @@ class PerformFlowAudit implements ShouldQueue
                 throw new \Exception('No screens found for audit');
             }
 
-            // TODO: revise. not needed.
             // Serialize all screen data for AI analysis
             $serializedScreens = [];
+            /** @var \App\Models\Screen $screen */
             foreach ($this->audit->screens as $screen) {
                 $serializedScreens[] = $screen->serializeForAudit();
             }
 
-            // TODO: Call AI service for multi-screen consistency analysis
+            // Call AI service for multi-screen consistency analysis
             $results = $aiAgentService->analyzeFlowConsistency($serializedScreens, $this->audit->name);
-
-            // For now, create a mock response
-            $results = $this->createMockResults();
 
             // Update audit with results
             $this->audit->update([
@@ -77,39 +74,6 @@ class PerformFlowAudit implements ShouldQueue
         }
     }
 
-    /**
-     * Create mock results for testing
-     * TODO: Remove this when AI service is implemented
-     */
-    private function createMockResults(): array
-    {
-        return [
-            'auditId' => $this->audit->id,
-            'flowName' => $this->audit->name,
-            'overallConsistencyScore' => 7.2,
-            'issues' => [
-                [
-                    'type' => 'terminology',
-                    'severity' => 'medium',
-                    'description' => 'Inconsistent button text across screens',
-                    'screens' => ['Screen 1', 'Screen 2'],
-                    'suggestion' => 'Standardize button text to "Continue" across all screens'
-                ],
-                [
-                    'type' => 'color_usage',
-                    'severity' => 'high',
-                    'description' => 'Primary action button color differs between screens',
-                    'screens' => ['Screen 1', 'Screen 3'],
-                    'suggestion' => 'Use consistent primary color (#007bff) for all primary actions'
-                ]
-            ],
-            'positiveFindings' => [
-                'Consistent typography hierarchy across all screens',
-                'Good use of spacing and padding consistency',
-                'Clear visual progression through the flow'
-            ]
-        ];
-    }
 
     /**
      * Handle a job failure.

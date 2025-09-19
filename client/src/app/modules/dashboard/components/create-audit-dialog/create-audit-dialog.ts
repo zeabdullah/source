@@ -86,6 +86,7 @@ export class CreateAuditDialog implements OnInit {
                 finalize(() => this.isLoading.set(false)),
             )
             .subscribe(response => {
+                console.log(response.payload)
                 this.screens.set(response.payload || [])
             })
     }
