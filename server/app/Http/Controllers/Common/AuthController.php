@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 
 /**
  * @OA\Tag(
- *     name="Authentication",
+ *     name="Auth",
  *     description="Authentication endpoints for users and plugin"
  * )
  */
@@ -21,7 +21,9 @@ class AuthController extends Controller
      *     path="/plugin/login",
      *     summary="Plugin login",
      *     description="Authenticate plugin with email and password",
-     *     tags={"Authentication"},
+     *     tags={"Auth"},
+     *     @OA\Parameter(ref="#/components/parameters/AcceptJson"),
+     *     @OA\Parameter(ref="#/components/parameters/ContentTypeJson"),
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -65,8 +67,10 @@ class AuthController extends Controller
      *     path="/plugin/logout",
      *     summary="Plugin logout",
      *     description="Logout plugin and revoke current access token",
-     *     tags={"Authentication"},
+     *     tags={"Auth"},
      *     security={{"sanctum": {}}},
+     *     @OA\Parameter(ref="#/components/parameters/AcceptJson"),
+     *     @OA\Parameter(ref="#/components/parameters/ContentTypeJson"),
      *     @OA\Response(response=200, description="Logged out successfully")
      * )
      */
@@ -81,7 +85,9 @@ class AuthController extends Controller
      *     path="/login",
      *     summary="User login",
      *     description="Authenticate user with email and password",
-     *     tags={"Authentication"},
+     *     tags={"Auth"},
+     *     @OA\Parameter(ref="#/components/parameters/AcceptJson"),
+     *     @OA\Parameter(ref="#/components/parameters/ContentTypeJson"),
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -131,7 +137,9 @@ class AuthController extends Controller
      *     path="/register",
      *     summary="User registration",
      *     description="Register a new user account",
-     *     tags={"Authentication"},
+     *     tags={"Auth"},
+     *     @OA\Parameter(ref="#/components/parameters/AcceptJson"),
+     *     @OA\Parameter(ref="#/components/parameters/ContentTypeJson"),
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -186,8 +194,10 @@ class AuthController extends Controller
      *     path="/logout",
      *     summary="User logout",
      *     description="Logout user and revoke current access token",
-     *     tags={"Authentication"},
+     *     tags={"Auth"},
      *     security={{"sanctum": {}}},
+     *     @OA\Parameter(ref="#/components/parameters/AcceptJson"),
+     *     @OA\Parameter(ref="#/components/parameters/ContentTypeJson"),
      *     @OA\Response(response=200, description="Logged out successfully")
      * )
      */
@@ -208,8 +218,9 @@ class AuthController extends Controller
      *     path="/me",
      *     summary="Get current user",
      *     description="Get the currently authenticated user",
-     *     tags={"Authentication"},
+     *     tags={"Auth"},
      *     security={{"sanctum": {}}},
+     *     @OA\Parameter(ref="#/components/parameters/AcceptJson"),
      *     @OA\Response(
      *         response=200,
      *         description="Current user data",

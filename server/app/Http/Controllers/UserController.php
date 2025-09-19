@@ -22,6 +22,22 @@ use Illuminate\Http\Request;
  *      scheme="bearer",
  *      bearerFormat="JWT"
  * )
+ * @OA\Parameter(
+ *      parameter="AcceptJson",
+ *      name="Accept",
+ *      in="header",
+ *      description="Accept JSON response",
+ *      required=true,
+ *      @OA\Schema(type="string", default="application/json")
+ * )
+ * @OA\Parameter(
+ *      parameter="ContentTypeJson",
+ *      name="Content-Type",
+ *      in="header",
+ *      description="Content type for JSON requests",
+ *      required=true,
+ *      @OA\Schema(type="string", default="application/json")
+ * )
  * @OA\Schema(
  *      schema="User",
  *      type="object",

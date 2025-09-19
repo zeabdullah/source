@@ -472,11 +472,19 @@
         "/plugin/login": {
             "post": {
                 "tags": [
-                    "Authentication"
+                    "Auth"
                 ],
                 "summary": "Plugin login",
                 "description": "Authenticate plugin with email and password",
                 "operationId": "ee17a58670c7b550a76fbfc51eead4c6",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AcceptJson"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ContentTypeJson"
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -527,11 +535,19 @@
         "/plugin/logout": {
             "post": {
                 "tags": [
-                    "Authentication"
+                    "Auth"
                 ],
                 "summary": "Plugin logout",
                 "description": "Logout plugin and revoke current access token",
                 "operationId": "b43645daad704aac4bc410baac28294b",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AcceptJson"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ContentTypeJson"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Logged out successfully"
@@ -547,11 +563,19 @@
         "/login": {
             "post": {
                 "tags": [
-                    "Authentication"
+                    "Auth"
                 ],
                 "summary": "User login",
                 "description": "Authenticate user with email and password",
                 "operationId": "8996919397379915d415b58ad0c83846",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AcceptJson"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ContentTypeJson"
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -603,11 +627,19 @@
         "/register": {
             "post": {
                 "tags": [
-                    "Authentication"
+                    "Auth"
                 ],
                 "summary": "User registration",
                 "description": "Register a new user account",
                 "operationId": "384ac579d904822bfb3571a2688a3c79",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AcceptJson"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ContentTypeJson"
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -675,11 +707,19 @@
         "/logout": {
             "post": {
                 "tags": [
-                    "Authentication"
+                    "Auth"
                 ],
                 "summary": "User logout",
                 "description": "Logout user and revoke current access token",
                 "operationId": "9d1297eac38fe037da627ef6601adb5b",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AcceptJson"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ContentTypeJson"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Logged out successfully"
@@ -695,11 +735,16 @@
         "/me": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Auth"
                 ],
                 "summary": "Get current user",
                 "description": "Get the currently authenticated user",
                 "operationId": "d73910b0085e20326b6f135e9bebbb32",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AcceptJson"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Current user data",
@@ -1587,6 +1632,28 @@
                 "type": "object"
             }
         },
+        "parameters": {
+            "AcceptJson": {
+                "name": "Accept",
+                "in": "header",
+                "description": "Accept JSON response",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "default": "application/json"
+                }
+            },
+            "ContentTypeJson": {
+                "name": "Content-Type",
+                "in": "header",
+                "description": "Content type for JSON requests",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "default": "application/json"
+                }
+            }
+        },
         "securitySchemes": {
             "sanctum": {
                 "type": "http",
@@ -1601,7 +1668,7 @@
             "description": "Audit management and execution endpoints"
         },
         {
-            "name": "Authentication",
+            "name": "Auth",
             "description": "Authentication endpoints for users and plugin"
         },
         {
