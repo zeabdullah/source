@@ -1,0 +1,172 @@
+<main class="mx-auto w-full max-w-[1600px] flex-1 px-4 py-8 lg:px-8 lg:py-12">
+    @if (loading()) {
+    <div class="flex items-center justify-center py-8">
+        <p-progress-spinner
+            ariaLabel="loading audit details"
+            class="text-brand-500"
+            strokeWidth="4"
+        />
+    </div>
+    } @else if (auditData()) { @let audit = auditData()!;
+
+    <header class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-h1 font-extrabold tracking-tighter">{{ audit.name }}</h1>
+                @if (audit.description) {
+                <p class="text-body/normal text-gray-600 mt-2">{{ audit.description }}</p>
+                }
+            </div>
+            <div class="flex items-center gap-3">
+                <p-tag [value]="statusLabel()" [severity]="statusSeverity()" />
+                @if (audit.overall_score !== null) {
+                <div class="text-right">
+                    <div class="text-h3 font-bold text-gray-900">{{ audit.overall_score }}/10</div>
+                    <div class="text-sm text-gray-500">Overall Score</div>
+                </div>
+                }
+            </div>
+        </div>
+    </header>
+
+    @if (audit.status === 'completed' && audit.results) {
+    <div class="space-y-8">
+        <!-- Positive Findings -->
+        @if (audit.results.positiveFindings.length > 0) {
+        <p-card header="Positive Findings">
+            <div class="space-y-3">
+                @for (finding of audit.results.positiveFindings; track finding) {
+                <div class="flex items-start gap-3">
+                    <i class="pi pi-check-circle text-green-500 mt-1"></i>
+                    <p class="text-body/normal text-gray-700">{{ finding }}</p>
+                </div>
+                }
+            </div>
+        </p-card>
+        }
+
+        <!-- Issues by Severity -->
+        @if (audit.results.issues.length > 0) {
+        <div class="space-y-6">
+            <!-- High Severity Issues -->
+            @if (issuesBySeverity().high.length > 0) {
+            <p-card header="High Priority Issues">
+                <div class="space-y-4">
+                    @for (issue of issuesBySeverity().high; track issue.description) {
+                    <div class="border-red-500 border-l-4 pl-4">
+                        <div class="mb-2 flex items-center gap-2">
+                            <i class="pi pi-exclamation-triangle text-red-500"></i>
+                            <span class="text-red-700 font-semibold">
+                                {{ issue.type.replace('_', ' ').toUpperCase() }}
+                            </span>
+                        </div>
+                        <p class="text-body/normal mb-2 text-gray-700">{{ issue.description }}</p>
+                        <p class="text-gray-600 mb-2 text-sm">
+                            <strong>Affected screens:</strong>
+                            {{ issue.screens.join(', ') }}
+                        </p>
+                        <p class="text-blue-600 text-sm">
+                            <strong>Suggestion:</strong>
+                            {{ issue.suggestion }}
+                        </p>
+                    </div>
+                    }
+                </div>
+            </p-card>
+            }
+
+            <!-- Medium Severity Issues -->
+            @if (issuesBySeverity().medium.length > 0) {
+            <p-card header="Medium Priority Issues">
+                <div class="space-y-4">
+                    @for (issue of issuesBySeverity().medium; track issue.description) {
+                    <div class="border-yellow-500 border-l-4 pl-4">
+                        <div class="mb-2 flex items-center gap-2">
+                            <i class="pi pi-exclamation-circle text-yellow-500"></i>
+                            <span class="text-yellow-700 font-semibold">
+                                {{ issue.type.replace('_', ' ').toUpperCase() }}
+                            </span>
+                        </div>
+                        <p class="text-body/normal mb-2 text-gray-700">{{ issue.description }}</p>
+                        <p class="text-gray-600 mb-2 text-sm">
+                            <strong>Affected screens:</strong>
+                            {{ issue.screens.join(', ') }}
+                        </p>
+                        <p class="text-blue-600 text-sm">
+                            <strong>Suggestion:</strong>
+                            {{ issue.suggestion }}
+                        </p>
+                    </div>
+                    }
+                </div>
+            </p-card>
+            }
+
+            <!-- Low Severity Issues -->
+            @if (issuesBySeverity().low.length > 0) {
+            <p-card header="Low Priority Issues">
+                <div class="space-y-4">
+                    @for (issue of issuesBySeverity().low; track issue.description) {
+                    <div class="border-blue-500 border-l-4 pl-4">
+                        <div class="mb-2 flex items-center gap-2">
+                            <i class="pi pi-info-circle text-blue-500"></i>
+                            <span class="text-blue-700 font-semibold">
+                                {{ issue.type.replace('_', ' ').toUpperCase() }}
+                            </span>
+                        </div>
+                        <p class="text-body/normal mb-2 text-gray-700">{{ issue.description }}</p>
+                        <p class="text-gray-600 mb-2 text-sm">
+                            <strong>Affected screens:</strong>
+                            {{ issue.screens.join(', ') }}
+                        </p>
+                        <p class="text-blue-600 text-sm">
+                            <strong>Suggestion:</strong>
+                            {{ issue.suggestion }}
+                        </p>
+                    </div>
+                    }
+                </div>
+            </p-card>
+            }
+        </div>
+        }
+    </div>
+    } @else if (audit.status === 'processing') {
+    <div class="flex flex-col items-center justify-center py-16">
+        <p-progress-spinner strokeWidth="4" styleClass="w-16 h-16 mb-4" />
+        <h2 class="mb-2 text-h3 font-bold text-gray-900">Processing Audit</h2>
+        <p class="text-body/normal text-gray-600 max-w-md text-center">
+            Our AI is analyzing your screen flow for design consistency. This may take a few
+            minutes.
+        </p>
+    </div>
+    } @else if (audit.status === 'failed') {
+    <div class="flex flex-col items-center justify-center py-16">
+        <i class="pi pi-times-circle text-red-500 text-6xl mb-4"></i>
+        <h2 class="mb-2 text-h3 font-bold text-gray-900">Audit Failed</h2>
+        <p class="text-body/normal text-gray-600 max-w-md text-center">
+            There was an error processing your audit. Please try again or contact support if the
+            issue persists.
+        </p>
+        <p-button label="Retry Audit" icon="pi pi-refresh" class="mt-4" (onClick)="loadAudit()" />
+    </div>
+    } @else {
+    <div class="flex flex-col items-center justify-center py-16">
+        <i class="pi pi-clock text-gray-400 text-6xl mb-4"></i>
+        <h2 class="mb-2 text-h3 font-bold text-gray-900">Audit Pending</h2>
+        <p class="text-body/normal text-gray-600 max-w-md text-center">
+            Your audit is ready to be processed. Click the execute button to start the analysis.
+        </p>
+    </div>
+    } } @else {
+    <div class="flex flex-col items-center justify-center py-16">
+        <i class="pi pi-exclamation-triangle text-yellow-500 text-6xl mb-4"></i>
+        <h2 class="mb-2 text-h3 font-bold text-gray-900">Audit Not Found</h2>
+        <p class="text-body/normal text-gray-600 max-w-md text-center">
+            The audit you're looking for doesn't exist or you don't have permission to view it.
+        </p>
+    </div>
+    }
+</main>
+
+<p-toast position="bottom-right" />

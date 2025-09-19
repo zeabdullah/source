@@ -17,8 +17,12 @@ class EnsureUserIsProjectOwner extends BaseMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $projectId = $request->route()->parameter('projectId');
-        if (!$projectId || !is_string($projectId)) {
+        if (!$projectId) {
             throw new \Exception("'" . static::class . "'" . " can only be passed to routes that take a 'projectId' route parameter");
+        }
+
+        if (!is_string($projectId)) {
+            return $this->badRequestResponse('Project ID must be a string');
         }
 
         $project = Project::find($projectId);

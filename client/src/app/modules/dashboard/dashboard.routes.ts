@@ -54,6 +54,25 @@ export const dashboardRoutes: Routes = [
                                     import('./containers/releases/releases').then(m => m.Releases),
                             },
                             {
+                                path: 'audits',
+                                children: [
+                                    {
+                                        path: '',
+                                        loadComponent: () =>
+                                            import('./containers/audits/audits').then(
+                                                m => m.Audits,
+                                            ),
+                                    },
+                                    {
+                                        path: ':auditId',
+                                        loadComponent: () =>
+                                            import('./containers/audit-details/audit-details').then(
+                                                m => m.AuditDetails,
+                                            ),
+                                    },
+                                ],
+                            },
+                            {
                                 path: 'settings',
                                 loadComponent: () =>
                                     import('./containers/settings/settings').then(m => m.Settings),

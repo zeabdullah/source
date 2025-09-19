@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\FigmaService;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -58,6 +59,13 @@ class Screen extends Model
         return $this->morphMany(Comment::class, 'commentable');
     }
 
+    public function audits()
+    {
+        return $this->belongsToMany(Audit::class, 'audit_screens')
+            ->withPivot('sequence_order')
+            ->orderBy('audit_screens.sequence_order');
+    }
+
     /**
      * Scope to search screens by description and section name
      */
@@ -86,7 +94,15 @@ class Screen extends Model
      */
     public function hasFigmaData(): bool
     {
-        return isset($this->figma_node_id);
+        return isset($this->figma_node_id) && !empty($this->data);
+    }
+
+    /**
+     * Check if screen has valid Figma node ID
+     */
+    public function hasValidFigmaNodeId(): bool
+    {
+        return !empty($this->figma_node_id) && !empty($this->figma_file_key);
     }
 
     /**
@@ -99,6 +115,47 @@ class Screen extends Model
         }
 
         return "https://www.figma.com/file/{$this->project->figma_file_key}/?node-id={$this->figma_node_id}";
+    }
+
+    /**
+     * Serialize Figma frame data for AI analysis
+     */
+    public function serializeForAudit(): string
+    {
+        if (!$this->data || !is_array($this->data)) {
+            return "Screen: {$this->section_name}\nNo Figma data available.";
+        }
+
+        return json_encode($this->data);
+    }
+
+    /**
+     * Manually sync Figma data for this screen
+     */
+    public function syncFigmaData(): bool
+    {
+        if (!$this->hasValidFigmaNodeId()) {
+            return false;
+        }
+
+        $owner = $this->project->owner;
+        if (!$owner || !$owner->figma_access_token) {
+            return false;
+        }
+
+        $figmaService = new FigmaService();
+        $nodeData = $figmaService->validateAndGetNodeData(
+            $this->figma_node_id,
+            $this->figma_file_key,
+            $owner->figma_access_token
+        );
+
+        if ($nodeData) {
+            $this->update(['data' => $nodeData]);
+            return true;
+        }
+
+        return false;
     }
 }
 
