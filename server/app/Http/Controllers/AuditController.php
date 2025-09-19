@@ -8,10 +8,38 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
+/**
+ * @OA\Tag(
+ *     name="Audits",
+ *     description="Audit management and execution endpoints"
+ * )
+ */
 class AuditController extends Controller
 {
     /**
-     * Display a listing of audits for a project
+     * @OA\Get(
+     *     path="/projects/{projectId}/audits",
+     *     summary="Get project audits",
+     *     description="Get all audits for a specific project",
+     *     tags={"Audits"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of audits",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Audit")
+     *         )
+     *     ),
+     *     @OA\Response(response=500, description="Server error")
+     * )
      */
     public function index(Request $request, string $projectId): JsonResponse
     {
@@ -35,7 +63,38 @@ class AuditController extends Controller
     }
 
     /**
-     * Store a newly created audit
+     * @OA\Post(
+     *     path="/projects/{projectId}/audits",
+     *     summary="Create audit",
+     *     description="Create a new audit for a project",
+     *     tags={"Audits"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", maxLength=255, example="User Flow Audit"),
+     *             @OA\Property(property="description", type="string", maxLength=2000, nullable=true, example="Audit description"),
+     *             @OA\Property(property="screen_ids", type="array", minItems=2, maxItems=7,
+     *                 @OA\Items(type="integer", example=1),
+     *                 example={1, 2, 3}
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Audit created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Audit")
+     *     ),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
      */
     public function store(Request $request, string $projectId): JsonResponse
     {
@@ -90,7 +149,34 @@ class AuditController extends Controller
     }
 
     /**
-     * Display the specified audit
+     * @OA\Get(
+     *     path="/projects/{projectId}/audits/{auditId}",
+     *     summary="Get audit details",
+     *     description="Get details of a specific audit",
+     *     tags={"Audits"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="auditId",
+     *         in="path",
+     *         description="Audit ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Audit details",
+     *         @OA\JsonContent(ref="#/components/schemas/Audit")
+     *     ),
+     *     @OA\Response(response=404, description="Audit not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
      */
     public function show(Request $request, string $projectId, string $auditId): JsonResponse
     {
@@ -115,7 +201,36 @@ class AuditController extends Controller
     }
 
     /**
-     * Execute the audit (trigger AI analysis)
+     * @OA\Post(
+     *     path="/projects/{projectId}/audits/{auditId}/execute",
+     *     summary="Execute audit",
+     *     description="Start AI analysis for an audit",
+     *     tags={"Audits"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="auditId",
+     *         in="path",
+     *         description="Audit ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Audit processing started",
+     *         @OA\JsonContent(ref="#/components/schemas/Audit")
+     *     ),
+     *     @OA\Response(response=202, description="Audit is already being processed"),
+     *     @OA\Response(response=404, description="Audit not found"),
+     *     @OA\Response(response=409, description="Audit has already been completed"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
      */
     public function execute(Request $request, string $projectId, string $auditId): JsonResponse
     {
@@ -148,7 +263,40 @@ class AuditController extends Controller
     }
 
     /**
-     * Get audit status
+     * @OA\Get(
+     *     path="/projects/{projectId}/audits/{auditId}/status",
+     *     summary="Get audit status",
+     *     description="Get the current status of an audit",
+     *     tags={"Audits"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="auditId",
+     *         in="path",
+     *         description="Audit ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Audit status",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="status", type="string", enum={"pending", "processing", "completed", "failed"}, example="processing"),
+     *             @OA\Property(property="overall_score", type="number", format="float", nullable=true, example=85.5),
+     *             @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Audit not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
      */
     public function status(Request $request, string $projectId, string $auditId): JsonResponse
     {
@@ -175,7 +323,41 @@ class AuditController extends Controller
     }
 
     /**
-     * Update the specified audit
+     * @OA\Put(
+     *     path="/projects/{projectId}/audits/{auditId}",
+     *     summary="Update audit",
+     *     description="Update an existing audit",
+     *     tags={"Audits"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="auditId",
+     *         in="path",
+     *         description="Audit ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", maxLength=255, example="Updated Audit Name"),
+     *             @OA\Property(property="description", type="string", maxLength=2000, nullable=true, example="Updated description")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Audit updated successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Audit")
+     *     ),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
      */
     public function update(Request $request, Project $project, Audit $audit): JsonResponse
     {
@@ -196,7 +378,34 @@ class AuditController extends Controller
     }
 
     /**
-     * Remove the specified audit
+     * @OA\Delete(
+     *     path="/projects/{projectId}/audits/{auditId}",
+     *     summary="Delete audit",
+     *     description="Delete an audit",
+     *     tags={"Audits"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="auditId",
+     *         in="path",
+     *         description="Audit ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Audit deleted successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Audit")
+     *     ),
+     *     @OA\Response(response=404, description="Audit not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
      */
     public function destroy(Request $request, string $projectId, string $auditId): JsonResponse
     {

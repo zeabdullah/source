@@ -11,9 +11,39 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Storage;
 
-
+/**
+ * @OA\Tag(
+ *     name="Email Templates",
+ *     description="Email template management and Brevo integration"
+ * )
+ */
 class EmailTemplateController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/projects/{projectId}/email-templates",
+     *     summary="Get project email templates",
+     *     description="Get all email templates for a project",
+     *     tags={"Email Templates"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of email templates",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/EmailTemplate")
+     *         )
+     *     ),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function getProjectEmailTemplates(Request $request, string $projectId): JsonResponse
     {
         /** @var \App\Models\Project */
@@ -88,7 +118,36 @@ class EmailTemplateController extends Controller
     // ===== BREVO INTEGRATION METHODS =====
 
     /**
-     * Import email template from Brevo
+     * @OA\Post(
+     *     path="/projects/{projectId}/email-templates/import-brevo",
+     *     summary="Import Brevo template",
+     *     description="Import an email template from Brevo",
+     *     tags={"Email Templates"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="brevo_template_id", type="integer", example=123)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Template imported successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/EmailTemplate")
+     *     ),
+     *     @OA\Response(response=403, description="Brevo API token not configured"),
+     *     @OA\Response(response=404, description="Template not found in Brevo"),
+     *     @OA\Response(response=409, description="Template already imported"),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
      */
     public function importBrevoTemplate(Request $request, string $projectId, BrevoService $brevo, N8nService $n8n): JsonResponse
     {
@@ -285,7 +344,23 @@ class EmailTemplateController extends Controller
     }
 
     /**
-     * Get user's Brevo templates
+     * @OA\Get(
+     *     path="/brevo-templates",
+     *     summary="Get Brevo templates",
+     *     description="Get all templates from user's Brevo account",
+     *     tags={"Email Templates"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of Brevo templates",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/BrevoTemplate")
+     *         )
+     *     ),
+     *     @OA\Response(response=403, description="Brevo API token not configured"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
      */
     public function getBrevoTemplates(Request $request, BrevoService $brevo): JsonResponse
     {
