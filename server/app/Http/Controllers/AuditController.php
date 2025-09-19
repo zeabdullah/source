@@ -4,11 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Audit;
 use App\Models\Project;
-use App\Models\Screen;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class AuditController extends Controller
 {
@@ -17,22 +14,22 @@ class AuditController extends Controller
      */
     public function index(Request $request, Project $project): JsonResponse
     {
-
         // user already checked for ownership with is_owner middleware
 
-        $audits = $project->audits()
-            ->with([
-                'screens' => function ($query) {
-                    $query->orderBy('audit_screens.sequence_order');
-                }
-            ])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        try {
+            $audits = $project->audits()
+                ->with([
+                    'screens' => function ($query) {
+                        $query->orderBy('audit_screens.sequence_order');
+                    }
+                ])
+                ->orderBy('created_at', 'desc')
+                ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $audits
-        ]);
+            return $this->responseJson($audits);
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to fetch audits: ' . $th->getMessage());
+        }
     }
 
     /**
@@ -42,46 +39,51 @@ class AuditController extends Controller
     {
         // user already checked for ownership with is_owner middleware
 
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:2000',
             'screen_ids' => 'required|array|min:2|max:7',
             'screen_ids.*' => 'exists:screens,id',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
+        try {
+            // Validate that all screens belong to the project
+            $screenCount = $project->screens()
+                ->whereIn('id', $validated['screen_ids'])
+                ->count();
 
-        // TODO: Validate that all screens belong to the project
-
-        $audit = Audit::create([
-            'project_id' => $project->id,
-            'name' => $request->name,
-            'description' => $request->description,
-            'status' => 'pending',
-        ]);
-
-        // Attach screens with sequence order
-        foreach ($request->screen_ids as $index => $screenId) {
-            $audit->screens()->attach($screenId, [
-                'sequence_order' => $index + 1
-            ]);
-        }
-
-        $audit->load([
-            'screens' => function ($query) {
-                $query->orderBy('audit_screens.sequence_order');
+            if ($screenCount !== count($validated['screen_ids'])) {
+                return $this->responseJson(
+                    message: 'One or more screens do not belong to the specified project.',
+                    code: 422
+                );
             }
-        ]);
 
-        return response()->json([
-            'success' => true,
-            'data' => $audit
-        ], 201);
+            $audit = Audit::create([
+                'project_id' => $project->id,
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+                'status' => 'pending',
+            ]);
+
+            // Attach screens with sequence order
+            foreach ($validated['screen_ids'] as $index => $screenId) {
+                $audit->screens()->attach($screenId, [
+                    'sequence_order' => $index + 1
+                ]);
+            }
+
+            // TODO: need to ensure it works correctly
+            $audit->load([
+                'screens' => function ($query) {
+                    $query->orderBy('audit_screens.sequence_order');
+                }
+            ]);
+
+            return $this->responseJson($audit, 'Audit created successfully', 201);
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to create audit: ' . $th->getMessage());
+        }
     }
 
     /**
@@ -91,16 +93,17 @@ class AuditController extends Controller
     {
         // user already checked for ownership with is_owner middleware
 
-        $audit->load([
-            'screens' => function ($query) {
-                $query->orderBy('audit_screens.sequence_order');
-            }
-        ]);
+        try {
+            $audit->load([
+                'screens' => function ($query) {
+                    $query->orderBy('audit_screens.sequence_order');
+                }
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'data' => $audit
-        ]);
+            return $this->responseJson($audit);
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to fetch audit: ' . $th->getMessage());
+        }
     }
 
     /**
@@ -110,31 +113,25 @@ class AuditController extends Controller
     {
         // user already checked for ownership with is_owner middleware
 
-        if ($audit->isProcessing()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Audit is already being processed'
-            ], 409);
+        try {
+            if ($audit->isProcessing()) {
+                return $this->responseJson($audit, 'Audit is already being processed', 202);
+            }
+
+            if ($audit->isCompleted()) {
+                return $this->responseJson($audit, 'Audit has already been completed', 409);
+            }
+
+            // Update status to processing
+            $audit->update(['status' => 'processing']);
+
+            // TODO: Dispatch PerformFlowAudit job
+            // PerformFlowAudit::dispatch($audit);
+
+            return $this->responseJson($audit, 'Audit processing started');
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to execute audit: ' . $th->getMessage());
         }
-
-        if ($audit->isCompleted()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Audit has already been completed'
-            ], 409);
-        }
-
-        // Update status to processing
-        $audit->update(['status' => 'processing']);
-
-        // TODO: Dispatch PerformFlowAudit job
-        // PerformFlowAudit::dispatch($audit);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Audit processing started',
-            'data' => $audit
-        ]);
     }
 
     /**
@@ -144,16 +141,19 @@ class AuditController extends Controller
     {
         // user already checked for ownership with is_owner middleware
 
-        return response()->json([
-            'success' => true,
-            'data' => [
+        try {
+            $statusData = [
                 'id' => $audit->id,
                 'status' => $audit->status,
                 'overall_score' => $audit->overall_score,
                 'created_at' => $audit->created_at,
                 'updated_at' => $audit->updated_at,
-            ]
-        ]);
+            ];
+
+            return $this->responseJson($statusData);
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to fetch audit status: ' . $th->getMessage());
+        }
     }
 
     /**
@@ -163,24 +163,18 @@ class AuditController extends Controller
     {
         // user already checked for ownership with is_owner middleware
 
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:2000',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+        try {
+            $audit->update($validated);
+
+            return $this->responseJson($audit->fresh(), 'Audit updated successfully');
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to update audit: ' . $th->getMessage());
         }
-
-        $audit->update($request->only(['name', 'description']));
-
-        return response()->json([
-            'success' => true,
-            'data' => $audit
-        ]);
     }
 
     /**
@@ -190,11 +184,12 @@ class AuditController extends Controller
     {
         // user already checked for ownership with is_owner middleware
 
-        $audit->delete();
+        try {
+            $audit->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Audit deleted successfully'
-        ]);
+            return $this->responseJson(message: 'Audit deleted successfully');
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to delete audit: ' . $th->getMessage());
+        }
     }
 }
