@@ -54,6 +54,7 @@ class Audit extends Model
 
     /**
      * Get the screens that belong to this audit
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<Screen, Audit, \Illuminate\Database\Eloquent\Relations\Pivot>
      */
     public function screens(): BelongsToMany
     {

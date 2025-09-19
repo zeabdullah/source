@@ -110,28 +110,14 @@ class Screen extends Model
 
     /**
      * Serialize Figma frame data for AI analysis
-     * This method extracts structured data from the screen's Figma data
-     * to be sent to the LLM for consistency analysis
      */
-    public function serializeForAudit(): string // TODO: revise. not needed.
+    public function serializeForAudit(): string
     {
         if (!$this->data || !is_array($this->data)) {
             return "Screen: {$this->section_name}\nNo Figma data available.";
         }
 
-        $serialized = "Screen: {$this->section_name}\n";
-        $serialized .= "Figma Node ID: {$this->figma_node_id}\n\n";
-
-        // Extract component hierarchy and properties
-        $serialized .= $this->extractComponentData($this->data);
-
-        return $serialized;
+        return json_encode($this->data);
     }
-
-    /**
-     * Recursively extract component data from Figma structure
-     */
-    // This method is no longer needed, as Figma data will be stored in structured JSON for AI analysis.
-    // Removed as per instructions.
 }
 

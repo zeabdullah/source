@@ -89,6 +89,73 @@ You must respond with a JSON object containing:
         );
     }
 
+    private function getFlowConsistencySystemInstruction(): Content
+    {
+        return Content::parse(
+            "You are a UX/UI design consistency expert specializing in analyzing user flow designs across multiple screens. Your role is to evaluate design consistency and provide actionable recommendations for improvement.
+
+**Core Responsibilities:**
+- Analyze multiple screens within a user flow for design consistency
+- Identify inconsistencies in visual design, interaction patterns, and user experience
+- Provide specific, actionable recommendations for improvement
+- Score overall consistency and highlight both issues and positive findings
+
+**Analysis Framework:**
+When examining screen flows, evaluate these key areas:
+
+**Visual Consistency:**
+- Color usage and palette consistency across screens
+- Typography hierarchy and font choices
+- Spacing, padding, and margin consistency
+- Icon style and usage patterns
+- Visual hierarchy and information architecture
+
+**Interaction Consistency:**
+- Button styles, sizes, and placement
+- Form field designs and validation patterns
+- Navigation patterns and menu structures
+- Loading states and feedback mechanisms
+- Error handling and messaging
+
+**Content Consistency:**
+- Terminology and labeling consistency
+- Tone and voice in copy
+- Information density and layout patterns
+- Call-to-action placement and wording
+
+**User Experience Flow:**
+- Logical progression through the flow
+- Consistent mental models
+- Appropriate feedback and confirmation patterns
+- Accessibility considerations
+
+**Scoring Guidelines:**
+- Rate overall consistency from 0-10 (10 being perfectly consistent)
+- Consider both the severity and frequency of inconsistencies
+- Weight critical user-facing elements more heavily
+- Account for intentional variations vs. unintentional inconsistencies
+
+**Response Requirements:**
+- Provide specific examples of inconsistencies with screen references
+- Include actionable suggestions for each issue
+- Highlight positive consistency findings
+- Prioritize issues by severity and user impact
+- Be constructive and solution-oriented in recommendations
+
+**Issue Categories:**
+- terminology: Inconsistent text, labels, or messaging
+- color_usage: Inconsistent color application or palette usage
+- spacing: Inconsistent spacing, padding, or margins
+- typography: Inconsistent font choices, sizes, or hierarchy
+- interaction: Inconsistent button styles, form patterns, or interactions
+- layout: Inconsistent layout patterns or information architecture
+- accessibility: Accessibility or usability issues
+- navigation: Inconsistent navigation patterns or flow logic
+
+Always provide clear, implementable recommendations that help improve the overall user experience and design consistency."
+        );
+    }
+
     /**
      * Generate AI response for Figma design analysis
      *
@@ -189,6 +256,111 @@ You must respond with a JSON object containing:
             return [
                 'chat_message' => "AI failed to respond: " . $th->getMessage(),
                 'updated_html' => null
+            ];
+        }
+    }
+
+    /**
+     * Analyze flow consistency across multiple screens
+     */
+    public function analyzeFlowConsistency(array $screens, string $auditName): array
+    {
+        $systemInstruction = $this->getFlowConsistencySystemInstruction();
+
+        // Add screen data context to system instruction
+        $screensContext = "**Flow Name:** {$auditName}\n\n**Screens to Analyze:**\n" . implode("\n\n---\n\n", $screens);
+        $systemInstruction = Content::parse(
+            $systemInstruction->parts[0]->text . "\n\n" . $screensContext
+        );
+
+        $model = $this->baseModel
+            ->withSystemInstruction($systemInstruction)
+            ->withGenerationConfig(
+                new GenerationConfig(
+                    responseMimeType: ResponseMimeType::APPLICATION_JSON,
+                    responseSchema: new Schema(
+                        DataType::OBJECT,
+                        properties: [
+                            'auditId' => new Schema(
+                                DataType::STRING,
+                                description: 'Identifier for this audit analysis'
+                            ),
+                            'flowName' => new Schema(
+                                DataType::STRING,
+                                description: 'Name of the flow being analyzed'
+                            ),
+                            'overallConsistencyScore' => new Schema(
+                                DataType::NUMBER,
+                                description: 'Overall consistency score from 0-10'
+                            ),
+                            'issues' => new Schema(
+                                DataType::ARRAY ,
+                                description: 'Array of consistency issues found',
+                                items: new Schema(
+                                    DataType::OBJECT,
+                                    properties: [
+                                        'type' => new Schema(
+                                            DataType::STRING,
+                                            description: 'Type of issue (terminology, color_usage, spacing, typography, etc.)'
+                                        ),
+                                        'severity' => new Schema(
+                                            DataType::STRING,
+                                            description: 'Severity level (low, medium, high)'
+                                        ),
+                                        'description' => new Schema(
+                                            DataType::STRING,
+                                            description: 'Detailed description of the issue'
+                                        ),
+                                        'screens' => new Schema(
+                                            DataType::ARRAY ,
+                                            description: 'Array of screen names affected by this issue',
+                                            items: new Schema(DataType::STRING)
+                                        ),
+                                        'suggestion' => new Schema(
+                                            DataType::STRING,
+                                            description: 'Actionable suggestion to fix the issue'
+                                        )
+                                    ],
+                                    required: ['type', 'severity', 'description', 'screens', 'suggestion']
+                                )
+                            ),
+                            'positiveFindings' => new Schema(
+                                DataType::ARRAY ,
+                                description: 'Array of positive consistency findings',
+                                items: new Schema(DataType::STRING)
+                            )
+                        ],
+                        required: ['auditId', 'flowName', 'overallConsistencyScore', 'issues', 'positiveFindings']
+                    )
+                )
+            );
+
+        try {
+            $result = $model->generateContent("Analyze the flow consistency for: {$auditName}");
+            $response = $result->json(true);
+
+            return [
+                'auditId' => $response['auditId'] ?? uniqid('audit_'),
+                'flowName' => $response['flowName'] ?? $auditName,
+                'overallConsistencyScore' => $response['overallConsistencyScore'] ?? 0,
+                'issues' => $response['issues'] ?? [],
+                'positiveFindings' => $response['positiveFindings'] ?? []
+            ];
+        } catch (\Throwable $th) {
+            return [
+                'auditId' => uniqid('audit_'),
+                'flowName' => $auditName,
+                'overallConsistencyScore' => 0,
+                'issues' => [
+                    [
+                        'type' => 'analysis_error',
+                        'severity' => 'high',
+                        'description' => 'AI analysis failed: ' . $th->getMessage(),
+                        'screens' => ['All'],
+                        'suggestion' => 'Please retry the analysis or contact support if the issue persists'
+                    ]
+                ],
+                'positiveFindings' => []
             ];
         }
     }

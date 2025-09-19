@@ -43,14 +43,15 @@ class PerformFlowAudit implements ShouldQueue
                 throw new \Exception('No screens found for audit');
             }
 
+            // TODO: revise. not needed.
             // Serialize all screen data for AI analysis
             $serializedScreens = [];
             foreach ($this->audit->screens as $screen) {
-                $serializedScreens[] = $screen->serializeForAudit(); // TODO: revise. not needed.
+                $serializedScreens[] = $screen->serializeForAudit();
             }
 
             // TODO: Call AI service for multi-screen consistency analysis
-            // $results = $aiAgentService->analyzeFlowConsistency($serializedScreens, $this->audit->name);
+            $results = $aiAgentService->analyzeFlowConsistency($serializedScreens, $this->audit->name);
 
             // For now, create a mock response
             $results = $this->createMockResults();
