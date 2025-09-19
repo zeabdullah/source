@@ -28,7 +28,34 @@ use Illuminate\Support\Facades\Storage;
 class AiChatController extends Controller
 {
     /**
-     * Used for the AI response webhook from N8n.
+     * @OA\Post(
+     *     path="/basic/email-templates/{emailTemplateId}/chats/ai-response-webhook",
+     *     summary="Create AI chat response for email template (webhook)",
+     *     description="Webhook endpoint for N8n to create AI chat responses for email templates",
+     *     tags={"AI Chat"},
+     *     security={{"basic_auth": {}}},
+     *     @OA\Parameter(
+     *         name="emailTemplateId",
+     *         in="path",
+     *         description="Email template ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="content", type="string", example="AI generated response")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="AI chat message created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/AiChat")
+     *     ),
+     *     @OA\Response(response=404, description="Email template not found"),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
      */
     public function createAiChatResponseForEmailTemplate(Request $request, string $emailTemplateId): JsonResponse
     {
@@ -57,7 +84,34 @@ class AiChatController extends Controller
     }
 
     /**
-     * Used for the AI response webhook from N8n.
+     * @OA\Post(
+     *     path="/basic/screens/{screenId}/chats/ai-response-webhook",
+     *     summary="Create AI chat response for screen (webhook)",
+     *     description="Webhook endpoint for N8n to create AI chat responses for screens",
+     *     tags={"AI Chat"},
+     *     security={{"basic_auth": {}}},
+     *     @OA\Parameter(
+     *         name="screenId",
+     *         in="path",
+     *         description="Screen ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="content", type="string", example="AI generated response")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="AI chat message created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/AiChat")
+     *     ),
+     *     @OA\Response(response=404, description="Screen not found"),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
      */
     public function createAiChatResponseForScreen(Request $request, string $screenId): JsonResponse
     {
@@ -302,6 +356,32 @@ class AiChatController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/basic/email-templates/{emailTemplateId}/chat",
+     *     summary="Get email template chat (basic)",
+     *     description="Get all chat messages for an email template without project context",
+     *     tags={"AI Chat"},
+     *     security={{"basic_auth": {}}},
+     *     @OA\Parameter(
+     *         name="emailTemplateId",
+     *         in="path",
+     *         description="Email template ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of chat messages",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/AiChat")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Email template not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function getEmailTemplateChatBasic(Request $request, string $emailTemplateId): JsonResponse
     {
         try {

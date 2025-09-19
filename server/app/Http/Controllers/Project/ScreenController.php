@@ -18,30 +18,6 @@ use Illuminate\Http\Request;
  */
 class ScreenController extends Controller
 {
-    /** @deprecated Use `exportScreens` instead */
-    public function createScreen(Request $request, string $projectId): JsonResponse
-    {
-        /** @var \App\Models\Project */
-        $project = $request->attributes->get('project');
-
-        $isMember = $project->members()->where('user_id', $request->user()->id)->exists();
-        if (!$isMember) {
-            return $this->notFoundResponse('Project not found');
-        }
-
-        $validated = $request->validate([
-            'section_name' => 'nullable|string|max:255',
-            'data' => 'nullable|array',
-        ]);
-
-        try {
-            $screen = Screen::create(array_merge($validated, ['project_id' => $projectId]));
-            return $this->responseJson($screen, 'Created successfully', 201);
-        } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to save Screen to database: ' . $th->getMessage());
-        }
-    }
-
     /**
      * @OA\Post(
      *     path="/projects/{projectId}/screens/export",
@@ -209,6 +185,30 @@ class ScreenController extends Controller
             return $this->serverErrorResponse(message: 'Failed to get screen: ' . $th->getMessage());
         }
     }
+
+    /**
+     * @OA\Get(
+     *     path="/basic/screens/{screenId}",
+     *     summary="Get screen by ID (Basic)",
+     *     description="Get a specific screen by its ID without project context",
+     *     tags={"Screens"},
+     *     security={{"basic_auth": {}}},
+     *     @OA\Parameter(
+     *         name="screenId",
+     *         in="path",
+     *         description="Screen ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Screen data",
+     *         @OA\JsonContent(ref="#/components/schemas/Screen")
+     *     ),
+     *     @OA\Response(response=404, description="Screen not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function getScreenByIdBasic(Request $request, string $screenId): JsonResponse
     {
         return $this->getScreenById($request, '', $screenId);
@@ -318,10 +318,5 @@ class ScreenController extends Controller
             return $this->serverErrorResponse(message: 'Failed to delete screen: ' . $th->getMessage());
         }
 
-    }
-
-    public function regenerateDescription(Request $request, string $projectId, string $screenId, ScreenService $screenService): JsonResponse
-    {
-        return $this->notImplementedResponse();
     }
 }

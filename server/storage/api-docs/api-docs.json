@@ -12,6 +12,134 @@
         }
     ],
     "paths": {
+        "/basic/email-templates/{emailTemplateId}/chats/ai-response-webhook": {
+            "post": {
+                "tags": [
+                    "AI Chat"
+                ],
+                "summary": "Create AI chat response for email template (webhook)",
+                "description": "Webhook endpoint for N8n to create AI chat responses for email templates",
+                "operationId": "c5bb68bda392fa6cd3ccf6446e951ed7",
+                "parameters": [
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "example": "AI generated response"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "AI chat message created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AiChat"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "basic_auth": []
+                    }
+                ]
+            }
+        },
+        "/basic/screens/{screenId}/chats/ai-response-webhook": {
+            "post": {
+                "tags": [
+                    "AI Chat"
+                ],
+                "summary": "Create AI chat response for screen (webhook)",
+                "description": "Webhook endpoint for N8n to create AI chat responses for screens",
+                "operationId": "681cc8dcd801567956895b8e26273933",
+                "parameters": [
+                    {
+                        "name": "screenId",
+                        "in": "path",
+                        "description": "Screen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "example": "AI generated response"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "AI chat message created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AiChat"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Screen not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "basic_auth": []
+                    }
+                ]
+            }
+        },
         "/email-templates/{emailTemplateId}/chats": {
             "get": {
                 "tags": [
@@ -138,6 +266,54 @@
                 "security": [
                     {
                         "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/basic/email-templates/{emailTemplateId}/chat": {
+            "get": {
+                "tags": [
+                    "AI Chat"
+                ],
+                "summary": "Get email template chat (basic)",
+                "description": "Get all chat messages for an email template without project context",
+                "operationId": "e5f1e2c33e4e120a0602511fcf0053aa",
+                "parameters": [
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of chat messages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/AiChat"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "basic_auth": []
                     }
                 ]
             }
@@ -1540,6 +1716,237 @@
                 ]
             }
         },
+        "/projects/{projectId}/email-templates/{emailTemplateId}": {
+            "get": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "Get email template by ID",
+                "description": "Get a specific email template by its ID",
+                "operationId": "4658b1d3952aec2ee0af7be093b94279",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email template data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailTemplate"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "Update email template",
+                "description": "Update an email template by its ID",
+                "operationId": "ab091b63eac394fbe5c1071fc92bac58",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "section_name": {
+                                        "type": "string",
+                                        "example": "Updated Template Name",
+                                        "nullable": true
+                                    },
+                                    "html": {
+                                        "type": "string",
+                                        "example": "<html>Updated content</html>",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Email template updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailTemplate"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "Delete email template",
+                "description": "Delete an email template by its ID",
+                "operationId": "8b41f1f4e4a472e67b580c93c5811e0a",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email template deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailTemplate"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/email-templates/{emailTemplateId}": {
+            "get": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "Get email template by ID (basic)",
+                "description": "Get a specific email template by its ID without project context",
+                "operationId": "aa319e24d38090621e2a2ca5b05b2937",
+                "parameters": [
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email template data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailTemplate"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/projects/{projectId}/email-templates/import-brevo": {
             "post": {
                 "tags": [
@@ -1595,6 +2002,152 @@
                     },
                     "409": {
                         "description": "Template already imported"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/email-templates/{emailTemplateId}/sync-brevo": {
+            "post": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "Sync email template with Brevo",
+                "description": "Sync local email template with the latest data from Brevo",
+                "operationId": "1e4448ec8b63c7214880a4916b6e6f17",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Template synced with Brevo successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailTemplate"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Email template is not linked to Brevo"
+                    },
+                    "403": {
+                        "description": "Brevo API token not configured"
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/email-templates/{emailTemplateId}/update-brevo": {
+            "put": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "Update email template in Brevo",
+                "description": "Update the email template in Brevo with local changes",
+                "operationId": "70b956c4edb22df8c60caae6687d903e",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "html_content": {
+                                        "type": "string",
+                                        "example": "<html>Updated content</html>"
+                                    },
+                                    "template_name": {
+                                        "type": "string",
+                                        "example": "Updated Template Name",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Template updated in Brevo successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailTemplate"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Email template is not linked to Brevo"
+                    },
+                    "403": {
+                        "description": "Brevo API token not configured"
+                    },
+                    "404": {
+                        "description": "Email template not found"
                     },
                     "422": {
                         "description": "Validation errors"
@@ -2411,6 +2964,51 @@
                 "security": [
                     {
                         "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/basic/screens/{screenId}": {
+            "get": {
+                "tags": [
+                    "Screens"
+                ],
+                "summary": "Get screen by ID (Basic)",
+                "description": "Get a specific screen by its ID without project context",
+                "operationId": "dec05cbc1050cb60bc8db9c96f225d27",
+                "parameters": [
+                    {
+                        "name": "screenId",
+                        "in": "path",
+                        "description": "Screen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Screen data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Screen"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Screen not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "basic_auth": []
                     }
                 ]
             }

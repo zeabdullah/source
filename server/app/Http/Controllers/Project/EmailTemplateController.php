@@ -56,6 +56,36 @@ class EmailTemplateController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/projects/{projectId}/email-templates/{emailTemplateId}",
+     *     summary="Get email template by ID",
+     *     description="Get a specific email template by its ID",
+     *     tags={"Email Templates"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="emailTemplateId",
+     *         in="path",
+     *         description="Email template ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Email template data",
+     *         @OA\JsonContent(ref="#/components/schemas/EmailTemplate")
+     *     ),
+     *     @OA\Response(response=404, description="Email template not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function getEmailTemplateById(Request $request, string $projectId, string $emailTemplateId): JsonResponse
     {
         try {
@@ -69,11 +99,72 @@ class EmailTemplateController extends Controller
             return $this->serverErrorResponse(message: 'Failed to get email template: ' . $th->getMessage());
         }
     }
+    /**
+     * @OA\Get(
+     *     path="/email-templates/{emailTemplateId}",
+     *     summary="Get email template by ID (basic)",
+     *     description="Get a specific email template by its ID without project context",
+     *     tags={"Email Templates"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="emailTemplateId",
+     *         in="path",
+     *         description="Email template ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Email template data",
+     *         @OA\JsonContent(ref="#/components/schemas/EmailTemplate")
+     *     ),
+     *     @OA\Response(response=404, description="Email template not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function getEmailTemplateByIdBasic(Request $request, string $emailTemplateId): JsonResponse
     {
         return $this->getEmailTemplateById($request, '', $emailTemplateId);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/projects/{projectId}/email-templates/{emailTemplateId}",
+     *     summary="Update email template",
+     *     description="Update an email template by its ID",
+     *     tags={"Email Templates"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="emailTemplateId",
+     *         in="path",
+     *         description="Email template ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="section_name", type="string", nullable=true, example="Updated Template Name"),
+     *             @OA\Property(property="html", type="string", nullable=true, example="<html>Updated content</html>")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Email template updated successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/EmailTemplate")
+     *     ),
+     *     @OA\Response(response=404, description="Email template not found"),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function updateEmailTemplateById(Request $request, string $projectId, string $emailTemplateId): JsonResponse
     {
         $validated = $request->validate([
@@ -97,6 +188,36 @@ class EmailTemplateController extends Controller
         }
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/projects/{projectId}/email-templates/{emailTemplateId}",
+     *     summary="Delete email template",
+     *     description="Delete an email template by its ID",
+     *     tags={"Email Templates"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="emailTemplateId",
+     *         in="path",
+     *         description="Email template ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Email template deleted successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/EmailTemplate")
+     *     ),
+     *     @OA\Response(response=404, description="Email template not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function deleteEmailTemplateById(Request $request, string $projectId, string $emailTemplateId): JsonResponse
     {
         /** @var \App\Models\Project */
@@ -114,8 +235,6 @@ class EmailTemplateController extends Controller
             return $this->serverErrorResponse(message: 'Failed to delete email template: ' . $th->getMessage());
         }
     }
-
-    // ===== BREVO INTEGRATION METHODS =====
 
     /**
      * @OA\Post(
@@ -243,7 +362,36 @@ class EmailTemplateController extends Controller
     }
 
     /**
-     * Sync email template with Brevo
+     * @OA\Post(
+     *     path="/projects/{projectId}/email-templates/{emailTemplateId}/sync-brevo",
+     *     summary="Sync email template with Brevo",
+     *     description="Sync local email template with the latest data from Brevo",
+     *     tags={"Email Templates"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="emailTemplateId",
+     *         in="path",
+     *         description="Email template ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Template synced with Brevo successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/EmailTemplate")
+     *     ),
+     *     @OA\Response(response=400, description="Email template is not linked to Brevo"),
+     *     @OA\Response(response=403, description="Brevo API token not configured"),
+     *     @OA\Response(response=404, description="Email template not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
      */
     public function syncWithBrevo(Request $request, string $projectId, string $emailTemplateId, BrevoService $brevo): JsonResponse
     {
@@ -287,7 +435,44 @@ class EmailTemplateController extends Controller
     }
 
     /**
-     * Update email template in Brevo
+     * @OA\Put(
+     *     path="/projects/{projectId}/email-templates/{emailTemplateId}/update-brevo",
+     *     summary="Update email template in Brevo",
+     *     description="Update the email template in Brevo with local changes",
+     *     tags={"Email Templates"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="projectId",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="emailTemplateId",
+     *         in="path",
+     *         description="Email template ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="html_content", type="string", example="<html>Updated content</html>"),
+     *             @OA\Property(property="template_name", type="string", nullable=true, example="Updated Template Name")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Template updated in Brevo successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/EmailTemplate")
+     *     ),
+     *     @OA\Response(response=400, description="Email template is not linked to Brevo"),
+     *     @OA\Response(response=403, description="Brevo API token not configured"),
+     *     @OA\Response(response=404, description="Email template not found"),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
      */
     public function updateInBrevo(Request $request, string $projectId, string $emailTemplateId, BrevoService $brevo): JsonResponse
     {
