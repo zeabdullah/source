@@ -109,6 +109,44 @@ use Illuminate\Http\Request;
  *      @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z"),
  *      @OA\Property(property="user", ref="#/components/schemas/User")
  * )
+ * @OA\Schema(
+ *      schema="AiChat",
+ *      type="object",
+ *      @OA\Property(property="id", type="integer", example=1),
+ *      @OA\Property(property="content", type="string", example="AI generated response"),
+ *      @OA\Property(property="sender", type="string", enum={"user", "ai"}, example="ai"),
+ *      @OA\Property(property="user_id", type="integer", nullable=true, example=1),
+ *      @OA\Property(property="commentable_id", type="integer", example=1),
+ *      @OA\Property(property="commentable_type", type="string", example="App\\Models\\Screen"),
+ *      @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z"),
+ *      @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z")
+ * )
+ * @OA\Schema(
+ *      schema="Screen",
+ *      type="object",
+ *      @OA\Property(property="id", type="integer", example=1),
+ *      @OA\Property(property="project_id", type="integer", example=1),
+ *      @OA\Property(property="section_name", type="string", nullable=true, example="Login Screen"),
+ *      @OA\Property(property="figma_node_id", type="string", nullable=true, example="1:23"),
+ *      @OA\Property(property="figma_file_key", type="string", nullable=true, example="abc123def456"),
+ *      @OA\Property(property="figma_svg_url", type="string", format="url", nullable=true, example="https://figma.com/svg/..."),
+ *      @OA\Property(property="figma_node_name", type="string", nullable=true, example="Login"),
+ *      @OA\Property(property="description", type="string", nullable=true, example="User login screen"),
+ *      @OA\Property(property="data", type="object", nullable=true),
+ *      @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z"),
+ *      @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z")
+ * )
+ * @OA\Schema(
+ *      schema="Release",
+ *      type="object",
+ *      @OA\Property(property="id", type="integer", example=1),
+ *      @OA\Property(property="project_id", type="integer", example=1),
+ *      @OA\Property(property="name", type="string", example="Version 1.0"),
+ *      @OA\Property(property="description", type="string", nullable=true, example="Initial release"),
+ *      @OA\Property(property="status", type="string", enum={"draft", "published", "archived"}, example="draft"),
+ *      @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z"),
+ *      @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z")
+ * )
 /**
  * @OA\Tag(
  *     name="Users",

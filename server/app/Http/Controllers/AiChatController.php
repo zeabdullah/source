@@ -19,6 +19,12 @@ use App\Services\BrevoService;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @OA\Tag(
+ *     name="AI Chat",
+ *     description="AI chat management endpoints for screens and email templates"
+ * )
+ */
 class AiChatController extends Controller
 {
     /**
@@ -80,6 +86,42 @@ class AiChatController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/email-templates/{emailTemplateId}/chats",
+     *     summary="Send email template chat message",
+     *     description="Send a chat message to AI for an email template and get AI response",
+     *     tags={"AI Chat"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="emailTemplateId",
+     *         in="path",
+     *         description="Email template ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="content", type="string", example="Please improve this email template")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Chat message sent successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="user", ref="#/components/schemas/AiChat"),
+     *             @OA\Property(property="ai", ref="#/components/schemas/AiChat"),
+     *             @OA\Property(property="template_updated", type="boolean", example=true),
+     *             @OA\Property(property="brevo_updated", type="boolean", example=false),
+     *             @OA\Property(property="thumbnail_updated", type="boolean", example=true)
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Email template not found"),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId): JsonResponse
     {
         $validated = $request->validate([
@@ -207,6 +249,32 @@ class AiChatController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/email-templates/{emailTemplateId}/chats",
+     *     summary="Get email template chat",
+     *     description="Get all chat messages for an email template",
+     *     tags={"AI Chat"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="emailTemplateId",
+     *         in="path",
+     *         description="Email template ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of chat messages",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/AiChat")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Email template not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function getEmailTemplateChat(Request $request, string $emailTemplateId): JsonResponse
     {
         try {
@@ -252,6 +320,40 @@ class AiChatController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/screens/{screenId}/chats",
+     *     summary="Send screen chat message",
+     *     description="Send a chat message to AI for a screen and get AI response",
+     *     tags={"AI Chat"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="screenId",
+     *         in="path",
+     *         description="Screen ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="content", type="string", example="Please analyze this screen design")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Chat message sent successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="user", ref="#/components/schemas/AiChat"),
+     *             @OA\Property(property="ai", ref="#/components/schemas/AiChat")
+     *         )
+     *     ),
+     *     @OA\Response(response=403, description="Figma access token required"),
+     *     @OA\Response(response=404, description="Screen not found"),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function sendScreenChatMessage(Request $request, string $screenId): JsonResponse
     {
         $validated = $request->validate([
@@ -358,6 +460,32 @@ class AiChatController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/screens/{screenId}/chats",
+     *     summary="Get screen chat",
+     *     description="Get all chat messages for a screen",
+     *     tags={"AI Chat"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="screenId",
+     *         in="path",
+     *         description="Screen ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of chat messages",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/AiChat")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Screen not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function getScreenChat(Request $request, string $screenId): JsonResponse
     {
         try {
@@ -386,6 +514,37 @@ class AiChatController extends Controller
     }
 
 
+    /**
+     * @OA\Put(
+     *     path="/chats/{chatId}",
+     *     summary="Update chat message",
+     *     description="Update a chat message by its ID (user messages only)",
+     *     tags={"AI Chat"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="chatId",
+     *         in="path",
+     *         description="Chat message ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="content", type="string", example="Updated message content")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Chat message updated successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/AiChat")
+     *     ),
+     *     @OA\Response(response=403, description="Not authorized to update this message"),
+     *     @OA\Response(response=404, description="Chat message not found"),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function updateChatMessageById(Request $request, string $chatId): JsonResponse
     {
         $validated = $request->validate([
@@ -412,6 +571,30 @@ class AiChatController extends Controller
         }
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/chats/{chatId}",
+     *     summary="Delete chat message",
+     *     description="Delete a chat message by its ID (user messages only)",
+     *     tags={"AI Chat"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="chatId",
+     *         in="path",
+     *         description="Chat message ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Chat message deleted successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/AiChat")
+     *     ),
+     *     @OA\Response(response=403, description="Not authorized to delete this message"),
+     *     @OA\Response(response=404, description="Chat message not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function deleteChatMessageById(Request $request, string $chatId): JsonResponse
     {
         try {
