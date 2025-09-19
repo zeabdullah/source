@@ -1,9 +1,0 @@
-**Backend**: Create `Audit` model/migration and add serialization method to `Screen` model.
-**Backend**: Implement API endpoints for AI audits.
-**Backend**: Create `PerformAiAudit` asynchronous job.
-**Backend**: Update `AiAgentService` prompt to analyze serialized Figma data.
-**Backend**: Create `AuditController`.
-**Frontend**: Add "Request AI Audit" button to the UI.
-**Frontend**: Create `AuditReport` component to display results.
-**Frontend**: Create `AuditService` for API communication.
-**Frontend**: Implement state management and polling for audits.
