@@ -8,8 +8,40 @@ use App\Models\Screen;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @OA\Tag(
+ *     name="Comments",
+ *     description="Comment management endpoints for screens and email templates"
+ * )
+ */
 class CommentController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/screens/{screenId}/comments",
+     *     summary="Get screen comments",
+     *     description="Get all comments for a specific screen",
+     *     tags={"Comments"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="screenId",
+     *         in="path",
+     *         description="Screen ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of screen comments",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Comment")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Screen not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function getScreenComments(Request $request, string $screenId): JsonResponse
     {
         try {
@@ -36,6 +68,36 @@ class CommentController extends Controller
             );
         }
     }
+
+    /**
+     * @OA\Post(
+     *     path="/screens/{screenId}/comments",
+     *     summary="Create screen comment",
+     *     description="Create a new comment for a specific screen",
+     *     tags={"Comments"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="screenId",
+     *         in="path",
+     *         description="Screen ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="content", type="string", example="This is a comment about the screen")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Comment created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Comment")
+     *     ),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function createScreenComment(Request $request, string $screenId): JsonResponse
     {
         $validated = $request->validate([
@@ -61,6 +123,33 @@ class CommentController extends Controller
             );
         }
     }
+
+    /**
+     * @OA\Get(
+     *     path="/email-templates/{emailTemplateId}/comments",
+     *     summary="Get email template comments",
+     *     description="Get all comments for a specific email template",
+     *     tags={"Comments"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="emailTemplateId",
+     *         in="path",
+     *         description="Email template ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of email template comments",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Comment")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Email template not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function getEmailTemplateComments(Request $request, string $emailTemplateId): JsonResponse
     {
         try {
@@ -87,6 +176,36 @@ class CommentController extends Controller
             );
         }
     }
+
+    /**
+     * @OA\Post(
+     *     path="/email-templates/{emailTemplateId}/comments",
+     *     summary="Create email template comment",
+     *     description="Create a new comment for a specific email template",
+     *     tags={"Comments"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="emailTemplateId",
+     *         in="path",
+     *         description="Email template ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="content", type="string", example="This is a comment about the email template")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Comment created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Comment")
+     *     ),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function createEmailTemplateComment(Request $request, string $emailTemplateId): JsonResponse
     {
         $validated = $request->validate([
@@ -113,6 +232,29 @@ class CommentController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/comments/{commentId}",
+     *     summary="Get comment by ID",
+     *     description="Get a specific comment by its ID",
+     *     tags={"Comments"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="commentId",
+     *         in="path",
+     *         description="Comment ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Comment data",
+     *         @OA\JsonContent(ref="#/components/schemas/Comment")
+     *     ),
+     *     @OA\Response(response=404, description="Comment not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function getCommentById(Request $request, string $commentId): JsonResponse
     {
         try {
@@ -129,6 +271,37 @@ class CommentController extends Controller
             );
         }
     }
+
+    /**
+     * @OA\Put(
+     *     path="/comments/{commentId}",
+     *     summary="Update comment",
+     *     description="Update a comment by its ID",
+     *     tags={"Comments"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="commentId",
+     *         in="path",
+     *         description="Comment ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="content", type="string", example="Updated comment content")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Comment updated successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Comment")
+     *     ),
+     *     @OA\Response(response=404, description="Comment not found"),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function updateCommentById(Request $request, string $commentId): JsonResponse
     {
         $validated = $request->validate([
@@ -153,6 +326,30 @@ class CommentController extends Controller
             );
         }
     }
+
+    /**
+     * @OA\Delete(
+     *     path="/comments/{commentId}",
+     *     summary="Delete comment",
+     *     description="Delete a comment by its ID",
+     *     tags={"Comments"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="commentId",
+     *         in="path",
+     *         description="Comment ID",
+     *         required=true,
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Comment deleted successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Comment")
+     *     ),
+     *     @OA\Response(response=404, description="Comment not found"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
+     */
     public function deleteCommentById(Request $request, string $commentId): JsonResponse
     {
         try {

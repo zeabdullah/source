@@ -97,6 +97,18 @@ use Illuminate\Http\Request;
  *      @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z"),
  *      @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z")
  * )
+ * @OA\Schema(
+ *      schema="Comment",
+ *      type="object",
+ *      @OA\Property(property="id", type="integer", example=1),
+ *      @OA\Property(property="content", type="string", example="This is a comment"),
+ *      @OA\Property(property="user_id", type="integer", example=1),
+ *      @OA\Property(property="commentable_id", type="integer", example=1),
+ *      @OA\Property(property="commentable_type", type="string", example="App\\Models\\Screen"),
+ *      @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z"),
+ *      @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z"),
+ *      @OA\Property(property="user", ref="#/components/schemas/User")
+ * )
 /**
  * @OA\Tag(
  *     name="Users",
