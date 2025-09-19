@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\PerformFlowAudit;
 use App\Models\Audit;
 use App\Models\Project;
 use Illuminate\Http\Request;
@@ -137,8 +138,8 @@ class AuditController extends Controller
             // Update status to processing
             $audit->update(['status' => 'processing']);
 
-            // TODO: Dispatch PerformFlowAudit job
-            // PerformFlowAudit::dispatch($audit);
+            // Dispatch PerformFlowAudit job
+            PerformFlowAudit::dispatch($audit);
 
             return $this->responseJson($audit, 'Audit processing started');
         } catch (\Throwable $th) {

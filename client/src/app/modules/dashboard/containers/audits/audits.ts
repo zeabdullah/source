@@ -1,10 +1,18 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core'
+import {
+    ChangeDetectionStrategy,
+    Component,
+    computed,
+    inject,
+    OnDestroy,
+    OnInit,
+    signal,
+} from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Button } from 'primeng/button'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { Toast } from 'primeng/toast'
 import { MessageService } from 'primeng/api'
-import { catchError, finalize, of } from 'rxjs'
+import { catchError, finalize, interval, of, Subscription, switchMap, takeWhile } from 'rxjs'
 import { AuditService } from '~/core/services/audit.service'
 import { Audit } from '~/shared/interfaces/modules/dashboard/shared/interfaces/audit.interface'
 import { AuditCard } from '../../components/audit-card/audit-card'
@@ -19,7 +27,7 @@ import { EmptyState } from '~/shared/components/empty-state/empty-state'
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: { class: 'flex flex-1 flex-col' },
 })
-export class Audits implements OnInit {
+export class Audits implements OnInit, OnDestroy {
     private auditService = inject(AuditService)
     private route = inject(ActivatedRoute)
     private messageService = inject(MessageService)
@@ -27,6 +35,7 @@ export class Audits implements OnInit {
     private audits = signal<Audit[]>([])
     private isLoading = signal(false)
     showCreateDialog = signal(false)
+    private pollingSubscription?: Subscription
 
     projectId = computed(() =>
         Number(this.route.snapshot.parent?.parent?.paramMap.get('projectId')),
@@ -34,8 +43,15 @@ export class Audits implements OnInit {
     auditsList = this.audits.asReadonly()
     loading = this.isLoading.asReadonly()
 
+    hasProcessingAudits = computed(() => this.audits().some(audit => audit.status === 'processing'))
+
     ngOnInit() {
         this.loadAudits()
+        this.startPolling()
+    }
+
+    ngOnDestroy() {
+        this.stopPolling()
     }
 
     private loadAudits() {
@@ -87,11 +103,57 @@ export class Audits implements OnInit {
 
     onAuditExecuted() {
         this.loadAudits()
+        this.startPolling() // Restart polling when audit is executed
         this.messageService.add({
             severity: 'info',
             summary: 'Processing',
             detail: 'Audit execution started',
             life: 3000,
         })
+    }
+
+    private startPolling() {
+        this.stopPolling() // Stop any existing polling first
+        this.pollingSubscription = interval(5000) // Poll in milliseconds
+            .pipe(
+                takeWhile(() => this.hasProcessingAudits()),
+                switchMap(() => this.auditService.getAudits(this.projectId())),
+                catchError(error => {
+                    console.error('Polling error:', error)
+                    return of({ message: '', payload: [] })
+                }),
+            )
+            .subscribe(response => {
+                const currentAudits = this.audits()
+                const updatedAudits = response.payload || []
+
+                // Check if any audit status changed from processing to completed/failed
+                const statusChanged = currentAudits.some(currentAudit => {
+                    const updatedAudit = updatedAudits.find(ua => ua.id === currentAudit.id)
+                    return (
+                        currentAudit.status === 'processing' &&
+                        updatedAudit &&
+                        (updatedAudit.status === 'completed' || updatedAudit.status === 'failed')
+                    )
+                })
+
+                this.audits.set(updatedAudits)
+
+                if (statusChanged) {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Update',
+                        detail: 'Audit status updated',
+                        life: 3000,
+                    })
+                }
+            })
+    }
+
+    private stopPolling() {
+        if (this.pollingSubscription) {
+            this.pollingSubscription.unsubscribe()
+            this.pollingSubscription = undefined
+        }
     }
 }

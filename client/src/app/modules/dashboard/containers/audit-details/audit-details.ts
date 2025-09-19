@@ -30,7 +30,7 @@ export class AuditDetails implements OnInit {
     projectId = computed(() =>
         Number(this.route.snapshot.parent?.parent?.paramMap.get('projectId')),
     )
-    auditId = computed(() => Number(this.route.snapshot.parent?.paramMap.get('auditId')))
+    auditId = computed(() => Number(this.route.snapshot.paramMap.get('auditId')))
     auditData = this.audit.asReadonly()
     loading = this.isLoading.asReadonly()
 

@@ -1,12 +1,4 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    computed,
-    inject,
-    input,
-    output,
-    signal,
-} from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core'
 import { Router } from '@angular/router'
 import { Button } from 'primeng/button'
 import { Tag } from 'primeng/tag'
@@ -147,7 +139,7 @@ export class AuditCard {
                     return of({ message: '', payload: null })
                 }),
             )
-            .subscribe(response => {
+            .subscribe(() => {
                 this.auditDeleted.emit()
             })
     }
