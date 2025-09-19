@@ -18,6 +18,7 @@ import { EmptyState } from '~/shared/components/empty-state/empty-state'
     providers: [MessageService],
     templateUrl: './ai-chat-panel.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    host: { class: 'h-full' },
 })
 export class AiChatPanel implements OnInit {
     http = inject(HttpClient)

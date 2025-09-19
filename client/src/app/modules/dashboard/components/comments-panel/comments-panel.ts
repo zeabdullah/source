@@ -17,6 +17,7 @@ import { EmptyState } from '~/shared/components/empty-state/empty-state'
     providers: [MessageService],
     templateUrl: './comments-panel.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    host: { class: 'h-full' },
 })
 export class CommentsPanel implements OnInit {
     http = inject(HttpClient)

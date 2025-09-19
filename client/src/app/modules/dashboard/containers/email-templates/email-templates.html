@@ -17,7 +17,7 @@
     position="right"
     closable="false"
     closeOnEscape="false"
-    styleClass="w-full max-w-[450px]"
+    styleClass="w-full max-w-[540px]"
     [baseZIndex]="1100"
 >
     <p-tabs [(value)]="activeTab" class="flex h-full flex-col">
@@ -40,7 +40,7 @@
                 class="flex flex-col"
                 [class.h-full]="activeTab === 'ai-chat'"
             >
-                @if (id !== null){
+                @if (id !== null) {
                 <app-ai-chat-panel [emailTemplateId]="id" />
                 }
             </p-tabpanel>

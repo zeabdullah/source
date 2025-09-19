@@ -7,7 +7,7 @@
     >
         <markdown
             [data]="message().content"
-            class="prose-sm max-w-none text-sm"
+            class="prose-sm max-w-none break-words"
             [ngClass]="message().user_id !== null ? 'prose-dark' : 'prose'"
         />
     </div>

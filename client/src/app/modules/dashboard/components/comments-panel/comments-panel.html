@@ -1,5 +1,5 @@
 <div class="flex h-full flex-col">
-    <div class="flex-1 overflow-y-auto p-2">
+    <div class="-me-4 flex-1 overflow-y-auto pe-4 pb-4" [class.space-y-4]="comments().length > 0">
         @if (isLoading()) {
         <div class="flex justify-center py-8">
             <p-progressSpinner size="small" />
@@ -10,13 +10,9 @@
             title="No comments yet"
             subtitle="Be the first to share your thoughts on this item."
         />
-        } @else {
-        <div class="space-y-4">
-            @for (comment of comments(); track comment.id) {
-            <app-comment [comment]="comment" />
-            }
-        </div>
-        }
+        } @else { @for (comment of comments(); track comment.id) {
+        <app-comment [comment]="comment" />
+        } }
     </div>
     <div class="flex gap-2 border-t border-gray-100 pt-3">
         <input
