@@ -103,12 +103,9 @@ class FigmaService
 
     /**
      * Validate if a Figma node ID exists and fetch its data
-     * @param string $nodeId
-     * @param string $fileKey
-     * @param string $figmaAccessToken
      * @return array|null Returns node data if valid, null if invalid
      */
-    public function validateAndGetNodeData(string $nodeId, string $fileKey, string $figmaAccessToken): ?array
+    public function validateAndGetNodeData(string $nodeId, string $fileKey, string $figmaAccessToken, int $depth = 1): ?array
     {
         $client = new HttpClient([
             'base_uri' => 'https://api.figma.com/v1/',
@@ -122,7 +119,7 @@ class FigmaService
             $response = $client->get("files/{$fileKey}/nodes", [
                 'query' => [
                     'ids' => $nodeId,
-                    'depth' => 1, // For minimal data usage
+                    'depth' => $depth,
                 ],
             ]);
 
@@ -132,7 +129,13 @@ class FigmaService
                 return null;
             }
 
-            return $data['nodes'][$nodeId]['document'];
+            $document = $data['nodes'][$nodeId]['document'];
+            $nodeName = $document['name'];
+
+            return [
+                'document' => $document,
+                'name' => $nodeName,
+            ];
         } catch (\Exception $e) {
             Log::error('Failed to validate Figma node: ' . $e->getMessage(), [
                 'node_id' => $nodeId,

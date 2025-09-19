@@ -59,7 +59,7 @@ export class CreateAuditDialog implements OnInit {
 
     screenOptions = computed(() =>
         this.screensList().map(screen => ({
-            label: screen.section_name || `Screen ${screen.id}`,
+            label: screen.figma_node_name || `Screen ${screen.id}`,
             value: screen.id,
             image: screen.figma_svg_url,
         })),
@@ -83,10 +83,10 @@ export class CreateAuditDialog implements OnInit {
                     })
                     return of<LaravelApiResponse<Screen[]>>({ message: '', payload: [] })
                 }),
+
                 finalize(() => this.isLoading.set(false)),
             )
             .subscribe(response => {
-                console.log(response.payload)
                 this.screens.set(response.payload || [])
             })
     }

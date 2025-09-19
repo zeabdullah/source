@@ -313,6 +313,19 @@ class AiChatController extends Controller
                             );
                         }
                     );
+                } else {
+                    // Fetch from API and cache it
+                    $figmaNodes = cache()->remember(
+                        $figmaCacheKey,
+                        now()->addHours(12),
+                        function () use ($accessToken, $screen, $figma) {
+                            return $figma->getFigmaFrameForAI(
+                                $screen->figma_node_id,
+                                $screen->figma_file_key,
+                                $accessToken,
+                            );
+                        }
+                    );
                 }
 
                 $aiReply = $ai->generateFigmaReply($userMsg, $contextMessages, $figmaNodes);

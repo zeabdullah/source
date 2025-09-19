@@ -57,7 +57,7 @@ class ScreenController extends Controller
             );
 
             // Map over the frame IDs and create a new screen for each one
-            $createdScreens = collect($frameIds)->map(function ($frameId) use ($projectId, $fileKey, $svgUrls) {
+            $createdScreens = collect($frameIds)->map(function ($frameId) use ($projectId, $fileKey, $svgUrls, $validated) {
                 $data = [
                     'project_id' => $projectId,
                     'figma_node_id' => $frameId,
@@ -66,7 +66,13 @@ class ScreenController extends Controller
                 if (isset($svgUrls[$frameId])) {
                     $data['figma_svg_url'] = $svgUrls[$frameId];
                 }
-                return Screen::create($data);
+
+                $screen = Screen::create($data);
+
+                // Sync Figma data to populate figma_node_name
+                $screen->syncFigmaDataWithToken($validated['figma_access_token']);
+
+                return $screen;
             });
             return $this->responseJson($createdScreens, 'Frames exported as screens successfully', 201);
         } catch (\Throwable $th) {

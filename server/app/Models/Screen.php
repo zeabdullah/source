@@ -16,6 +16,7 @@ class Screen extends Model
     protected $fillable = [
         'project_id',
         'section_name',
+        'figma_node_name',
         'figma_svg_url',
         'figma_node_id',
         'figma_file_key',
@@ -27,6 +28,7 @@ class Screen extends Model
         'project_id',
         'section_name',
         'data',
+        'figma_node_name',
         'figma_svg_url',
         'figma_node_id',
         'figma_file_key',
@@ -117,16 +119,35 @@ class Screen extends Model
         return "https://www.figma.com/file/{$this->project->figma_file_key}/?node-id={$this->figma_node_id}";
     }
 
-    /**
-     * Serialize Figma frame data for AI analysis
-     */
     public function serializeForAudit(): string
     {
-        if (!$this->data || !is_array($this->data)) {
-            return "Screen: {$this->section_name}\nNo Figma data available.";
+        $detailedData = $this->getDetailedFigmaNodeData();
+
+        if (!$detailedData) {
+            return "Screen: {$this->figma_node_name}\nNo detailed Figma data available for flow analysis.";
         }
 
-        return json_encode($this->data);
+        return json_encode($detailedData);
+    }
+
+    public function getDetailedFigmaNodeData(): ?array
+    {
+        if (!$this->hasValidFigmaNodeId()) {
+            return null;
+        }
+
+        $owner = $this->project->owner;
+        if (!$owner || !$owner->figma_access_token) {
+            return null;
+        }
+
+        $figmaService = new FigmaService();
+        return $figmaService->validateAndGetNodeData(
+            $this->figma_node_id,
+            $this->figma_file_key,
+            $owner->figma_access_token,
+            4
+        );
     }
 
     /**
@@ -143,15 +164,27 @@ class Screen extends Model
             return false;
         }
 
+        return $this->syncFigmaDataWithToken($owner->figma_access_token);
+    }
+
+    /**
+     * Sync Figma data with provided access token
+     */
+    public function syncFigmaDataWithToken(string $figmaAccessToken): bool
+    {
+        if (!$this->hasValidFigmaNodeId()) {
+            return false;
+        }
+
         $figmaService = new FigmaService();
         $nodeData = $figmaService->validateAndGetNodeData(
             $this->figma_node_id,
             $this->figma_file_key,
-            $owner->figma_access_token
+            $figmaAccessToken
         );
 
         if ($nodeData) {
-            $this->update(['data' => $nodeData]);
+            $this->update(['data' => $nodeData['document'], 'figma_node_name' => $nodeData['name']]);
             return true;
         }
 

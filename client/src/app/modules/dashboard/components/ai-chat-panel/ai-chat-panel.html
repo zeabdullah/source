@@ -26,7 +26,7 @@
             pInputText
             [(ngModel)]="newMessage"
             (keydown.enter)="sendMessage()"
-            placeholder="Ask about this email..."
+            placeholder="Ask anything about this..."
             class="flex-1"
             [disabled]="isLoading() || isWaitingForAiResponse()"
         />
