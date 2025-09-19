@@ -10,13 +10,15 @@ import { AiChatMessage } from '../ai-chat-message/ai-chat-message'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 import { Toast } from 'primeng/toast'
 import { AiChatMessageData } from '../../shared/interfaces/ai-chat-message-data.interface'
+import { EmptyState } from '~/shared/components/empty-state/empty-state'
 
 @Component({
     selector: 'app-ai-chat-panel',
-    imports: [FormsModule, InputText, Button, ProgressSpinner, AiChatMessage, Toast],
+    imports: [FormsModule, InputText, Button, ProgressSpinner, AiChatMessage, Toast, EmptyState],
     providers: [MessageService],
     templateUrl: './ai-chat-panel.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    host: { class: 'h-full' },
 })
 export class AiChatPanel implements OnInit {
     http = inject(HttpClient)
@@ -92,11 +94,19 @@ export class AiChatPanel implements OnInit {
         const formData = new FormData()
         formData.set('content', messageContent)
 
+        // For email templates, set update_template to true to enable AI template updates
+        if (this.chatType === 'email-templates') {
+            formData.set('update_template', '1')
+        }
+
         this.http
-            .post<LaravelApiResponse<{ user: AiChatMessageData; ai: { content: string } }>>(
-                `/api/${this.chatType}/${encodeURIComponent(this.chatId)}/chats`,
-                formData,
-            )
+            .post<
+                LaravelApiResponse<{
+                    user: AiChatMessageData
+                    ai: { content: string }
+                    template_updated?: boolean
+                }>
+            >(`/api/${this.chatType}/${encodeURIComponent(this.chatId)}/chats`, formData)
             .pipe(
                 catchError(err => {
                     console.warn('Failed to send message:', err)
@@ -110,7 +120,11 @@ export class AiChatPanel implements OnInit {
                         life: 10_000,
                     })
                     return of<
-                        LaravelApiResponse<{ user: AiChatMessageData; ai: { content: string } }>
+                        LaravelApiResponse<{
+                            user: AiChatMessageData
+                            ai: { content: string }
+                            template_updated?: boolean
+                        }>
                     >({
                         message: '',
                         payload: null,
@@ -129,6 +143,16 @@ export class AiChatPanel implements OnInit {
                         updated_at: new Date().toISOString(),
                     }
                     this.messages.update(messages => [...messages, aiMessage])
+
+                    // Show success message if template was updated
+                    if (response.payload.template_updated) {
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Template Updated',
+                            detail: 'Email template has been updated with AI-generated content!',
+                            life: 4000,
+                        })
+                    }
                 }
                 this.isWaitingForAiResponse.set(false)
             })

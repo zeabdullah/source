@@ -13,8 +13,8 @@ class Screen extends Model
     use HasFactory;
 
     protected $fillable = [
-        'section_name',
         'project_id',
+        'section_name',
         'figma_svg_url',
         'figma_node_id',
         'figma_file_key',

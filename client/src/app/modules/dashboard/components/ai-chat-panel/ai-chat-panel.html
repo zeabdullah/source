@@ -1,11 +1,17 @@
 <p-toast />
 
 <div class="flex h-full flex-col">
-    <div class="flex-1 space-y-4 overflow-y-auto p-2">
+    <div class="-me-4 flex-1 overflow-y-auto pe-4 pb-4" [class.space-y-4]="messages().length > 0">
         @if (isLoading()) {
         <div class="flex items-center justify-center py-4">
             <p-progress-spinner ariaLabel="loading chats" strokeWidth="4" />
         </div>
+        } @else if (messages().length === 0) {
+        <app-empty-state
+            icon="pi pi-sparkles"
+            title="Start a conversation"
+            subtitle="Ask questions about this item and get AI-powered insights and suggestions."
+        />
         } @else { @for (message of messages(); track message.id) {
         <app-ai-chat-message [message]="message" />
         } @if (isWaitingForAiResponse()) {

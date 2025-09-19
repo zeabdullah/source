@@ -41,7 +41,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             $table->string('section_name')->nullable();
-            $table->string('campaign_id');
+            $table->string('campaign_id')->nullable();
             $table->string('thumbnail_url')->nullable();
             $table->timestamps();
         });

@@ -17,7 +17,7 @@
     position="right"
     closable="false"
     closeOnEscape="false"
-    styleClass="w-full max-w-[450px]"
+    styleClass="w-full max-w-[540px]"
     [baseZIndex]="1100"
 >
     <p-tabs [(value)]="activeTab" class="flex h-full flex-col">
@@ -40,7 +40,7 @@
                 class="flex flex-col"
                 [class.h-full]="activeTab === 'ai-chat'"
             >
-                @if (id !== null){
+                @if (id !== null) {
                 <app-ai-chat-panel [emailTemplateId]="id" />
                 }
             </p-tabpanel>
@@ -50,17 +50,28 @@
 
 <div class="flex flex-1 flex-col">
     <div class="flex-shrink-0">
-        <div class="mb-16 flex gap-4">
-            <div class="flex flex-col gap-1">
-                <label for="release">Release</label>
-                <p-select
-                    [options]="releases"
-                    [(ngModel)]="selectedRelease"
-                    [checkmark]="true"
-                    optionLabel="name"
-                    optionValue="value"
-                    placeholder="Release..."
-                    class="w-44 basis-full lg:w-56"
+        <div class="mb-16 flex items-end justify-between gap-4">
+            <div class="flex gap-4">
+                <div class="flex flex-col gap-1">
+                    <label for="release">Release</label>
+                    <p-select
+                        [options]="releases"
+                        [(ngModel)]="selectedRelease"
+                        [checkmark]="true"
+                        optionLabel="name"
+                        optionValue="value"
+                        placeholder="Release..."
+                        class="w-44 basis-full lg:w-56"
+                    />
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <p-button
+                    icon="pi pi-download"
+                    label="Import from Brevo"
+                    [outlined]="true"
+                    (onClick)="openBrevoTemplateSelector()"
                 />
             </div>
         </div>
@@ -73,13 +84,13 @@
         <app-empty-state
             icon="pi-envelope"
             title="No email templates yet"
-            subtitle="Connect your MailChimp account to get started."
+            subtitle="Import your email templates from Brevo to get started."
         >
             <p-button
-                icon="pi pi-envelope"
-                label="Connect to MailChimp"
+                icon="pi pi-download"
+                label="Import from Brevo"
                 size="large"
-                (onClick)="connectToMailChimp()"
+                (onClick)="openBrevoTemplateSelector()"
             />
         </app-empty-state>
         } @else {
@@ -115,3 +126,12 @@
         }
     </div>
 </div>
+
+<!-- Brevo Template Selector -->
+<app-brevo-template-selector
+    [projectId]="getProjectId()"
+    [visible]="brevoSelectorVisible()"
+    [existingTemplates]="emailTemplates()"
+    (visibleChange)="onBrevoSelectorVisibleChange($event)"
+    (templatesImported)="onTemplatesImported($event)"
+/>

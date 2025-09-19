@@ -14,6 +14,10 @@ use App\Services\FigmaService;
 use Illuminate\Support\Facades\DB;
 use Gemini\Data\Content;
 use Gemini\Enums\Role;
+use Illuminate\Support\Facades\Log;
+use App\Services\BrevoService;
+use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Storage;
 
 class AiChatController extends Controller
 {
@@ -76,7 +80,7 @@ class AiChatController extends Controller
         }
     }
 
-    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId, N8nService $n8n): JsonResponse
+    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId): JsonResponse
     {
         $validated = $request->validate([
             'content' => 'required|string',
@@ -89,24 +93,117 @@ class AiChatController extends Controller
                 return $this->notFoundResponse('Email template not found');
             }
 
-            $chatMsg = new AiChat(['content' => $userPrompt]);
-            $chatMsg->sender = 'user';
-            $chatMsg->user_id = $request->user()->id;
-            $chatMsg->commentable_id = $emailTemplateId;
-            $chatMsg->commentable_type = EmailTemplate::class;
-            $chatMsg->saveOrFail();
+            $result = DB::transaction(function () use ($request, $emailTemplate, $emailTemplateId, $userPrompt) {
+                $ai = new AiAgentService();
+                $brevo = new BrevoService();
+                $n8n = new N8nService();
 
-            $aiResponseContent = $n8n->generateAgentResponseForEmailTemplate($userPrompt, $emailTemplateId);
+                // create user message
+                $userAiChat = new AiChat(['content' => $userPrompt]);
+                $userAiChat->sender = 'user';
+                $userAiChat->user_id = $request->user()->id;
+                $userAiChat->commentable_id = $emailTemplateId;
+                $userAiChat->commentable_type = EmailTemplate::class;
 
-            return $this->responseJson([
-                'user' => $chatMsg->fresh(),
-                'ai' => ['content' => $aiResponseContent],
-            ], 'Messages created successfully', 201);
+                // feed history of messages as ai context
+                $contextMessages = $emailTemplate->aiChats()
+                    ->orderBy('created_at', 'desc')
+                    ->limit(15)
+                    ->get(['sender', 'content'])
+                    ->reverse()
+                    ->values()
+                    ->map(fn($msg) => Content::parse(
+                        $msg->content,
+                        $msg->sender === 'user' ? Role::USER : Role::MODEL
+                    ))
+                    ->toArray();
 
+                // Get AI response with structured output
+                $aiResponse = $ai->generateEmailTemplateReply($userPrompt, $contextMessages, $emailTemplate->html_content);
+                $aiReplyText = $aiResponse['chat_message'];
+                $updatedHtml = $aiResponse['updated_html'];
+
+                $brevoUpdated = false;
+                $thumbnailUpdated = false;
+                if ($updatedHtml !== null) {
+                    $emailTemplate->html_content = $updatedHtml;
+
+                    // Generate new thumbnail from updated HTML
+                    try {
+                        $base64Img = $n8n->generateBase64ThumbnailFromHtml($updatedHtml);
+                        if ($base64Img) {
+                            $binaryImg = base64_decode($base64Img);
+                            if ($binaryImg !== false) {
+                                // Delete old thumbnail if exists
+                                if (!empty($emailTemplate->thumbnail_url)) {
+                                    $oldPath = str_replace(asset('storage') . '/', '', $emailTemplate->thumbnail_url);
+                                    if (Storage::exists($oldPath)) {
+                                        Storage::delete($oldPath);
+                                    }
+                                }
+                                $thumbnailPath = 'email-thumbnails/' . uniqid('et_', true) . '.png';
+                                Storage::put($thumbnailPath, $binaryImg);
+                                $emailTemplate->thumbnail_url = Storage::url($thumbnailPath);
+                                $thumbnailUpdated = true;
+                            }
+                        }
+                    } catch (\Throwable $thumbnailException) {
+                        Log::warning('Failed to generate thumbnail: ' . $thumbnailException->getMessage(), [
+                            'email_template_id' => $emailTemplateId,
+                        ]);
+                        // Continue execution even if thumbnail generation fails
+                    }
+
+                    $emailTemplate->save();
+
+                    // Update Brevo template if linked and user has API token
+                    $user = $request->user();
+                    if ($user->brevo_api_token && $emailTemplate->brevo_template_id) {
+                        try {
+                            $brevoTemplateData = [
+                                'htmlContent' => $updatedHtml,
+                            ];
+                            $brevo->updateTemplate($user->brevo_api_token, $emailTemplate->brevo_template_id, $brevoTemplateData);
+                            $brevoUpdated = true;
+                        } catch (RequestException $e) {
+                            Log::warning('Failed to update Brevo template: ' . $e->getMessage(), [
+                                'email_template_id' => $emailTemplateId,
+                                'brevo_template_id' => $emailTemplate->brevo_template_id,
+                                'user_id' => $user->id,
+                            ]);
+                            // Continue execution even if Brevo update fails
+                        }
+                    }
+                }
+
+                // create ai message
+                $aiReply = new AiChat([
+                    'content' => $aiReplyText,
+                ]);
+                $aiReply->user_id = null;
+                $aiReply->sender = 'ai';
+                $aiReply->commentable_id = $userAiChat->commentable_id;
+                $aiReply->commentable_type = $userAiChat->commentable_type;
+
+                $userAiChat->saveOrFail();
+                $aiReply->saveOrFail();
+
+                return [
+                    'user' => $userAiChat->fresh(),
+                    'ai' => $aiReply->fresh(),
+                    'template_updated' => $updatedHtml !== null,
+                    'brevo_updated' => $brevoUpdated,
+                    'thumbnail_updated' => $thumbnailUpdated,
+                ];
+            }, attempts: 2);
+
+            return $this->responseJson($result, 'Chat message created successfully', 201);
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse([
+            Log::error('Failed to send chat message: ' . $th->getMessage(), [
                 'trace' => $th->getTrace(),
-            ], 'Failed to send chat message: ' . $th->getMessage(), );
+            ]);
+
+            return $this->serverErrorResponse('Failed to send chat message: ' . $th->getMessage());
         }
     }
 
@@ -155,7 +252,7 @@ class AiChatController extends Controller
         }
     }
 
-    public function sendScreenChatMessage(Request $request, string $screenId, AiAgentService $ai, FigmaService $figma): JsonResponse
+    public function sendScreenChatMessage(Request $request, string $screenId): JsonResponse
     {
         $validated = $request->validate([
             'content' => 'required|string',
@@ -176,7 +273,10 @@ class AiChatController extends Controller
                 return $this->notFoundResponse('Screen not found');
             }
 
-            $result = DB::transaction(function () use ($request, $screen, $screenId, $userMsg, $accessToken, $figmaCacheKey, $ai, $figma) {
+            $result = DB::transaction(function () use ($request, $screen, $screenId, $userMsg, $accessToken, $figmaCacheKey) {
+                $ai = new AiAgentService();
+                $figma = new FigmaService();
+
                 // create user message
                 $chatMsg = new AiChat([
                     'content' => $userMsg,
@@ -199,6 +299,7 @@ class AiChatController extends Controller
                     ))
                     ->toArray();
 
+                $figmaNodes = null;
                 // Fetch and add Figma data to context messages using cache
                 if ($screen->hasFigmaData()) {
                     $figmaNodes = cache()->remember(
@@ -206,22 +307,19 @@ class AiChatController extends Controller
                         now()->addHours(12),
                         function () use ($accessToken, $screen, $figma) {
                             return $figma->getFigmaFrameForAI(
-                                $screen->figma_file_key,
                                 $screen->figma_node_id,
+                                $screen->figma_file_key,
                                 $accessToken,
                             );
                         }
                     );
-
-                    $figmaContext = "Figma Frame Data: " . json_encode($figmaNodes);
-                    $contextMessages[] = Content::parse($figmaContext, Role::USER); // Add as user role for context
                 }
 
-                $aiReplyText = $ai->generateReplyFromContext($userMsg, history: $contextMessages);
+                $aiReply = $ai->generateFigmaReply($userMsg, $contextMessages, $figmaNodes);
 
                 // create ai message
                 $aiReply = new AiChat([
-                    'content' => $aiReplyText,
+                    'content' => $aiReply['chat_message'],
                 ]);
                 $aiReply->user_id = null;
                 $aiReply->sender = 'ai';
@@ -229,6 +327,10 @@ class AiChatController extends Controller
                 $aiReply->commentable_type = $chatMsg->commentable_type;
 
                 $chatMsg->saveOrFail();
+
+                // Ensure AI reply has a later timestamp
+                // since transactions don't guarantee sequential order of timestamps
+                $aiReply->created_at = now()->addSecond();
                 $aiReply->saveOrFail();
 
                 return [

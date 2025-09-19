@@ -77,7 +77,7 @@ class Project extends Model
         );
     }
 
-    public function releases(): HasMany
+    public function releases()
     {
         return $this->hasMany(Release::class);
     }
@@ -87,7 +87,7 @@ class Project extends Model
         return $this->hasMany(Screen::class);
     }
 
-    public function emailTemplates(): HasMany
+    public function emailTemplates()
     {
         return $this->hasMany(EmailTemplate::class);
     }

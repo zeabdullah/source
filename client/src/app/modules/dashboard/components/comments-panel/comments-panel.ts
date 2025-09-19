@@ -9,13 +9,15 @@ import { ProgressSpinner } from 'primeng/progressspinner'
 import { Comment } from '../comment/comment'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 import { CommentData } from '../../shared/interfaces/comment.interface'
+import { EmptyState } from '~/shared/components/empty-state/empty-state'
 
 @Component({
     selector: 'app-comments-panel',
-    imports: [FormsModule, InputText, Button, ProgressSpinner, Comment],
+    imports: [FormsModule, InputText, Button, ProgressSpinner, Comment, EmptyState],
     providers: [MessageService],
     templateUrl: './comments-panel.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    host: { class: 'h-full' },
 })
 export class CommentsPanel implements OnInit {
     http = inject(HttpClient)
@@ -98,7 +100,6 @@ export class CommentsPanel implements OnInit {
             .subscribe(response => {
                 this.isSubmitting.set(false)
                 if (response.payload) {
-                    console.log(response.payload)
                     this.comments.update(comments => [...comments, response.payload!])
                     this.newComment.set('')
                 }

@@ -40,7 +40,7 @@ describe('createAiChatResponseForEmailTemplate', function () {
             'content' => 'This is an AI response for the email template.',
         ];
 
-        $response = postJson("/api/projects/email-templates/{$emailTemplate->id}/chats/ai-response-webhook", $payload, [
+        $response = postJson("/api/basic/email-templates/{$emailTemplate->id}/chats/ai-response-webhook", $payload, [
             'Authorization' => 'Basic ' . base64_encode(env('BASIC_AUTH_USERNAME', 'test') . ':' . env('BASIC_AUTH_PASSWORD', 'password'))
         ]);
 
@@ -82,7 +82,7 @@ describe('createAiChatResponseForEmailTemplate', function () {
             'content' => 'This is an AI response for a non-existent email template.',
         ];
 
-        $response = postJson('/api/projects/email-templates/999/chats/ai-response-webhook', $payload, [
+        $response = postJson('/api/basic/email-templates/999/chats/ai-response-webhook', $payload, [
             'Authorization' => 'Basic ' . base64_encode(env('BASIC_AUTH_USERNAME', 'test') . ':' . env('BASIC_AUTH_PASSWORD', 'password'))
         ]);
 
@@ -97,7 +97,7 @@ describe('createAiChatResponseForEmailTemplate', function () {
         $project = Project::factory()->create(['owner_id' => $user->id]);
         $emailTemplate = EmailTemplate::factory()->create(['project_id' => $project->id]);
 
-        $response = postJson("/api/projects/email-templates/{$emailTemplate->id}/chats/ai-response-webhook", [], [
+        $response = postJson("/api/basic/email-templates/{$emailTemplate->id}/chats/ai-response-webhook", [], [
             'Authorization' => 'Basic ' . base64_encode(env('BASIC_AUTH_USERNAME', 'test') . ':' . env('BASIC_AUTH_PASSWORD', 'password'))
         ]);
 
@@ -114,7 +114,7 @@ describe('createAiChatResponseForEmailTemplate', function () {
             'content' => 123, // Not a string
         ];
 
-        $response = postJson("/api/projects/email-templates/{$emailTemplate->id}/chats/ai-response-webhook", $payload, [
+        $response = postJson("/api/basic/email-templates/{$emailTemplate->id}/chats/ai-response-webhook", $payload, [
             'Authorization' => 'Basic ' . base64_encode(env('BASIC_AUTH_USERNAME', 'test') . ':' . env('BASIC_AUTH_PASSWORD', 'password'))
         ]);
 
