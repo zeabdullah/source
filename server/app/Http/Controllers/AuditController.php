@@ -12,9 +12,10 @@ class AuditController extends Controller
     /**
      * Display a listing of audits for a project
      */
-    public function index(Request $request, Project $project): JsonResponse
+    public function index(Request $request, string $projectId): JsonResponse
     {
-        // user already checked for ownership with is_owner middleware
+        /** @var Project */
+        $project = $request->attributes->get('project');
 
         try {
             $audits = $project->audits()
@@ -35,9 +36,10 @@ class AuditController extends Controller
     /**
      * Store a newly created audit
      */
-    public function store(Request $request, Project $project): JsonResponse
+    public function store(Request $request, string $projectId): JsonResponse
     {
-        // user already checked for ownership with is_owner middleware
+        /** @var Project */
+        $project = $request->attributes->get('project');
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -89,11 +91,16 @@ class AuditController extends Controller
     /**
      * Display the specified audit
      */
-    public function show(Project $project, Audit $audit): JsonResponse
+    public function show(Request $request, string $projectId, string $auditId): JsonResponse
     {
         // user already checked for ownership with is_owner middleware
 
         try {
+            $audit = Audit::find($auditId);
+            if (!$audit) {
+                return $this->notFoundResponse('Audit not found');
+            }
+
             $audit->load([
                 'screens' => function ($query) {
                     $query->orderBy('audit_screens.sequence_order');
@@ -109,11 +116,16 @@ class AuditController extends Controller
     /**
      * Execute the audit (trigger AI analysis)
      */
-    public function execute(Project $project, Audit $audit): JsonResponse
+    public function execute(Request $request, string $projectId, string $auditId): JsonResponse
     {
         // user already checked for ownership with is_owner middleware
 
         try {
+            $audit = Audit::find($auditId);
+            if (!$audit) {
+                return $this->notFoundResponse('Audit not found');
+            }
+
             if ($audit->isProcessing()) {
                 return $this->responseJson($audit, 'Audit is already being processed', 202);
             }
@@ -137,11 +149,16 @@ class AuditController extends Controller
     /**
      * Get audit status
      */
-    public function status(Project $project, Audit $audit): JsonResponse
+    public function status(Request $request, string $projectId, string $auditId): JsonResponse
     {
         // user already checked for ownership with is_owner middleware
 
         try {
+            $audit = Audit::find($auditId);
+            if (!$audit) {
+                return $this->notFoundResponse('Audit not found');
+            }
+
             $statusData = [
                 'id' => $audit->id,
                 'status' => $audit->status,
@@ -180,14 +197,17 @@ class AuditController extends Controller
     /**
      * Remove the specified audit
      */
-    public function destroy(Project $project, Audit $audit): JsonResponse
+    public function destroy(Request $request, string $projectId, string $auditId): JsonResponse
     {
-        // user already checked for ownership with is_owner middleware
-
         try {
+            $audit = Audit::find($auditId);
+            if (!$audit) {
+                return $this->notFoundResponse('Audit not found');
+            }
+
             $audit->delete();
 
-            return $this->responseJson(message: 'Audit deleted successfully');
+            return $this->responseJson($audit, 'Audit deleted successfully');
         } catch (\Throwable $th) {
             return $this->serverErrorResponse(message: 'Failed to delete audit: ' . $th->getMessage());
         }
