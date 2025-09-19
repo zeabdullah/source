@@ -91,4 +91,9 @@ class Project extends Model
     {
         return $this->hasMany(EmailTemplate::class);
     }
+
+    public function audits()
+    {
+        return $this->hasMany(Audit::class);
+    }
 }

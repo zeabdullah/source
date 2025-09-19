@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AiChatController;
+use App\Http\Controllers\AuditController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Common\AuthController;
@@ -61,8 +62,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Email Templates (per project)
         Route::middleware('is_owner')->group(function () {
-            // Legacy Mailchimp routes (kept for backward compatibility)
-            Route::post('/{projectId}/email-templates/import', [EmailTemplateController::class, 'importEmailTemplate']);
 
             // Brevo integration routes
             Route::post('/{projectId}/email-templates/import-brevo', [EmailTemplateController::class, 'importBrevoTemplate']);
@@ -74,6 +73,15 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{projectId}/email-templates/{emailTemplateId}', [EmailTemplateController::class, 'getEmailTemplateById']);
             Route::put('/{projectId}/email-templates/{emailTemplateId}', [EmailTemplateController::class, 'updateEmailTemplateById']);
             Route::delete('/{projectId}/email-templates/{emailTemplateId}', [EmailTemplateController::class, 'deleteEmailTemplateById']);
+
+            // Audits (per project)
+            Route::get('/{projectId}/audits', [AuditController::class, 'index']);
+            Route::post('/{projectId}/audits', [AuditController::class, 'store']);
+            Route::get('/{projectId}/audits/{auditId}', [AuditController::class, 'show']);
+            Route::put('/{projectId}/audits/{auditId}', [AuditController::class, 'update']);
+            Route::delete('/{projectId}/audits/{auditId}', [AuditController::class, 'destroy']);
+            Route::post('/{projectId}/audits/{auditId}/execute', [AuditController::class, 'execute']);
+            Route::get('/{projectId}/audits/{auditId}/status', [AuditController::class, 'status']);
         });
 
     });

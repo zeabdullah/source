@@ -58,6 +58,13 @@ class Screen extends Model
         return $this->morphMany(Comment::class, 'commentable');
     }
 
+    public function audits()
+    {
+        return $this->belongsToMany(Audit::class, 'audit_screens')
+            ->withPivot('sequence_order')
+            ->orderBy('audit_screens.sequence_order');
+    }
+
     /**
      * Scope to search screens by description and section name
      */
@@ -100,5 +107,31 @@ class Screen extends Model
 
         return "https://www.figma.com/file/{$this->project->figma_file_key}/?node-id={$this->figma_node_id}";
     }
+
+    /**
+     * Serialize Figma frame data for AI analysis
+     * This method extracts structured data from the screen's Figma data
+     * to be sent to the LLM for consistency analysis
+     */
+    public function serializeForAudit(): string // TODO: revise. not needed.
+    {
+        if (!$this->data || !is_array($this->data)) {
+            return "Screen: {$this->section_name}\nNo Figma data available.";
+        }
+
+        $serialized = "Screen: {$this->section_name}\n";
+        $serialized .= "Figma Node ID: {$this->figma_node_id}\n\n";
+
+        // Extract component hierarchy and properties
+        $serialized .= $this->extractComponentData($this->data);
+
+        return $serialized;
+    }
+
+    /**
+     * Recursively extract component data from Figma structure
+     */
+    // This method is no longer needed, as Figma data will be stored in structured JSON for AI analysis.
+    // Removed as per instructions.
 }
 
