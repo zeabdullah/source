@@ -48,11 +48,6 @@ class AuditController extends Controller
 
         try {
             $audits = $project->audits()
-                ->with([
-                    'screens' => function ($query) {
-                        $query->orderBy('audit_screens.sequence_order');
-                    }
-                ])
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -135,13 +130,6 @@ class AuditController extends Controller
                 ]);
             }
 
-            // TODO: need to ensure it works correctly
-            $audit->load([
-                'screens' => function ($query) {
-                    $query->orderBy('audit_screens.sequence_order');
-                }
-            ]);
-
             return $this->responseJson($audit, 'Audit created successfully', 201);
         } catch (\Throwable $th) {
             return $this->serverErrorResponse(message: 'Failed to create audit: ' . $th->getMessage());
@@ -187,12 +175,6 @@ class AuditController extends Controller
             if (!$audit) {
                 return $this->notFoundResponse('Audit not found');
             }
-
-            $audit->load([
-                'screens' => function ($query) {
-                    $query->orderBy('audit_screens.sequence_order');
-                }
-            ]);
 
             return $this->responseJson($audit);
         } catch (\Throwable $th) {
@@ -371,7 +353,7 @@ class AuditController extends Controller
         try {
             $audit->update($validated);
 
-            return $this->responseJson($audit->fresh(), 'Audit updated successfully');
+            return $this->responseJson($audit, 'Audit updated successfully');
         } catch (\Throwable $th) {
             return $this->serverErrorResponse(message: 'Failed to update audit: ' . $th->getMessage());
         }

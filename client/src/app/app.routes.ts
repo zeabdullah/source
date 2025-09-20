@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router'
 import { authRoutes } from './modules/auth/auth.routes'
 import { landingRoutes } from './modules/landing/landing.routes'
-import { dashboardRoutes } from './modules/dashboard/dashboard.routes'
 
 export const routes: Routes = [
     {
@@ -14,6 +13,7 @@ export const routes: Routes = [
     },
     {
         path: 'dashboard',
-        children: dashboardRoutes,
+        loadChildren: () =>
+            import('./modules/dashboard/dashboard.routes').then(m => m.dashboardRoutes),
     },
 ]

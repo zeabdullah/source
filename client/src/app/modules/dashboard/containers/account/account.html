@@ -29,11 +29,13 @@
                             placeholder="Enter your Figma access token"
                             fluid
                         />
-                        @if (figmaForm.get('figma_access_token')?.invalid &&
-                        figmaForm.get('figma_access_token')?.touched) {
-                        <p-message severity="error" variant="simple">
-                            Figma access token is required
-                        </p-message>
+                        @if (
+                            figmaForm.get('figma_access_token')?.invalid &&
+                            figmaForm.get('figma_access_token')?.touched
+                        ) {
+                            <p-message severity="error" variant="simple">
+                                Figma access token is required
+                            </p-message>
                         }
                     </div>
 
@@ -99,11 +101,13 @@
                             placeholder="Enter your Brevo API token"
                             fluid
                         />
-                        @if (brevoForm.get('brevo_api_token')?.invalid &&
-                        brevoForm.get('brevo_api_token')?.touched) {
-                        <p-message severity="error" variant="simple">
-                            Brevo API token is required
-                        </p-message>
+                        @if (
+                            brevoForm.get('brevo_api_token')?.invalid &&
+                            brevoForm.get('brevo_api_token')?.touched
+                        ) {
+                            <p-message severity="error" variant="simple">
+                                Brevo API token is required
+                            </p-message>
                         }
                     </div>
 

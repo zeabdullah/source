@@ -16,5 +16,14 @@
 
     "plugins": ["prettier-plugin-tailwindcss"],
     "tailwindStylesheet": "./src/styles.css",
-    "tailwindAttributes": ["routerLinkActive"]
+    "tailwindAttributes": ["routerLinkActive"],
+
+    "overrides": [
+        {
+            "files": "*.html",
+            "options": {
+                "parser": "angular"
+            }
+        }
+    ]
 }

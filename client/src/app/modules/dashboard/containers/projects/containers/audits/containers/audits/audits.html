@@ -1,0 +1,53 @@
+<header class="mb-12 flex items-center justify-between gap-4">
+    <div>
+        <h1 class="mb-3 text-h1 font-extrabold tracking-tighter">Audits</h1>
+        <p class="text-body text-gray-700">Analyze design consistency across your screen flows</p>
+    </div>
+    <p-button icon="pi pi-plus" label="New Audit" class="shrink-0" (onClick)="onCreateAudit()" />
+</header>
+
+@if (loading()) {
+    <div class="flex items-center justify-center py-8">
+        <p-progress-spinner ariaLabel="loading audits" class="text-brand-500" strokeWidth="4" />
+    </div>
+} @else {
+    <section>
+        <div
+            [ngClass]="{
+                'grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6 lg:gap-8':
+                    auditsList().length > 0,
+            }"
+        >
+            @for (audit of auditsList(); track audit.id) {
+                <app-audit-card
+                    [audit]="audit"
+                    [projectId]="projectId()"
+                    (auditDeleted)="onAuditDeleted()"
+                    (auditExecuted)="onAuditExecuted()"
+                />
+            } @empty {
+                <app-empty-state
+                    icon="pi-shield"
+                    title="No audits yet"
+                    subtitle="Create your first audit to analyze design consistency across your screen flows."
+                >
+                    <p-button
+                        icon="pi pi-plus"
+                        label="Create Audit"
+                        size="large"
+                        (onClick)="onCreateAudit()"
+                    />
+                </app-empty-state>
+            }
+        </div>
+    </section>
+}
+
+<app-create-audit-dialog
+    [visible]="showCreateDialog()"
+    (visibleChange)="showCreateDialog.set($event)"
+    [projectId]="projectId()"
+    (auditCreated)="onAuditCreated()"
+/>
+
+<p-toast position="bottom-right" />

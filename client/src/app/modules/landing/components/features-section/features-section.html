@@ -6,12 +6,12 @@
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             @for (feature of features; track feature.title) {
-            <app-feature-card
-                [title]="feature.title"
-                [description]="feature.description"
-                [illustrationSrc]="feature.illustrationSrc"
-                [class]="feature.big ? 'lg:col-span-2' : ''"
-            />
+                <app-feature-card
+                    [title]="feature.title"
+                    [description]="feature.description"
+                    [illustrationSrc]="feature.illustrationSrc"
+                    [class]="feature.big ? 'lg:col-span-2' : ''"
+                />
             }
         </div>
     </div>

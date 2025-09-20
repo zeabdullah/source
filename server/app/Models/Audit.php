@@ -30,7 +30,10 @@ class Audit extends Model
         'overall_score',
         'created_at',
         'updated_at',
+        'screens',
     ];
+
+    protected $with = ['screens'];
 
     protected $casts = [
         'results' => 'array',

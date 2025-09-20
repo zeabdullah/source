@@ -1,0 +1,104 @@
+@let id = shownScreenId();
+@if (id !== null) {
+    @let item = getScreenById(id) ?? { description: '', figma_svg_url: '' };
+
+    <div class="fixed inset-0 z-[1102] flex items-center justify-center bg-black/20">
+        <div class="relative isolate h-full w-full" (click)="closeExpandedScreen()">
+            <div class="absolute inset-0 isolate -z-10 bg-black/10"></div>
+            <app-expanded-image
+                [item]="{ name: item.description ?? '', image: item.figma_svg_url ?? '' }"
+            />
+        </div>
+    </div>
+}
+
+<p-drawer
+    [(visible)]="drawerVisible"
+    header="Screen Details"
+    position="right"
+    closable="false"
+    closeOnEscape="false"
+    styleClass="w-full max-w-[540px]"
+    [baseZIndex]="1100"
+>
+    <p-tabs [(value)]="activeTab" class="flex h-full flex-col">
+        <p-tablist>
+            <p-tab value="comments">Comments</p-tab>
+            <p-tab value="ai-chat">AI Chat</p-tab>
+        </p-tablist>
+        <p-tabpanels class="flex-1 overflow-y-auto pe-4">
+            <p-tabpanel
+                value="comments"
+                class="flex flex-col"
+                [class.h-full]="activeTab === 'comments'"
+            >
+                @if (id !== null) {
+                    <app-comments-panel [screenId]="id" />
+                }
+            </p-tabpanel>
+            <p-tabpanel
+                value="ai-chat"
+                class="flex flex-col"
+                [class.h-full]="activeTab === 'ai-chat'"
+            >
+                @if (id !== null) {
+                    <app-ai-chat-panel [screenId]="id" />
+                }
+            </p-tabpanel>
+        </p-tabpanels>
+    </p-tabs>
+</p-drawer>
+
+<div class="flex flex-1 flex-col">
+    <div class="flex-shrink-0">
+        <div class="mb-16 flex gap-4">
+            <div class="flex flex-col gap-1">
+                <label for="release">Release</label>
+                <p-select
+                    [options]="releases"
+                    [(ngModel)]="selectedRelease"
+                    [checkmark]="true"
+                    optionLabel="name"
+                    optionValue="value"
+                    placeholder="Release..."
+                    class="w-44 basis-full lg:w-56"
+                />
+            </div>
+            <div class="flex flex-col gap-1">
+                <label for="device">Device</label>
+                <p-select
+                    [options]="devices"
+                    [(ngModel)]="selectedDevice"
+                    [checkmark]="true"
+                    optionLabel="name"
+                    optionValue="value"
+                    placeholder="Device..."
+                    class="w-44 basis-full lg:w-56"
+                />
+            </div>
+        </div>
+
+        <div class="space-y-12">
+            @for (section of screensBySection(); track section.sectionName) {
+                <section>
+                    <h3 class="mb-4 font-bold">{{ section.sectionName }}</h3>
+                    <div class="scrollbar-hidden flex w-full gap-4 overflow-x-auto">
+                        @for (screen of section.screens; track screen.id) {
+                            <button
+                                (click)="showScreenDetails(screen.id)"
+                                class="group relative min-w-fit shrink-0 overflow-hidden rounded-xl border border-black/10 bg-gray-100 transition-all duration-300 hover:shadow-lg"
+                            >
+                                <img
+                                    [src]="screen.figma_svg_url"
+                                    [alt]="screen.description"
+                                    width="200"
+                                    class="h-80 w-[260px] object-cover transition duration-200 group-hover:scale-105 group-hover:brightness-90"
+                                />
+                            </button>
+                        }
+                    </div>
+                </section>
+            }
+        </div>
+    </div>
+</div>

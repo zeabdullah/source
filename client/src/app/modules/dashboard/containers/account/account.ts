@@ -1,29 +1,30 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core'
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
 import { Button } from 'primeng/button'
 import { Card } from 'primeng/card'
 import { ConfirmPopup } from 'primeng/confirmpopup'
-import { ConfirmationService, MessageService } from 'primeng/api'
+import { ConfirmationService } from 'primeng/api'
 import { InputText } from 'primeng/inputtext'
 import { Message } from 'primeng/message'
 import { Toast } from 'primeng/toast'
-import { UserService } from '~/core/services/user.service'
+import { UserRepository } from '~/core/repositories/user.repository'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { MessageService } from '~/core/services/message.service'
 
 @Component({
     selector: 'app-account',
     imports: [ReactiveFormsModule, Card, InputText, Button, Message, Toast, ConfirmPopup],
-    providers: [ConfirmationService, MessageService],
+    providers: [ConfirmationService],
     templateUrl: './account.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    host: {
-        class: 'grow',
-    },
+    host: { class: 'grow' },
 })
 export class Account {
     private fb = inject(NonNullableFormBuilder)
-    private userService = inject(UserService)
+    private userRepository = inject(UserRepository)
     private confirmationService = inject(ConfirmationService)
-    private messageService = inject(MessageService)
+    private message = inject(MessageService)
+    destroyRef = inject(DestroyRef)
 
     public isSubmitting = signal(false)
 
@@ -43,27 +44,23 @@ export class Account {
         this.isSubmitting.set(true)
 
         const token = this.figmaForm.value.figma_access_token
-        this.userService.storeFigmaToken(token).subscribe({
-            next: () => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: 'Figma access token saved successfully!',
-                    life: 4000,
-                })
-                this.isSubmitting.set(false)
-                this.figmaForm.reset()
-            },
-            error: error => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: error.error?.message || 'Failed to save token',
-                    life: 4000,
-                })
-                this.isSubmitting.set(false)
-            },
-        })
+        this.userRepository
+            .storeFigmaToken(token)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: () => {
+                    this.message.success('Success', 'Figma access token saved successfully!')
+                    this.isSubmitting.set(false)
+                    this.figmaForm.reset()
+                },
+                error: err => {
+                    this.message.error(
+                        'Error',
+                        `Failed to save token: ${err.error?.message || err.message}`,
+                    )
+                    this.isSubmitting.set(false)
+                },
+            })
     }
 
     submitBrevoToken() {
@@ -74,27 +71,23 @@ export class Account {
         this.isSubmitting.set(true)
 
         const token = this.brevoForm.value.brevo_api_token
-        this.userService.storeBrevoToken(token).subscribe({
-            next: () => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: 'Brevo API token saved successfully!',
-                    life: 4000,
-                })
-                this.isSubmitting.set(false)
-                this.brevoForm.reset()
-            },
-            error: error => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: error.error?.message || 'Failed to save token',
-                    life: 4000,
-                })
-                this.isSubmitting.set(false)
-            },
-        })
+        this.userRepository
+            .storeBrevoToken(token)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: () => {
+                    this.message.success('Success', 'Brevo API token saved successfully!')
+                    this.isSubmitting.set(false)
+                    this.brevoForm.reset()
+                },
+                error: err => {
+                    this.message.error(
+                        'Error',
+                        `Failed to save token: ${err.error?.message || err.message}`,
+                    )
+                    this.isSubmitting.set(false)
+                },
+            })
     }
 
     confirmDeleteFigmaToken(event: Event) {
@@ -136,50 +129,42 @@ export class Account {
     private deleteFigmaToken() {
         this.isSubmitting.set(true)
 
-        this.userService.removeFigmaToken().subscribe({
-            next: () => {
-                this.messageService.add({
-                    severity: 'info',
-                    summary: 'Token Deleted',
-                    detail: 'Figma access token deleted successfully!',
-                    life: 4000,
-                })
-                this.isSubmitting.set(false)
-            },
-            error: error => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: error.error?.message || 'Failed to delete token',
-                    life: 4000,
-                })
-                this.isSubmitting.set(false)
-            },
-        })
+        this.userRepository
+            .removeFigmaToken()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: () => {
+                    this.message.info('Token Deleted', 'Figma access token deleted successfully!')
+                    this.isSubmitting.set(false)
+                },
+                error: err => {
+                    this.message.error(
+                        'Error',
+                        `Failed to delete token: ${err.error?.message || err.message}`,
+                    )
+                    this.isSubmitting.set(false)
+                },
+            })
     }
 
     private deleteBrevoToken() {
         this.isSubmitting.set(true)
 
-        this.userService.removeBrevoToken().subscribe({
-            next: () => {
-                this.messageService.add({
-                    severity: 'info',
-                    summary: 'Token Deleted',
-                    detail: 'Brevo API token deleted successfully!',
-                    life: 4000,
-                })
-                this.isSubmitting.set(false)
-            },
-            error: error => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: error.error?.message || 'Failed to delete token',
-                    life: 4000,
-                })
-                this.isSubmitting.set(false)
-            },
-        })
+        this.userRepository
+            .removeBrevoToken()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: () => {
+                    this.message.info('Token Deleted', 'Brevo API token deleted successfully!')
+                    this.isSubmitting.set(false)
+                },
+                error: err => {
+                    this.message.error(
+                        'Error',
+                        `Failed to delete token: ${err.error?.message || err.message}`,
+                    )
+                    this.isSubmitting.set(false)
+                },
+            })
     }
 }

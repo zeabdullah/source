@@ -1,14 +1,7 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    inject,
-    OnDestroy,
-    OnInit,
-    signal,
-} from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core'
 import { Router, RouterLink } from '@angular/router'
-import { Subscription } from 'rxjs'
 import { AuthService } from '~/core/services/auth.service'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 
 @Component({
     selector: 'app-navbar',
@@ -16,25 +9,26 @@ import { AuthService } from '~/core/services/auth.service'
     templateUrl: './navbar.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Navbar implements OnInit, OnDestroy {
+export class Navbar implements OnInit {
     protected authService = inject(AuthService)
     protected router = inject(Router)
+    protected destroyRef = inject(DestroyRef)
 
-    protected authCheckSubscription = signal<Subscription | null>(null)
     protected isAuthenticated = this.authService.isAuthenticated.asReadonly()
 
     ngOnInit(): void {
-        this.authCheckSubscription.set(this.authService.checkIfAuthenticated().subscribe())
-    }
-
-    ngOnDestroy(): void {
-        this.authCheckSubscription()?.unsubscribe()
-        this.authCheckSubscription.set(null)
+        this.authService
+            .checkIfAuthenticated()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe()
     }
 
     logout() {
-        this.authService.logout().subscribe(() => {
-            this.router.navigate(['/'])
-        })
+        this.authService
+            .logout()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => {
+                this.router.navigate(['/'])
+            })
     }
 }

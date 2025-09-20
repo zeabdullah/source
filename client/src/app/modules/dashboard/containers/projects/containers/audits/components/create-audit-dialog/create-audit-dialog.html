@@ -1,0 +1,112 @@
+<p-dialog
+    [visible]="visible()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="false"
+    styleClass="w-full max-w-2xl"
+>
+    <ng-template #header>
+        <h3 class="text-h3 font-bold text-gray-900">Create New Audit</h3>
+    </ng-template>
+
+    <p class="mb-8 max-w-[480px] text-caption/normal text-gray-700">
+        Analyze design consistency across your screen flows by selecting 2-7 screens to audit.
+    </p>
+    <form [formGroup]="auditForm" class="flex flex-col gap-6">
+        <div class="flex flex-col gap-1.5">
+            <label class="text-label-text font-semibold" for="name">Audit Name*</label>
+            <div class="relative">
+                <input
+                    pInputText
+                    formControlName="name"
+                    id="name"
+                    name="name"
+                    type="text"
+                    placeholder="e.g., Onboarding Flow Audit"
+                    fluid
+                    [invalid]="auditForm.get('name')?.invalid && auditForm.get('name')?.touched"
+                />
+                @if (auditForm.get('name')?.invalid && auditForm.get('name')?.touched) {
+                    <p-message severity="error" variant="simple">
+                        @if (auditForm.get('name')?.errors?.['required']) {
+                            Name is required
+                        } @else if (auditForm.get('name')?.errors?.['maxlength']) {
+                            Name must be less than 255 characters
+                        }
+                    </p-message>
+                }
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            <label class="text-label-text font-semibold" for="description">Description</label>
+            <textarea
+                pTextarea
+                formControlName="description"
+                id="description"
+                name="description"
+                placeholder="Describe what this audit will analyze..."
+                [rows]="3"
+                class="resize-none"
+                fluid
+            ></textarea>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            <label class="text-label-text font-semibold" for="screens">Screens to Audit*</label>
+            <div class="relative">
+                <p-multiselect
+                    formControlName="screen_ids"
+                    [options]="screenOptions()"
+                    placeholder="Select 2-7 screens..."
+                    [showHeader]="false"
+                    [filter]="true"
+                    [showClear]="true"
+                    fluid
+                    [invalid]="
+                        auditForm.get('screen_ids')?.invalid && auditForm.get('screen_ids')?.touched
+                    "
+                    appendTo="body"
+                />
+                @if (auditForm.get('screen_ids')?.invalid && auditForm.get('screen_ids')?.touched) {
+                    <p-message severity="error" variant="simple">
+                        @if (auditForm.get('screen_ids')?.errors?.['required']) {
+                            Please select at least 2 screens
+                        } @else if (auditForm.get('screen_ids')?.errors?.['minlength']) {
+                            Please select at least 2 screens
+                        } @else if (auditForm.get('screen_ids')?.errors?.['maxlength']) {
+                            Please select no more than 7 screens
+                        }
+                    </p-message>
+                }
+            </div>
+            <p class="text-sm text-gray-500">
+                Select 2-7 screens to analyze for design consistency. The AI will examine visual
+                elements, interactions, and user experience patterns across your selected screens.
+            </p>
+        </div>
+    </form>
+
+    <ng-template #footer>
+        <div class="flex justify-end gap-2">
+            <p-button
+                label="Cancel"
+                variant="outlined"
+                severity="secondary"
+                (onClick)="onVisibleChange(false)"
+                [disabled]="submitting()"
+                size="large"
+            />
+            <p-button
+                label="Create Audit"
+                icon="pi pi-check"
+                iconPos="right"
+                (onClick)="onSubmit()"
+                [disabled]="!auditForm.valid || submitting()"
+                [loading]="submitting()"
+                size="large"
+            />
+        </div>
+    </ng-template>
+</p-dialog>
