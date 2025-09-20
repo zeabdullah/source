@@ -5,7 +5,7 @@ export interface MessageOptions {
     severity: 'success' | 'info' | 'warn' | 'error' | 'secondary' | 'contrast'
     summary: string
     detail: string
-    life?: number
+    life: number
 }
 
 export const defaultLife = {
@@ -21,66 +21,64 @@ export const defaultLife = {
 export class MessageService {
     private messageService = inject(PrimeNGMessageService)
 
-    private readonly defaultLife = defaultLife.success
-
     add(message: MessageOptions) {
         this.messageService.add({
             ...message,
-            life: message.life ?? this.defaultLife,
+            life: message.life || defaultLife[message.severity],
         })
     }
 
-    success(summary: string, detail: string, life?: number) {
+    success(summary: string, detail: string, life: number = defaultLife.success) {
         this.messageService.add({
             severity: 'success',
             summary,
             detail,
-            life: life ?? defaultLife.success,
+            life,
         })
     }
 
-    info(summary: string, detail: string, life?: number) {
+    info(summary: string, detail: string, life: number = defaultLife.info) {
         this.messageService.add({
             severity: 'info',
             summary,
             detail,
-            life: life ?? defaultLife.info,
+            life,
         })
     }
 
-    warn(summary: string, detail: string, life?: number) {
+    warn(summary: string, detail: string, life: number = defaultLife.warn) {
         this.messageService.add({
             severity: 'warn',
             summary,
             detail,
-            life: life ?? defaultLife.warn,
+            life,
         })
     }
 
-    error(summary: string, detail: string, life?: number) {
+    error(summary: string, detail: string, life: number = defaultLife.error) {
         this.messageService.add({
             severity: 'error',
             summary,
             detail,
-            life: life ?? defaultLife.error,
+            life,
         })
     }
 
-    secondary(summary: string, detail: string, life?: number) {
+    secondary(summary: string, detail: string, life: number = defaultLife.secondary) {
         this.messageService.add({
             severity: 'secondary',
             summary,
             detail,
-            life: life ?? defaultLife.secondary,
+            life,
         })
     }
 
-    contrast(summary: string, detail: string, life?: number) {
+    contrast(summary: string, detail: string, life: number = defaultLife.contrast) {
         this.messageService.add({
             severity: 'contrast',
             summary,
             detail,
-            life: life ?? defaultLife.contrast,
+            life,
         })
     }
 }

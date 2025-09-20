@@ -17,7 +17,10 @@ export class Navbar implements OnInit {
     protected isAuthenticated = this.authService.isAuthenticated.asReadonly()
 
     ngOnInit(): void {
-        this.authService.checkIfAuthenticated().pipe(takeUntilDestroyed()).subscribe()
+        this.authService
+            .checkIfAuthenticated()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe()
     }
 
     logout() {
