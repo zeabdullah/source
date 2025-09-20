@@ -1,14 +1,22 @@
 <p-toast position="bottom-right" />
 
-@let id = shownEmailId(); @if (id !== null) {
-<div class="fixed inset-0 z-[1102] flex items-center justify-center bg-black/20">
-    <div class="relative isolate h-full w-full" (click)="closeExpandedEmail()">
-        <div class="absolute inset-0 isolate -z-10 bg-black/10"></div>
-        <app-expanded-image
-            [item]="getEmailTemplateById(id) ? { name: getEmailTemplateById(id)!.section_name, image: getEmailTemplateById(id)!.thumbnail_url } : { name: '', image: '' }"
-        />
+@let id = shownEmailId();
+@if (id !== null) {
+    <div class="fixed inset-0 z-[1102] flex items-center justify-center bg-black/20">
+        <div class="relative isolate h-full w-full" (click)="closeExpandedEmail()">
+            <div class="absolute inset-0 isolate -z-10 bg-black/10"></div>
+            <app-expanded-image
+                [item]="
+                    getEmailTemplateById(id)
+                        ? {
+                              name: getEmailTemplateById(id)!.section_name,
+                              image: getEmailTemplateById(id)!.thumbnail_url,
+                          }
+                        : { name: '', image: '' }
+                "
+            />
+        </div>
     </div>
-</div>
 }
 
 <p-drawer
@@ -32,7 +40,7 @@
                 [class.h-full]="activeTab === 'comments'"
             >
                 @if (id !== null) {
-                <app-comments-panel [emailTemplateId]="id" />
+                    <app-comments-panel [emailTemplateId]="id" />
                 }
             </p-tabpanel>
             <p-tabpanel
@@ -41,7 +49,7 @@
                 [class.h-full]="activeTab === 'ai-chat'"
             >
                 @if (id !== null) {
-                <app-ai-chat-panel [emailTemplateId]="id" />
+                    <app-ai-chat-panel [emailTemplateId]="id" />
                 }
             </p-tabpanel>
         </p-tabpanels>
@@ -77,52 +85,52 @@
         </div>
 
         @if (isLoading()) {
-        <div class="flex items-center justify-center py-8">
-            <p-progress-spinner ariaLabel="loading" strokeWidth="4" />
-        </div>
+            <div class="flex items-center justify-center py-8">
+                <p-progress-spinner ariaLabel="loading" strokeWidth="4" />
+            </div>
         } @else if (emailTemplatesBySection().length === 0) {
-        <app-empty-state
-            icon="pi-envelope"
-            title="No email templates yet"
-            subtitle="Import your email templates from Brevo to get started."
-        >
-            <p-button
-                icon="pi pi-download"
-                label="Import from Brevo"
-                size="large"
-                (onClick)="openBrevoTemplateSelector()"
-            />
-        </app-empty-state>
+            <app-empty-state
+                icon="pi-envelope"
+                title="No email templates yet"
+                subtitle="Import your email templates from Brevo to get started."
+            >
+                <p-button
+                    icon="pi pi-download"
+                    label="Import from Brevo"
+                    size="large"
+                    (onClick)="openBrevoTemplateSelector()"
+                />
+            </app-empty-state>
         } @else {
-        <div class="space-y-12">
-            @for (section of emailTemplatesBySection(); track section.sectionName) {
-            <section>
-                <h3 class="mb-4 font-bold">{{ section.sectionName }}</h3>
-                <div class="scrollbar-hidden flex w-full gap-4 overflow-x-auto">
-                    @for (template of section.templates; track template.id) {
-                    <button
-                        (click)="showEmailDetails(template.id)"
-                        class="group relative shrink-0 overflow-hidden rounded-xl border border-black/10 bg-gray-100 transition-all duration-300 hover:shadow-lg"
-                    >
-                        <img
-                            [src]="template.thumbnail_url"
-                            [alt]="template.section_name"
-                            width="200"
-                            class="aspect-[3/4] w-full max-w-[300px] object-contain"
-                        />
-                        <div
-                            class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                        >
-                            <p class="text-center font-semibold text-white">
-                                {{ template.section_name }}
-                            </p>
+            <div class="space-y-12">
+                @for (section of emailTemplatesBySection(); track section.sectionName) {
+                    <section>
+                        <h3 class="mb-4 font-bold">{{ section.sectionName }}</h3>
+                        <div class="scrollbar-hidden flex w-full gap-4 overflow-x-auto">
+                            @for (template of section.templates; track template.id) {
+                                <button
+                                    (click)="showEmailDetails(template.id)"
+                                    class="group relative shrink-0 overflow-hidden rounded-xl border border-black/10 bg-gray-100 transition-all duration-300 hover:shadow-lg"
+                                >
+                                    <img
+                                        [src]="template.thumbnail_url"
+                                        [alt]="template.section_name"
+                                        width="200"
+                                        class="aspect-[3/4] w-full max-w-[300px] object-contain"
+                                    />
+                                    <div
+                                        class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                                    >
+                                        <p class="text-center font-semibold text-white">
+                                            {{ template.section_name }}
+                                        </p>
+                                    </div>
+                                </button>
+                            }
                         </div>
-                    </button>
-                    }
-                </div>
-            </section>
-            }
-        </div>
+                    </section>
+                }
+            </div>
         }
     </div>
 </div>

@@ -6,36 +6,33 @@
         - captured at a moment in time. Compare, track, and share how your product evolves.
     </p>
     @if (releases.length > 0) {
-    <p-button
-        label="New Release"
-        icon="pi pi-plus"
-        iconPos="left"
-        class="shrink-0"
-        (onClick)="openNewReleaseDialog()"
-    />
+        <p-button
+            label="New Release"
+            icon="pi pi-plus"
+            iconPos="left"
+            class="shrink-0"
+            (onClick)="openNewReleaseDialog()"
+        />
     }
 </div>
-
-@if (releases.length === 0) {
-<app-empty-state
-    icon="pi-list-check"
-    title="No releases yet"
-    subtitle="Get started by creating your very first release."
->
-    <p-button
-        icon="pi pi-plus"
-        label="New Release"
-        size="large"
-        (onClick)="openNewReleaseDialog()"
-    />
-</app-empty-state>
-} @else {
 <section class="grid grid-cols-1 gap-6">
     @for (release of releases; track release.version) {
-    <app-release-card [release]="release" />
+        <app-release-card [release]="release" />
+    } @empty {
+        <app-empty-state
+            icon="pi-list-check"
+            title="No releases yet"
+            subtitle="Get started by creating your very first release."
+        >
+            <p-button
+                icon="pi pi-plus"
+                label="New Release"
+                size="large"
+                (onClick)="openNewReleaseDialog()"
+            />
+        </app-empty-state>
     }
 </section>
-}
 
 <app-new-release-dialog
     [visible]="showNewReleaseDialog()"

@@ -5,15 +5,15 @@
     </div>
 
     @if (release().tags.length) {
-    <div class="flex items-center gap-2 text-caption">
-        <i class="pi pi-tag text-[16px] text-gray-700"></i>
-        @for (tag of release().tags; track tag) {
-        <p-chip
-            [label]="tag"
-            class="rounded-full bg-brand-100 px-2 py-1.5 text-xs font-semibold text-brand-700"
-        />
-        }
-    </div>
+        <div class="flex items-center gap-2 text-caption">
+            <i class="pi pi-tag text-[16px] text-gray-700"></i>
+            @for (tag of release().tags; track tag) {
+                <p-chip
+                    [label]="tag"
+                    class="rounded-full bg-brand-100 px-2 py-1.5 text-xs font-semibold text-brand-700"
+                />
+            }
+        </div>
     }
 
     <footer

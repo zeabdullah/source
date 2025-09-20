@@ -5,37 +5,38 @@
         <div class="flex-1">
             <h3 class="mb-2 text-h4 font-bold text-gray-900">{{ audit().name }}</h3>
             @if (audit().description) {
-            <p class="text-body/normal text-gray-600 mb-4">{{ audit().description }}</p>
+                <p class="text-body/normal text-gray-600 mb-4">{{ audit().description }}</p>
             }
 
             <div class="mb-4 flex items-center gap-2">
                 <p-tag [value]="statusLabel()" [severity]="statusSeverity()" />
                 @if (audit().overall_score !== null) {
-                <span class="text-sm font-medium text-gray-500">
-                    Score: {{ audit().overall_score }}/10
-                </span>
+                    <span class="text-sm font-medium text-gray-500">
+                        Score: {{ audit().overall_score }}/10
+                    </span>
                 }
             </div>
 
             <div class="mb-4 text-sm text-gray-500">
                 <p>
-                    {{ audit().screens?.length || 0 }} screen{{ audit().screens?.length !== 1 ? 's'
-                    : '' }}
+                    {{ audit().screens.length || 0 }} screen{{
+                        audit().screens.length !== 1 ? 's' : ''
+                    }}
                 </p>
-                <p>Created {{ audit().created_at | date:'short' }}</p>
+                <p>Created {{ audit().created_at | date: 'short' }}</p>
             </div>
         </div>
 
         <div class="flex items-center gap-2">
             @if (canExecute()) {
-            <p-button
-                icon="pi pi-play"
-                size="small"
-                variant="outlined"
-                severity="secondary"
-                (onClick)="executeAudit()"
-                styleClass="opacity-0 group-hover:opacity-100 transition-opacity"
-            />
+                <p-button
+                    icon="pi pi-play"
+                    size="small"
+                    variant="outlined"
+                    severity="secondary"
+                    (onClick)="executeAudit()"
+                    styleClass="opacity-0 group-hover:opacity-100 transition-opacity"
+                />
             }
 
             <p-menu [model]="menuItemsList" [popup]="true" #menu appendTo="body" />
@@ -50,12 +51,12 @@
     </div>
 
     @if (audit().status === 'processing') {
-    <div class="absolute inset-0 flex items-center justify-center bg-white/80">
-        <div class="flex flex-col items-center gap-2">
-            <p-progress-spinner strokeWidth="3" styleClass="w-8 h-8" />
-            <span class="text-gray-600 text-sm font-medium">Processing...</span>
+        <div class="absolute inset-0 flex items-center justify-center bg-white/80">
+            <div class="flex flex-col items-center gap-2">
+                <p-progress-spinner strokeWidth="3" styleClass="w-8 h-8" />
+                <span class="text-gray-600 text-sm font-medium">Processing...</span>
+            </div>
         </div>
-    </div>
     }
 </div>
 

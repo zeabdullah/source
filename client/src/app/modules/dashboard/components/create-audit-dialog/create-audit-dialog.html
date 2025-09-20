@@ -28,11 +28,13 @@
                     [invalid]="auditForm.get('name')?.invalid && auditForm.get('name')?.touched"
                 />
                 @if (auditForm.get('name')?.invalid && auditForm.get('name')?.touched) {
-                <p-message severity="error" variant="simple">
-                    @if (auditForm.get('name')?.errors?.['required']) { Name is required } @else if
-                    (auditForm.get('name')?.errors?.['maxlength']) { Name must be less than 255
-                    characters }
-                </p-message>
+                    <p-message severity="error" variant="simple">
+                        @if (auditForm.get('name')?.errors?.['required']) {
+                            Name is required
+                        } @else if (auditForm.get('name')?.errors?.['maxlength']) {
+                            Name must be less than 255 characters
+                        }
+                    </p-message>
                 }
             </div>
         </div>
@@ -62,17 +64,21 @@
                     [filter]="true"
                     [showClear]="true"
                     fluid
-                    [invalid]="auditForm.get('screen_ids')?.invalid && auditForm.get('screen_ids')?.touched"
+                    [invalid]="
+                        auditForm.get('screen_ids')?.invalid && auditForm.get('screen_ids')?.touched
+                    "
                     appendTo="body"
                 />
                 @if (auditForm.get('screen_ids')?.invalid && auditForm.get('screen_ids')?.touched) {
-                <p-message severity="error" variant="simple">
-                    @if (auditForm.get('screen_ids')?.errors?.['required']) { Please select at least
-                    2 screens } @else if (auditForm.get('screen_ids')?.errors?.['minlength']) {
-                    Please select at least 2 screens } @else if
-                    (auditForm.get('screen_ids')?.errors?.['maxlength']) { Please select no more
-                    than 7 screens }
-                </p-message>
+                    <p-message severity="error" variant="simple">
+                        @if (auditForm.get('screen_ids')?.errors?.['required']) {
+                            Please select at least 2 screens
+                        } @else if (auditForm.get('screen_ids')?.errors?.['minlength']) {
+                            Please select at least 2 screens
+                        } @else if (auditForm.get('screen_ids')?.errors?.['maxlength']) {
+                            Please select no more than 7 screens
+                        }
+                    </p-message>
                 }
             </div>
             <p class="text-sm text-gray-500">

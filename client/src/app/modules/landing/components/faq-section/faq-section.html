@@ -8,13 +8,13 @@
         <!-- FAQ List -->
         <div class="space-y-5">
             @for (faq of faqs; track $index) {
-            <app-faq-accordion
-                class="block"
-                [question]="faq.question"
-                [answer]="faq.answer"
-                [isOpen]="$index === openFaqIndex()"
-                (toggled)="toggleFaq($index)"
-            />
+                <app-faq-accordion
+                    class="block"
+                    [question]="faq.question"
+                    [answer]="faq.answer"
+                    [isOpen]="$index === openFaqIndex()"
+                    (toggled)="toggleFaq($index)"
+                />
             }
         </div>
     </div>

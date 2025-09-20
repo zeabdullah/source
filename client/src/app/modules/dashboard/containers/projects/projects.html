@@ -2,41 +2,45 @@
     <header class="mb-12 flex items-center justify-between gap-4">
         <h1 class="text-h1 font-extrabold tracking-tighter">Welcome, Abdullah</h1>
         @if (projects().length !== 0) {
-        <p-button
-            icon="pi pi-plus"
-            label="New Project"
-            class="shrink-0"
-            (onClick)="showDialog = true"
-        />
+            <p-button
+                icon="pi pi-plus"
+                label="New Project"
+                class="shrink-0"
+                (onClick)="showDialog = true"
+            />
         }
     </header>
 
     @if (isLoading()) {
-    <div class="flex items-center justify-center py-8">
-        <p-progress-spinner ariaLabel="loading projects" class="text-brand-500" strokeWidth="4" />
-    </div>
-    } @else if (projects().length === 0) {
-    <app-empty-state
-        icon="pi-folder-open"
-        title="No projects yet"
-        subtitle="Start by creating your first project to bring all your flows together in one place."
-    >
-        <p-button
-            icon="pi pi-plus"
-            label="New Project"
-            size="large"
-            (onClick)="showDialog = true"
-        />
-    </app-empty-state>
-    } @else {
-    <section>
-        <h2 class="mb-8 text-h3 font-bold">Recents</h2>
-        <div class="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-6 lg:gap-8">
-            @for (project of projects(); track project.id) {
-            <app-project-card [project]="project" />
-            }
+        <div class="flex items-center justify-center py-8">
+            <p-progress-spinner
+                ariaLabel="loading projects"
+                class="text-brand-500"
+                strokeWidth="4"
+            />
         </div>
-    </section>
+    } @else {
+        <section>
+            <h2 class="mb-8 text-h3 font-bold">Recents</h2>
+            <div class="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-6 lg:gap-8">
+                @for (project of projects(); track project.id) {
+                    <app-project-card [project]="project" />
+                } @empty {
+                    <app-empty-state
+                        icon="pi-folder-open"
+                        title="No projects yet"
+                        subtitle="Start by creating your first project to bring all your flows together in one place."
+                    >
+                        <p-button
+                            icon="pi pi-plus"
+                            label="New Project"
+                            size="large"
+                            (onClick)="showDialog = true"
+                        />
+                    </app-empty-state>
+                }
+            </div>
+        </section>
     }
 </main>
 
@@ -71,7 +75,7 @@
                     [invalid]="projectForm.get('name')?.invalid && projectForm.get('name')?.touched"
                 />
                 @if (projectForm.get('name')?.invalid && projectForm.get('name')?.touched) {
-                <p-message severity="error" variant="simple">Required</p-message>
+                    <p-message severity="error" variant="simple">Required</p-message>
                 }
             </div>
         </div>

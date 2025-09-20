@@ -18,10 +18,11 @@ import { Audit } from '~/shared/interfaces/modules/dashboard/shared/interfaces/a
 import { AuditCard } from '../../components/audit-card/audit-card'
 import { CreateAuditDialog } from '../../components/create-audit-dialog/create-audit-dialog'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
+import { NgClass } from '@angular/common'
 
 @Component({
     selector: 'app-audits',
-    imports: [Button, ProgressSpinner, Toast, AuditCard, CreateAuditDialog, EmptyState],
+    imports: [Button, ProgressSpinner, Toast, AuditCard, CreateAuditDialog, EmptyState, NgClass],
     providers: [MessageService],
     templateUrl: './audits.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

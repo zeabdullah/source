@@ -2,9 +2,9 @@
     <h1 class="mb-14 text-center text-h2 font-bold tracking-tight">Join us. Create an account</h1>
 
     @if (errorMessage()) {
-    <div class="mb-4">
-        <p-message severity="error"> {{ errorMessage() }} </p-message>
-    </div>
+        <div class="mb-4">
+            <p-message severity="error">{{ errorMessage() }}</p-message>
+        </div>
     }
 
     <form class="mb-8 space-y-8" [formGroup]="registerFb" (ngSubmit)="register()">
@@ -22,7 +22,7 @@
                     [invalid]="isInvalid('name')"
                 />
                 @if (isInvalid('name')) {
-                <p-message severity="error" variant="simple">Required</p-message>
+                    <p-message severity="error" variant="simple">Required</p-message>
                 }
             </div>
             <div class="flex flex-col gap-1">
@@ -38,10 +38,13 @@
                     [invalid]="isInvalid('email')"
                 />
                 @if (isInvalid('email')) {
-                <p-message severity="error" variant="simple">
-                    {{ registerFb.get('email')?.getError('email') ? 'Must be a valid email' :
-                    'Required' }}
-                </p-message>
+                    <p-message severity="error" variant="simple">
+                        {{
+                            registerFb.get('email')?.getError('email')
+                                ? 'Must be a valid email'
+                                : 'Required'
+                        }}
+                    </p-message>
                 }
             </div>
             <div class="flex flex-col gap-1">
@@ -56,10 +59,14 @@
                     [invalid]="isInvalid('password')"
                 />
                 @if (isInvalid('password')) {
-                <p-message severity="error" variant="simple">
-                    {{ registerFb.get('password')?.getError('required') ? 'Required' : `Must be at
-                    least 8 characters long` }}
-                </p-message>
+                    <p-message severity="error" variant="simple">
+                        {{
+                            registerFb.get('password')?.getError('required')
+                                ? 'Required'
+                                : `Must be at
+                    least 8 characters long`
+                        }}
+                    </p-message>
                 }
             </div>
             <div class="flex flex-col gap-1">
@@ -74,10 +81,13 @@
                     [invalid]="isInvalid('password_confirmation')"
                 />
                 @if (isInvalid('password_confirmation')) {
-                <p-message severity="error" variant="simple"
-                    >{{ registerFb.get('password_confirmation')?.getError('passwordMismatch') ?
-                    'Passwords must match' : 'Required' }}</p-message
-                >
+                    <p-message severity="error" variant="simple">
+                        {{
+                            registerFb.get('password_confirmation')?.getError('passwordMismatch')
+                                ? 'Passwords must match'
+                                : 'Required'
+                        }}
+                    </p-message>
                 }
             </div>
         </fieldset>
@@ -89,6 +99,7 @@
 
     <div class="text-center text-button text-gray-700">
         Already have an account?
-        <a routerLink="/auth/login" class="font-bold text-brand-500 hover:underline">Sign in</a>.
+        <a routerLink="/auth/login" class="font-bold text-brand-500 hover:underline">Sign in</a>
+        .
     </div>
 </div>

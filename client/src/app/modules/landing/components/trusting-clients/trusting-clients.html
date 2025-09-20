@@ -10,9 +10,9 @@
         <!-- Client Logos -->
         <div class="flex items-center justify-between gap-8 opacity-50">
             @for (client of clients; track client.name) {
-            <div class="flex-shrink-0">
-                <div [innerHTML]="client.logo" class="h-10"></div>
-            </div>
+                <div class="flex-shrink-0">
+                    <div [innerHTML]="client.logo" class="h-10"></div>
+                </div>
             }
         </div>
     </div>

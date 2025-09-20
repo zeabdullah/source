@@ -7,7 +7,7 @@ import {
     output,
     signal,
 } from '@angular/core'
-import { DatePipe } from '@angular/common'
+import { DatePipe, NgClass } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { catchError, of } from 'rxjs'
 import { Button } from 'primeng/button'
@@ -38,6 +38,7 @@ import { HttpErrorResponse } from '@angular/common/http'
         InputText,
         ProgressSpinner,
         Toast,
+        NgClass,
     ],
     providers: [MessageService],
     templateUrl: './brevo-template-selector.html',

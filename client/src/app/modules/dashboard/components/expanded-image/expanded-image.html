@@ -1,9 +1,5 @@
-@let currentItem = item(); @if (currentItem) {
-<div class="ms-[10%] me-auto flex h-screen w-fit max-w-1/2 flex-col gap-4 py-4 text-center">
-    <img
-        [src]="currentItem.image"
-        [alt]="currentItem.name"
-        class="h-full w-auto flex-1 object-contain"
-    />
-</div>
+@if (item()) {
+    <div class="ms-[10%] me-auto flex h-screen w-fit max-w-1/2 flex-col gap-4 py-4 text-center">
+        <img [src]="item().image" [alt]="item().name" class="h-full w-auto flex-1 object-contain" />
+    </div>
 }
