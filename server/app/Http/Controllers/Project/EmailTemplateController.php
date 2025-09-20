@@ -99,33 +99,6 @@ class EmailTemplateController extends Controller
             return $this->serverErrorResponse(message: 'Failed to get email template: ' . $th->getMessage());
         }
     }
-    /**
-     * @OA\Get(
-     *     path="/email-templates/{emailTemplateId}",
-     *     summary="Get email template by ID (basic)",
-     *     description="Get a specific email template by its ID without project context",
-     *     tags={"Email Templates"},
-     *     security={{"sanctum": {}}},
-     *     @OA\Parameter(
-     *         name="emailTemplateId",
-     *         in="path",
-     *         description="Email template ID",
-     *         required=true,
-     *         @OA\Schema(type="string", example="1")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Email template data",
-     *         @OA\JsonContent(ref="#/components/schemas/EmailTemplate")
-     *     ),
-     *     @OA\Response(response=404, description="Email template not found"),
-     *     @OA\Response(response=500, description="Server error")
-     * )
-     */
-    public function getEmailTemplateByIdBasic(Request $request, string $emailTemplateId): JsonResponse
-    {
-        return $this->getEmailTemplateById($request, '', $emailTemplateId);
-    }
 
     /**
      * @OA\Put(

@@ -187,34 +187,6 @@ class ScreenController extends Controller
     }
 
     /**
-     * @OA\Get(
-     *     path="/basic/screens/{screenId}",
-     *     summary="Get screen by ID (Basic)",
-     *     description="Get a specific screen by its ID without project context",
-     *     tags={"Screens"},
-     *     security={{"basic_auth": {}}},
-     *     @OA\Parameter(
-     *         name="screenId",
-     *         in="path",
-     *         description="Screen ID",
-     *         required=true,
-     *         @OA\Schema(type="string", example="1")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Screen data",
-     *         @OA\JsonContent(ref="#/components/schemas/Screen")
-     *     ),
-     *     @OA\Response(response=404, description="Screen not found"),
-     *     @OA\Response(response=500, description="Server error")
-     * )
-     */
-    public function getScreenByIdBasic(Request $request, string $screenId): JsonResponse
-    {
-        return $this->getScreenById($request, '', $screenId);
-    }
-
-    /**
      * @OA\Put(
      *     path="/projects/{projectId}/screens/{screenId}",
      *     summary="Update screen",
