@@ -8,7 +8,7 @@ import { Drawer } from 'primeng/drawer'
 import { TabsModule } from 'primeng/tabs'
 import { MessageService } from '~/core/services/message.service'
 import { SelectOption } from '~/shared/interfaces/select-option.interface'
-import { Screen } from '~/modules/dashboard/containers/projects/shared/interfaces/screen.interface'
+import { ScreenData } from '~/modules/dashboard/containers/projects/shared/interfaces/screen.interface'
 import { CommentsPanel } from '../../components/comments-panel/comments-panel'
 import { AiChatPanel } from '../../components/ai-chat-panel/ai-chat-panel'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
@@ -47,7 +47,7 @@ export class Screens {
     selectedDevice = signal<(typeof this.devices)[number]['value']>('iphone_15')
     selectedRelease = signal<(typeof this.releases)[number]['value']>('all')
     shownScreenId = signal<number | null>(null)
-    screens = signal<Screen[]>([])
+    screens = signal<ScreenData[]>([])
     isLoading = signal<boolean>(true)
 
     drawerVisible = false
@@ -75,7 +75,7 @@ export class Screens {
                 acc[sectionName].push(screen)
                 return acc
             },
-            {} as Record<string, Screen[]>,
+            {} as Record<string, ScreenData[]>,
         )
 
         return Object.entries(grouped).map(([sectionName, screens]) => ({
@@ -87,14 +87,14 @@ export class Screens {
     loadScreens(projectId: string) {
         this.isLoading.set(true)
         this.http
-            .get<LaravelApiResponse<Screen[]>>(`/api/projects/${projectId}/screens`)
+            .get<LaravelApiResponse<ScreenData[]>>(`/api/projects/${projectId}/screens`)
             .pipe(
                 catchError(err => {
                     this.message.error(
                         'Error',
                         `Failed to load screens. ${err.error?.message || err.message}`,
                     )
-                    return of<LaravelApiResponse<Screen[]>>({ message: '', payload: [] })
+                    return of<LaravelApiResponse<ScreenData[]>>({ message: '', payload: [] })
                 }),
             )
             .subscribe(response => {

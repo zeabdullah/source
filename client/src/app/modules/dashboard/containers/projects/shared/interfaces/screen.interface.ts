@@ -1,4 +1,4 @@
-export interface Screen {
+export interface ScreenData {
     id: number
     project_id: number
     section_name: string | null

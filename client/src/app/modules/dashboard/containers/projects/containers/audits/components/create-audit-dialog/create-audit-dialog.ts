@@ -20,7 +20,7 @@ import { MessageService } from '~/core/services/message.service'
 import { HttpClient } from '@angular/common/http'
 import { catchError, finalize, of } from 'rxjs'
 import { AuditRepository } from '~/modules/dashboard/containers/projects/containers/audits/shared/repositories/audit.repository'
-import { Screen } from '~/modules/dashboard/containers/projects/shared/interfaces/screen.interface'
+import { ScreenData } from '~/modules/dashboard/containers/projects/shared/interfaces/screen.interface'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { CreateAuditRequest } from '../../shared/interfaces/audit.interface'
@@ -45,7 +45,7 @@ export class CreateAuditDialog implements OnInit {
 
     auditCreated = output<void>()
 
-    private screens = signal<Screen[]>([])
+    private screens = signal<ScreenData[]>([])
     private isLoading = signal(false)
     private isSubmitting = signal(false)
 
@@ -74,7 +74,7 @@ export class CreateAuditDialog implements OnInit {
     private loadScreens() {
         this.isLoading.set(true)
         this.http
-            .get<LaravelApiResponse<Screen[]>>(`/api/projects/${this.projectId()}/screens`)
+            .get<LaravelApiResponse<ScreenData[]>>(`/api/projects/${this.projectId()}/screens`)
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
                 catchError(err => {
@@ -82,7 +82,7 @@ export class CreateAuditDialog implements OnInit {
                         'Error',
                         `Failed to load screens. ${err.error?.message || err.message}`,
                     )
-                    return of<LaravelApiResponse<Screen[]>>({ message: '', payload: [] })
+                    return of<LaravelApiResponse<ScreenData[]>>({ message: '', payload: [] })
                 }),
                 finalize(() => this.isLoading.set(false)),
             )
