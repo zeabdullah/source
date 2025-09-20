@@ -3,19 +3,18 @@ import { Button } from 'primeng/button'
 import { ReleaseCard } from '../../components/release-card/release-card'
 import { NewReleaseDialog } from '../../components/new-release-dialog/new-release-dialog'
 import { Release } from '../../shared/interfaces/release.interface'
-import { MessageService } from 'primeng/api'
+import { MessageService } from '~/core/services/message.service'
 import { Toast } from 'primeng/toast'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
 
 @Component({
     selector: 'app-releases',
     imports: [Button, ReleaseCard, NewReleaseDialog, Toast, EmptyState],
-    providers: [MessageService],
     templateUrl: './releases.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Releases {
-    messageService = inject(MessageService)
+    message = inject(MessageService)
     showNewReleaseDialog = signal(false)
 
     releases: Release[] = [
@@ -48,12 +47,7 @@ export class Releases {
 
     addNewRelease(release: Release) {
         this.releases.unshift(release)
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Release created successfully',
-            life: 4000,
-        })
+        this.message.success('Success', 'Release created successfully')
     }
 
     openNewReleaseDialog() {

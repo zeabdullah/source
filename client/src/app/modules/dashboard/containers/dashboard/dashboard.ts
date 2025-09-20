@@ -1,5 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core'
+import {
+    ChangeDetectionStrategy,
+    Component,
+    inject,
+    signal,
+    OnInit,
+    DestroyRef,
+} from '@angular/core'
 import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { InputIcon } from 'primeng/inputicon'
 import { IconField } from 'primeng/iconfield'
 import { InputText } from 'primeng/inputtext'
@@ -14,7 +22,8 @@ import { AuthService } from '~/core/services/auth.service'
     templateUrl: './dashboard.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
+    destroyRef = inject(DestroyRef)
     protected router = inject(Router)
     protected activatedRoute = inject(ActivatedRoute)
     protected authService = inject(AuthService)
@@ -22,8 +31,8 @@ export class Dashboard {
 
     protected user = this.authService.getUser()
 
-    constructor() {
-        this.router.events.subscribe(event => {
+    ngOnInit() {
+        this.router.events.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(event => {
             if (event instanceof NavigationEnd) {
                 this.isInsideProject.set(
                     Boolean(
@@ -33,6 +42,9 @@ export class Dashboard {
             }
         })
 
-        this.authService.checkIfAuthenticated().subscribe()
+        this.authService
+            .checkIfAuthenticated()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe()
     }
 }

@@ -1,28 +1,37 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core'
+import {
+    ChangeDetectionStrategy,
+    Component,
+    computed,
+    DestroyRef,
+    inject,
+    OnInit,
+    signal,
+} from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { catchError, finalize, of } from 'rxjs'
 import { Button } from 'primeng/button'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { Tag } from 'primeng/tag'
 import { Card } from 'primeng/card'
 import { Toast } from 'primeng/toast'
-import { MessageService } from 'primeng/api'
-import { catchError, finalize, of } from 'rxjs'
-import { AuditService } from '~/core/services/audit.service'
+import { MessageService } from '~/core/services/message.service'
+import { AuditRepository } from '~/core/repositories/audit.repository'
 import { Audit } from '~/shared/interfaces/modules/dashboard/shared/interfaces/audit.interface'
 import { AuditIssue } from '~/shared/interfaces/modules/dashboard/shared/interfaces/audit-issue.interface'
 
 @Component({
     selector: 'app-audit-details',
     imports: [Button, ProgressSpinner, Tag, Card, Toast],
-    providers: [MessageService],
     templateUrl: './audit-details.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: { class: 'flex flex-1 flex-col' },
 })
 export class AuditDetails implements OnInit {
-    private auditService = inject(AuditService)
+    private auditRepository = inject(AuditRepository)
     private route = inject(ActivatedRoute)
-    private messageService = inject(MessageService)
+    private message = inject(MessageService)
+    destroyRef = inject(DestroyRef)
 
     private audit = signal<Audit | null>(null)
     private isLoading = signal(false)
@@ -85,17 +94,13 @@ export class AuditDetails implements OnInit {
 
     loadAudit() {
         this.isLoading.set(true)
-        this.auditService
+        this.auditRepository
             .getAudit(this.projectId(), this.auditId())
             .pipe(
+                takeUntilDestroyed(this.destroyRef),
                 catchError(error => {
                     console.error('Failed to load audit:', error)
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to load audit details. Please try again.',
-                        life: 5000,
-                    })
+                    this.message.error('Error', 'Failed to load audit details. Please try again.')
                     return of({ message: '', payload: null })
                 }),
                 finalize(() => this.isLoading.set(false)),

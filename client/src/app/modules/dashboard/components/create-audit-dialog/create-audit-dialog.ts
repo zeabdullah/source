@@ -7,6 +7,7 @@ import {
     OnInit,
     output,
     signal,
+    DestroyRef,
 } from '@angular/core'
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
 import { Dialog } from 'primeng/dialog'
@@ -15,27 +16,28 @@ import { InputText } from 'primeng/inputtext'
 import { Textarea } from 'primeng/textarea'
 import { MultiSelect } from 'primeng/multiselect'
 import { Message } from 'primeng/message'
-import { MessageService } from 'primeng/api'
+import { MessageService } from '~/core/services/message.service'
 import { HttpClient } from '@angular/common/http'
 import { catchError, finalize, of } from 'rxjs'
-import { AuditService } from '~/core/services/audit.service'
+import { AuditRepository } from '~/core/repositories/audit.repository'
 import { CreateAuditRequest } from '~/shared/interfaces/modules/dashboard/shared/interfaces/audit.interface'
 import { Screen } from '~/modules/dashboard/shared/interfaces/screen.interface'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 
 @Component({
     selector: 'app-create-audit-dialog',
     imports: [Dialog, Button, InputText, Textarea, MultiSelect, Message, ReactiveFormsModule],
-    providers: [MessageService],
     templateUrl: './create-audit-dialog.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: { class: 'block' },
 })
 export class CreateAuditDialog implements OnInit {
-    private auditService = inject(AuditService)
+    private auditRepository = inject(AuditRepository)
     private fb = inject(FormBuilder)
-    private messageService = inject(MessageService)
+    private message = inject(MessageService)
     private http = inject(HttpClient)
+    destroyRef = inject(DestroyRef)
 
     visible = input<boolean>(false)
     visibleChange = output<boolean>()
@@ -74,16 +76,14 @@ export class CreateAuditDialog implements OnInit {
         this.http
             .get<LaravelApiResponse<Screen[]>>(`/api/projects/${this.projectId()}/screens`)
             .pipe(
+                takeUntilDestroyed(this.destroyRef),
                 catchError(err => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to load screens. ' + err.message,
-                        life: 10_000,
-                    })
+                    this.message.error(
+                        'Error',
+                        `Failed to load screens. ${err.error?.message || err.message}`,
+                    )
                     return of<LaravelApiResponse<Screen[]>>({ message: '', payload: [] })
                 }),
-
                 finalize(() => this.isLoading.set(false)),
             )
             .subscribe(response => {
@@ -108,39 +108,33 @@ export class CreateAuditDialog implements OnInit {
     }
 
     onSubmit() {
-        if (this.auditForm.valid) {
-            this.isSubmitting.set(true)
-            const formData = this.auditForm.value as CreateAuditRequest
-
-            this.auditService
-                .createAudit(this.projectId(), formData)
-                .pipe(
-                    catchError(error => {
-                        console.error('Failed to create audit:', error)
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Error',
-                            detail: 'Failed to create audit. Please try again.',
-                            life: 5000,
-                        })
-                        return of({ message: '', payload: null })
-                    }),
-                    finalize(() => this.isSubmitting.set(false)),
-                )
-                .subscribe(response => {
-                    if (response.payload) {
-                        this.auditCreated.emit()
-                        this.onVisibleChange(false)
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Success',
-                            detail: 'Audit created successfully',
-                            life: 3000,
-                        })
-                    }
-                })
-        } else {
+        if (!this.auditForm.valid) {
             this.auditForm.markAllAsTouched()
+            return
         }
+
+        this.isSubmitting.set(true)
+        const formData = this.auditForm.value as CreateAuditRequest
+
+        this.auditRepository
+            .createAudit(this.projectId(), formData)
+            .pipe(
+                takeUntilDestroyed(this.destroyRef),
+                catchError(err => {
+                    this.message.error(
+                        'Error',
+                        `Failed to create audit. ${err.error?.message || err.message}`,
+                    )
+                    return of({ message: '', payload: null })
+                }),
+                finalize(() => this.isSubmitting.set(false)),
+            )
+            .subscribe(response => {
+                if (response.payload) {
+                    this.auditCreated.emit()
+                    this.onVisibleChange(false)
+                    this.message.success('Success', 'Audit created successfully')
+                }
+            })
     }
 }

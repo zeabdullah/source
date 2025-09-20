@@ -9,7 +9,7 @@ import {
 } from '~/modules/dashboard/shared/interfaces/brevo-template.interface'
 
 @Injectable({ providedIn: 'root' })
-export class BrevoService {
+export class BrevoRepository {
     protected http = inject(HttpClient)
 
     /**

@@ -8,7 +8,7 @@ type StoreBrevoTokenResponse = LaravelApiResponse<null>
 type DeleteTokenResponse = LaravelApiResponse<null>
 
 @Injectable({ providedIn: 'root' })
-export class UserService {
+export class UserRepository {
     protected http = inject(HttpClient)
 
     storeFigmaToken(token: string): Observable<StoreFigmaTokenResponse> {

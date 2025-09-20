@@ -5,7 +5,7 @@ import { catchError, of } from 'rxjs'
 import { Select } from 'primeng/select'
 import { Drawer } from 'primeng/drawer'
 import { TabsModule } from 'primeng/tabs'
-import { MessageService } from 'primeng/api'
+import { MessageService } from '~/core/services/message.service'
 import { SelectOption } from '~/modules/dashboard/shared/interfaces/select-option.interface'
 import { Screen } from '~/modules/dashboard/shared/interfaces/screen.interface'
 import { ExpandedImage } from '../../components/expanded-image/expanded-image'
@@ -17,7 +17,6 @@ import { FormsModule } from '@angular/forms'
 @Component({
     selector: 'app-screens',
     imports: [Select, Drawer, FormsModule, TabsModule, ExpandedImage, CommentsPanel, AiChatPanel],
-    providers: [MessageService],
     templateUrl: './screens.html',
     styles: `
         ::ng-deep .p-drawer-content {
@@ -31,7 +30,7 @@ import { FormsModule } from '@angular/forms'
 export class Screens {
     http = inject(HttpClient)
     route = inject(ActivatedRoute)
-    messageService = inject(MessageService)
+    message = inject(MessageService)
 
     releases = [
         { name: 'All', value: 'all' },
@@ -91,12 +90,10 @@ export class Screens {
             .get<LaravelApiResponse<Screen[]>>(`/api/projects/${projectId}/screens`)
             .pipe(
                 catchError(err => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to load screens. ' + err.message,
-                        life: 10_000,
-                    })
+                    this.message.error(
+                        'Error',
+                        `Failed to load screens. ${err.error?.message || err.message}`,
+                    )
                     return of<LaravelApiResponse<Screen[]>>({ message: '', payload: [] })
                 }),
             )

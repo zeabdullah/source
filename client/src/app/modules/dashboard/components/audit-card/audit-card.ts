@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core'
+import {
+    ChangeDetectionStrategy,
+    Component,
+    computed,
+    DestroyRef,
+    inject,
+    input,
+    output,
+} from '@angular/core'
 import { Router } from '@angular/router'
 import { Button } from 'primeng/button'
 import { Tag } from 'primeng/tag'
@@ -7,24 +15,27 @@ import { MenuItem } from 'primeng/api'
 import { ConfirmDialog } from 'primeng/confirmdialog'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { DatePipe } from '@angular/common'
-import { ConfirmationService, MessageService } from 'primeng/api'
+import { ConfirmationService } from 'primeng/api'
+import { MessageService } from '~/core/services/message.service'
 import { catchError, of } from 'rxjs'
-import { AuditService } from '~/core/services/audit.service'
+import { AuditRepository } from '~/core/repositories/audit.repository'
 import { Audit } from '~/shared/interfaces/modules/dashboard/shared/interfaces/audit.interface'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 
 @Component({
     selector: 'app-audit-card',
     imports: [Button, Tag, Menu, ConfirmDialog, ProgressSpinner, DatePipe],
-    providers: [ConfirmationService, MessageService],
+    providers: [ConfirmationService],
     templateUrl: './audit-card.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: { class: 'block' },
 })
 export class AuditCard {
-    private auditService = inject(AuditService)
+    private auditRepository = inject(AuditRepository)
     private confirmationService = inject(ConfirmationService)
-    private messageService = inject(MessageService)
+    private message = inject(MessageService)
     private router = inject(Router)
+    destroyRef = inject(DestroyRef)
 
     audit = input.required<Audit>()
     projectId = input.required<number>()
@@ -94,17 +105,16 @@ export class AuditCard {
     }
 
     executeAudit() {
-        this.auditService
+        this.auditRepository
             .executeAudit(this.projectId(), this.audit().id)
             .pipe(
-                catchError(error => {
-                    console.error('Failed to execute audit:', error)
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to execute audit. Please try again.',
-                        life: 5000,
-                    })
+                takeUntilDestroyed(this.destroyRef),
+                catchError(err => {
+                    console.error('Failed to execute audit:', err)
+                    this.message.error(
+                        'Error',
+                        `Failed to execute audit: ${err.error?.message || err.message}`,
+                    )
                     return of({ message: '', payload: null })
                 }),
             )
@@ -125,17 +135,16 @@ export class AuditCard {
     }
 
     private deleteAudit() {
-        this.auditService
+        this.auditRepository
             .deleteAudit(this.projectId(), this.audit().id)
             .pipe(
-                catchError(error => {
-                    console.error('Failed to delete audit:', error)
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to delete audit. Please try again.',
-                        life: 5000,
-                    })
+                takeUntilDestroyed(this.destroyRef),
+                catchError(err => {
+                    console.error('Failed to delete audit:', err)
+                    this.message.error(
+                        'Error',
+                        `Failed to delete audit: ${err.error?.message || err.message}`,
+                    )
                     return of({ message: '', payload: null })
                 }),
             )

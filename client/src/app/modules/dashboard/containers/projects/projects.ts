@@ -1,18 +1,27 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core'
+import {
+    ChangeDetectionStrategy,
+    Component,
+    inject,
+    signal,
+    OnInit,
+    DestroyRef,
+} from '@angular/core'
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { Button } from 'primeng/button'
 import { Dialog } from 'primeng/dialog'
 import { InputText } from 'primeng/inputtext'
 import { Textarea } from 'primeng/textarea'
 import { ProjectCard } from '../../components/project-card/project-card'
 import { Message } from 'primeng/message'
-import { MessageService } from 'primeng/api'
 import { Toast } from 'primeng/toast'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { HttpClient } from '@angular/common/http'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 import { catchError, of } from 'rxjs'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
+import { AuthService } from '~/core/services/auth.service'
+import { MessageService } from '~/core/services/message.service'
 
 interface Project {
     id: number
@@ -36,15 +45,18 @@ interface Project {
         ProgressSpinner,
         EmptyState,
     ],
-    providers: [MessageService],
     templateUrl: './projects.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: { class: 'grow' },
 })
-export class Projects {
+export class Projects implements OnInit {
+    authService = inject(AuthService)
     fb = inject(NonNullableFormBuilder)
-    messageService = inject(MessageService)
     http = inject(HttpClient)
+    message = inject(MessageService)
+    destroyRef = inject(DestroyRef)
+
+    user = this.authService.getUser()
     showDialog = false
 
     projectForm = this.fb.group({
@@ -55,7 +67,7 @@ export class Projects {
     projects = signal<Project[]>([])
     isLoading = signal<boolean>(true)
 
-    constructor() {
+    ngOnInit() {
         this.loadProjects()
     }
 
@@ -68,13 +80,12 @@ export class Projects {
         this.http
             .get<LaravelApiResponse<Project[]>>('/api/projects')
             .pipe(
+                takeUntilDestroyed(this.destroyRef),
                 catchError(err => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to load projects. ' + err.message,
-                        life: 4000,
-                    })
+                    this.message.error(
+                        'Error',
+                        `Failed to load projects. ${err.error?.message || err.message}`,
+                    )
                     return of<LaravelApiResponse<Project[]>>({ message: '', payload: [] })
                 }),
             )
@@ -94,15 +105,16 @@ export class Projects {
         formData.append('description', this.projectForm.value.description || '')
 
         this.http
-            .post<LaravelApiResponse<Project>>('/api/projects', formData)
+            .post<LaravelApiResponse<Project>>('/api/projects', {
+                name: this.projectForm.value.name as string,
+            })
             .pipe(
+                takeUntilDestroyed(this.destroyRef),
                 catchError(err => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to create project. ' + err.message,
-                        life: 4000,
-                    })
+                    this.message.error(
+                        'Error',
+                        `Failed to create project. ${err.error?.message || err.message}`,
+                    )
                     return of<LaravelApiResponse<Project>>({ message: '', payload: null })
                 }),
             )
@@ -112,12 +124,7 @@ export class Projects {
                     this.projectForm.reset()
                     this.showDialog = false
 
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Success',
-                        detail: 'Project created successfully',
-                        life: 4000,
-                    })
+                    this.message.success('Success', 'Project created successfully')
                 }
             })
     }

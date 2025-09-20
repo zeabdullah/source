@@ -2,6 +2,7 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
+    DestroyRef,
     inject,
     OnDestroy,
     OnInit,
@@ -11,27 +12,28 @@ import { ActivatedRoute } from '@angular/router'
 import { Button } from 'primeng/button'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { Toast } from 'primeng/toast'
-import { MessageService } from 'primeng/api'
 import { catchError, finalize, interval, of, Subscription, switchMap, takeWhile } from 'rxjs'
-import { AuditService } from '~/core/services/audit.service'
+import { AuditRepository } from '~/core/repositories/audit.repository'
 import { Audit } from '~/shared/interfaces/modules/dashboard/shared/interfaces/audit.interface'
 import { AuditCard } from '../../components/audit-card/audit-card'
 import { CreateAuditDialog } from '../../components/create-audit-dialog/create-audit-dialog'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
 import { NgClass } from '@angular/common'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { MessageService } from '~/core/services/message.service'
 
 @Component({
     selector: 'app-audits',
     imports: [Button, ProgressSpinner, Toast, AuditCard, CreateAuditDialog, EmptyState, NgClass],
-    providers: [MessageService],
     templateUrl: './audits.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: { class: 'flex flex-1 flex-col' },
 })
 export class Audits implements OnInit, OnDestroy {
-    private auditService = inject(AuditService)
+    private auditRepository = inject(AuditRepository)
     private route = inject(ActivatedRoute)
-    private messageService = inject(MessageService)
+    private message = inject(MessageService)
+    destroyRef = inject(DestroyRef)
 
     private audits = signal<Audit[]>([])
     private isLoading = signal(false)
@@ -57,17 +59,13 @@ export class Audits implements OnInit, OnDestroy {
 
     private loadAudits() {
         this.isLoading.set(true)
-        this.auditService
+        this.auditRepository
             .getAudits(this.projectId())
             .pipe(
+                takeUntilDestroyed(this.destroyRef),
                 catchError(error => {
                     console.error('Failed to load audits:', error)
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to load audits. Please try again.',
-                        life: 5000,
-                    })
+                    this.message.error('Error', 'Failed to load audits. Please try again.')
                     return of({ message: '', payload: [] })
                 }),
                 finalize(() => this.isLoading.set(false)),
@@ -84,43 +82,31 @@ export class Audits implements OnInit, OnDestroy {
     onAuditCreated() {
         this.showCreateDialog.set(false)
         this.loadAudits()
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Audit created successfully',
-            life: 3000,
-        })
+        this.message.success('Success', 'Audit created successfully')
     }
 
     onAuditDeleted() {
         this.loadAudits()
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Audit deleted successfully',
-            life: 3000,
-        })
+        this.message.success('Success', 'Audit deleted successfully')
     }
 
     onAuditExecuted() {
         this.loadAudits()
         this.startPolling() // Restart polling when audit is executed
-        this.messageService.add({
-            severity: 'info',
-            summary: 'Processing',
-            detail: 'Audit execution started',
-            life: 3000,
-        })
+        this.message.info('Processing', 'Audit execution started')
     }
 
     private startPolling() {
-        this.stopPolling() // Stop any existing polling first
+        this.stopPolling()
+
         this.pollingSubscription = interval(5000) // Poll in milliseconds
             .pipe(
+                takeUntilDestroyed(this.destroyRef),
                 takeWhile(() => this.hasProcessingAudits()),
-                switchMap(() => this.auditService.getAudits(this.projectId())),
+                switchMap(() => this.auditRepository.getAudits(this.projectId())),
                 catchError(error => {
                     console.error('Polling error:', error)
+                    this.message.error('Error', 'Failed to load audits. Please try again.')
                     return of({ message: '', payload: [] })
                 }),
             )
@@ -141,12 +127,7 @@ export class Audits implements OnInit, OnDestroy {
                 this.audits.set(updatedAudits)
 
                 if (statusChanged) {
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Update',
-                        detail: 'Audit status updated',
-                        life: 3000,
-                    })
+                    this.message.success('Update', 'Audit status updated')
                 }
             })
     }

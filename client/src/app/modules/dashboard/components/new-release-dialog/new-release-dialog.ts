@@ -8,7 +8,6 @@ import { InputText } from 'primeng/inputtext'
 import { Textarea } from 'primeng/textarea'
 import { Message } from 'primeng/message'
 import { MultiSelect } from 'primeng/multiselect'
-import { MessageService } from 'primeng/api'
 import { Release } from '../../shared/interfaces/release.interface'
 import { AutoComplete } from 'primeng/autocomplete'
 
@@ -26,13 +25,11 @@ import { AutoComplete } from 'primeng/autocomplete'
         ReactiveFormsModule,
         Message,
     ],
-    providers: [MessageService],
     templateUrl: './new-release-dialog.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewReleaseDialog {
     fb = inject(NonNullableFormBuilder)
-    messageService = inject(MessageService)
 
     visible = input<boolean>(false)
     visibleChange = output<boolean>()
@@ -61,12 +58,6 @@ export class NewReleaseDialog {
         emails: this.fb.control<number[]>([]),
         compare: this.fb.control('1.2.0'),
     })
-
-    constructor() {
-        this.dialogForm.valueChanges.subscribe(values => {
-            console.log(values)
-        })
-    }
 
     onHide() {
         this.visibleChange.emit(false)

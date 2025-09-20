@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, signal, inject } from '@angular/core'
+import {
+    ChangeDetectionStrategy,
+    Component,
+    computed,
+    signal,
+    inject,
+    DestroyRef,
+} from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute } from '@angular/router'
@@ -8,7 +15,7 @@ import { Button } from 'primeng/button'
 import { Drawer } from 'primeng/drawer'
 import { Select } from 'primeng/select'
 import { TabsModule } from 'primeng/tabs'
-import { MessageService } from 'primeng/api'
+import { MessageService } from '~/core/services/message.service'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { SelectOption } from '~/modules/dashboard/shared/interfaces/select-option.interface'
 import { EmailTemplate } from '../../shared/interfaces/email.interface'
@@ -18,6 +25,7 @@ import { AiChatPanel } from '../../components/ai-chat-panel/ai-chat-panel'
 import { BrevoTemplateSelector } from '../../components/brevo-template-selector/brevo-template-selector'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 
 @Component({
     selector: 'app-email-templates',
@@ -49,7 +57,8 @@ import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.int
 export class EmailTemplates {
     http = inject(HttpClient)
     route = inject(ActivatedRoute)
-    messageService = inject(MessageService)
+    message = inject(MessageService)
+    destroyRef = inject(DestroyRef)
 
     releases = [
         { name: 'All', value: 'all' },
@@ -104,13 +113,12 @@ export class EmailTemplates {
         this.http
             .get<LaravelApiResponse<EmailTemplate[]>>(`/api/projects/${projectId}/email-templates`)
             .pipe(
+                takeUntilDestroyed(this.destroyRef),
                 catchError(err => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to load email templates. ' + err.message,
-                        life: 4000,
-                    })
+                    this.message.error(
+                        'Error',
+                        `Failed to load email templates. ${err.error?.message || err.message}`,
+                    )
                     return of<LaravelApiResponse<EmailTemplate[]>>({ message: '', payload: [] })
                 }),
             )
@@ -147,12 +155,10 @@ export class EmailTemplates {
         const currentTemplates = this.emailTemplates()
         this.emailTemplates.set([...currentTemplates, ...importedTemplates])
 
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Templates Imported',
-            detail: `Successfully imported ${importedTemplates.length} template(s) from Brevo!`,
-            life: 4000,
-        })
+        this.message.success(
+            'Templates Imported',
+            `Successfully imported ${importedTemplates.length} template(s) from Brevo!`,
+        )
     }
 
     getProjectId(): string {

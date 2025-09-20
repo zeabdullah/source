@@ -1,27 +1,36 @@
-import { ChangeDetectionStrategy, Component, input, signal, inject, OnInit } from '@angular/core'
+import {
+    ChangeDetectionStrategy,
+    Component,
+    input,
+    signal,
+    inject,
+    OnInit,
+    DestroyRef,
+} from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { HttpClient } from '@angular/common/http'
 import { catchError, of } from 'rxjs'
 import { Button } from 'primeng/button'
 import { InputText } from 'primeng/inputtext'
-import { MessageService } from 'primeng/api'
+import { MessageService } from '~/core/services/message.service'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { Comment } from '../comment/comment'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 import { CommentData } from '../../shared/interfaces/comment.interface'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 
 @Component({
     selector: 'app-comments-panel',
     imports: [FormsModule, InputText, Button, ProgressSpinner, Comment, EmptyState],
-    providers: [MessageService],
     templateUrl: './comments-panel.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: { class: 'h-full' },
 })
 export class CommentsPanel implements OnInit {
     http = inject(HttpClient)
-    messageService = inject(MessageService)
+    message = inject(MessageService)
+    destroyRef = inject(DestroyRef)
 
     screenId = input<number | undefined>()
     emailTemplateId = input<number | undefined>()
@@ -52,14 +61,13 @@ export class CommentsPanel implements OnInit {
                 `/api/${this.commentType}/${this.commentId}/comments`,
             )
             .pipe(
+                takeUntilDestroyed(this.destroyRef),
                 catchError(err => {
                     console.warn('Failed to load comments:', err)
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to load comments. ' + (err.error?.message || err.message),
-                        life: 10_000,
-                    })
+                    this.message.error(
+                        'Error',
+                        `Failed to load comments. ${err.error?.message || err.message}`,
+                    )
                     return of<LaravelApiResponse<CommentData[]>>({ message: '', payload: [] })
                 }),
             )
@@ -85,14 +93,13 @@ export class CommentsPanel implements OnInit {
                 formData,
             )
             .pipe(
+                takeUntilDestroyed(this.destroyRef),
                 catchError(err => {
                     console.warn('Failed to send comment:', err)
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to send comment. ' + (err.error?.message || err.message),
-                        life: 10_000,
-                    })
+                    this.message.error(
+                        'Error',
+                        `Failed to send comment. ${err.error?.message || err.message}`,
+                    )
                     this.isSubmitting.set(false)
                     return of<LaravelApiResponse<CommentData>>({ message: '', payload: null })
                 }),

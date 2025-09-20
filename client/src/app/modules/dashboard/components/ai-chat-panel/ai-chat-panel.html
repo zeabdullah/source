@@ -9,7 +9,14 @@
         } @else {
             @for (message of messages(); track message.id) {
                 <app-ai-chat-message [message]="message" />
+            } @empty {
+                <app-empty-state
+                    icon="pi pi-sparkles"
+                    title="Start a conversation"
+                    subtitle="Ask questions about this item and get AI-powered insights and suggestions."
+                />
             }
+
             @if (isWaitingForAiResponse()) {
                 <div class="bg-gray-50 flex items-center gap-2 rounded-lg p-3">
                     <p-progress-spinner ariaLabel="AI is typing" strokeWidth="3" class="h-4 w-4" />

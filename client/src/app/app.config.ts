@@ -1,17 +1,19 @@
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http'
 import {
     ApplicationConfig,
+    makeEnvironmentProviders,
     provideBrowserGlobalErrorListeners,
     provideZonelessChangeDetection,
 } from '@angular/core'
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser'
 import { provideRouter } from '@angular/router'
-import { routes } from './app.routes'
-import { baseInterceptor } from './shared/interceptors/base.interceptor'
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
-import { providePrimeNG } from 'primeng/config'
-import { primengPreset } from './primeng.preset'
 import { provideMarkdown } from 'ngx-markdown'
+import { MessageService as PrimeNGMessageService } from 'primeng/api'
+import { providePrimeNG } from 'primeng/config'
+import { baseInterceptor } from './shared/interceptors/base.interceptor'
+import { routes } from './app.routes'
+import { primengPreset } from './primeng.preset'
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -34,5 +36,6 @@ export const appConfig: ApplicationConfig = {
                 },
             },
         }),
+        makeEnvironmentProviders([PrimeNGMessageService]),
     ],
 }

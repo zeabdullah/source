@@ -1,28 +1,37 @@
-import { ChangeDetectionStrategy, Component, input, signal, inject, OnInit } from '@angular/core'
+import {
+    ChangeDetectionStrategy,
+    Component,
+    input,
+    signal,
+    inject,
+    OnInit,
+    DestroyRef,
+} from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { HttpClient } from '@angular/common/http'
 import { catchError, of } from 'rxjs'
 import { Button } from 'primeng/button'
 import { InputText } from 'primeng/inputtext'
-import { MessageService } from 'primeng/api'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { AiChatMessage } from '../ai-chat-message/ai-chat-message'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 import { Toast } from 'primeng/toast'
 import { AiChatMessageData } from '../../shared/interfaces/ai-chat-message-data.interface'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { MessageService } from '~/core/services/message.service'
 
 @Component({
     selector: 'app-ai-chat-panel',
     imports: [FormsModule, InputText, Button, ProgressSpinner, AiChatMessage, Toast, EmptyState],
-    providers: [MessageService],
     templateUrl: './ai-chat-panel.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: { class: 'h-full' },
 })
 export class AiChatPanel implements OnInit {
     http = inject(HttpClient)
-    messageService = inject(MessageService)
+    message = inject(MessageService)
+    destroyRef = inject(DestroyRef)
 
     emailTemplateId = input<number | undefined>()
     screenId = input<number | undefined>()
@@ -53,15 +62,13 @@ export class AiChatPanel implements OnInit {
                 `/api/${this.chatType}/${encodeURIComponent(this.chatId)}/chats`,
             )
             .pipe(
+                takeUntilDestroyed(this.destroyRef),
                 catchError(err => {
                     console.warn('Failed to load chat messages:', err)
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail:
-                            'Failed to load chat. ' + err.error ? err.error.message : err.message,
-                        life: 10_000,
-                    })
+                    this.message.error(
+                        'Error',
+                        `Failed to load chat. ${err.error?.message || err.message}`,
+                    )
                     return of<LaravelApiResponse<AiChatMessageData[]>>({ message: '', payload: [] })
                 }),
             )
@@ -110,15 +117,10 @@ export class AiChatPanel implements OnInit {
             .pipe(
                 catchError(err => {
                     console.warn('Failed to send message:', err)
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail:
-                            'Failed to send message. ' + err.error
-                                ? err.error.message
-                                : err.message,
-                        life: 10_000,
-                    })
+                    this.message.error(
+                        'Error',
+                        `Failed to send message. ${err.error?.message || err.message}`,
+                    )
                     return of<
                         LaravelApiResponse<{
                             user: AiChatMessageData
@@ -146,12 +148,10 @@ export class AiChatPanel implements OnInit {
 
                     // Show success message if template was updated
                     if (response.payload.template_updated) {
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Template Updated',
-                            detail: 'Email template has been updated with AI-generated content!',
-                            life: 4000,
-                        })
+                        this.message.success(
+                            'Template Updated',
+                            'Email template has been updated with AI-generated content!',
+                        )
                     }
                 }
                 this.isWaitingForAiResponse.set(false)

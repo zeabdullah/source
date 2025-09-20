@@ -6,6 +6,7 @@ import {
     input,
     output,
     signal,
+    DestroyRef,
 } from '@angular/core'
 import { DatePipe, NgClass } from '@angular/common'
 import { FormsModule } from '@angular/forms'
@@ -15,16 +16,17 @@ import { Card } from 'primeng/card'
 import { Checkbox } from 'primeng/checkbox'
 import { Dialog } from 'primeng/dialog'
 import { InputText } from 'primeng/inputtext'
-import { MessageService } from 'primeng/api'
+import { MessageService } from '~/core/services/message.service'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { Toast } from 'primeng/toast'
-import { BrevoService } from '~/core/services/brevo.service'
+import { BrevoRepository } from '~/core/repositories/brevo.repository'
 import {
     BrevoTemplate,
     GetBrevoTemplatesResponse,
 } from '../../shared/interfaces/brevo-template.interface'
 import { EmailTemplate } from '../../shared/interfaces/email.interface'
 import { HttpErrorResponse } from '@angular/common/http'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 
 @Component({
     selector: 'app-brevo-template-selector',
@@ -45,8 +47,9 @@ import { HttpErrorResponse } from '@angular/common/http'
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BrevoTemplateSelector {
-    private brevoService = inject(BrevoService)
-    private messageService = inject(MessageService)
+    private brevoRepository = inject(BrevoRepository)
+    private message = inject(MessageService)
+    destroyRef = inject(DestroyRef)
 
     // Inputs
     projectId = input.required<string>()
@@ -106,19 +109,15 @@ export class BrevoTemplateSelector {
 
     loadBrevoTemplates() {
         this.isLoading.set(true)
-        this.brevoService
+        this.brevoRepository
             .getTemplates()
             .pipe(
+                takeUntilDestroyed(this.destroyRef),
                 catchError((err: HttpErrorResponse) => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail:
-                            'Failed to load Brevo templates: ' + err.error
-                                ? err.error.message
-                                : err.message,
-                        life: 4000,
-                    })
+                    this.message.error(
+                        'Error',
+                        `Failed to load Brevo templates: ${err.error?.message || err.message}`,
+                    )
                     return of({ message: '', payload: [] })
                 }),
             )
@@ -156,56 +155,46 @@ export class BrevoTemplateSelector {
 
         if (selectedIds.length === 1) {
             // Single template import
-            this.brevoService.importTemplate(this.projectId(), selectedIds[0]).subscribe({
-                next: response => {
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Success',
-                        detail: 'Template imported successfully!',
-                        life: 4000,
-                    })
-                    this.templatesImported.emit([response.payload!])
-                    this.onVisibleChange(false)
-                },
-                error: (err: HttpErrorResponse) => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail:
-                            'Failed to import template: ' + err.error
-                                ? err.error.message
-                                : err.message,
-                        life: 4000,
-                    })
-                    this.isImporting.set(false)
-                },
-            })
+            this.brevoRepository
+                .importTemplate(this.projectId(), selectedIds[0])
+                .pipe(takeUntilDestroyed(this.destroyRef))
+                .subscribe({
+                    next: response => {
+                        this.message.success('Success', 'Successfully imported template!')
+                        this.templatesImported.emit([response.payload!])
+                        this.onVisibleChange(false)
+                    },
+                    error: (err: HttpErrorResponse) => {
+                        this.message.error(
+                            'Error',
+                            `Failed to import template: ${err.error?.message || err.message}`,
+                        )
+                        this.isImporting.set(false)
+                    },
+                })
         } else {
             // Multiple templates import
-            this.brevoService.importMultipleTemplates(this.projectId(), selectedIds).subscribe({
-                next: response => {
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Success',
-                        detail: `Successfully imported ${response.payload!.length} templates!`,
-                        life: 4000,
-                    })
-                    this.templatesImported.emit(response.payload!)
+            this.brevoRepository
+                .importMultipleTemplates(this.projectId(), selectedIds)
+                .pipe(
+                    takeUntilDestroyed(this.destroyRef),
+                    catchError((err: HttpErrorResponse) => {
+                        this.message.error(
+                            'Error',
+                            `Failed to import templates: ${err.error?.message || err.message}`,
+                        )
+                        this.isImporting.set(false)
+                        return of({ payload: [] })
+                    }),
+                )
+                .subscribe(response => {
+                    this.message.success(
+                        'Success',
+                        `Successfully imported ${response.payload?.length ?? 0} templates!`,
+                    )
+                    this.templatesImported.emit(response.payload ?? [])
                     this.onVisibleChange(false)
-                },
-                error: (err: HttpErrorResponse) => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail:
-                            'Failed to import templates: ' + err.error
-                                ? err.error.message
-                                : err.message,
-                        life: 4000,
-                    })
-                    this.isImporting.set(false)
-                },
-            })
+                })
         }
     }
 
