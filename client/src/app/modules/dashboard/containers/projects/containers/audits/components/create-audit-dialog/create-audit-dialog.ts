@@ -133,7 +133,6 @@ export class CreateAuditDialog implements OnInit {
                 if (response.payload) {
                     this.auditCreated.emit()
                     this.onVisibleChange(false)
-                    this.message.success('Success', 'Audit created successfully')
                 }
             })
     }

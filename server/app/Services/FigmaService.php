@@ -96,11 +96,6 @@ class FigmaService
         }
     }
 
-    public function disconnectFigmaFile(Project $project)
-    {
-        return $project->unregisterFigmaFile();
-    }
-
     /**
      * Validate if a Figma node ID exists and fetch its data
      * @return array|null Returns node data if valid, null if invalid

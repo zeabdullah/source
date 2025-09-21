@@ -13,7 +13,6 @@ import { FormsModule } from '@angular/forms'
 import { catchError, of } from 'rxjs'
 import { Button } from 'primeng/button'
 import { Card } from 'primeng/card'
-import { Checkbox } from 'primeng/checkbox'
 import { Dialog } from 'primeng/dialog'
 import { InputText } from 'primeng/inputtext'
 import { MessageService } from '~/core/services/message.service'
@@ -35,7 +34,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
         FormsModule,
         Button,
         Card,
-        Checkbox,
         Dialog,
         InputText,
         ProgressSpinner,

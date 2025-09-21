@@ -16,7 +16,6 @@ export class ProjectLayout {
         { id: 2, label: 'Email Templates', path: 'email-templates' },
         { id: 3, label: 'Releases', path: 'releases' },
         { id: 4, label: 'Audits', path: 'audits' },
-        { id: 5, label: 'A/B Tests', path: 'ab-tests' },
         { id: 6 },
         { id: 7, label: 'Project Settings', path: 'settings' },
     ]

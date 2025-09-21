@@ -3,21 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\N8nService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\AiChat;
 use App\Models\EmailTemplate;
 use App\Models\Screen;
 use App\Services\AiAgentService;
+use App\Services\N8nService;
 use App\Services\FigmaService;
+use App\Services\BrevoService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Gemini\Data\Content;
 use Gemini\Enums\Role;
-use Illuminate\Support\Facades\Log;
-use App\Services\BrevoService;
 use GuzzleHttp\Exception\RequestException;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * @OA\Tag(
@@ -63,7 +63,7 @@ class AiChatController extends Controller
      *     @OA\Response(response=500, description="Server error")
      * )
      */
-    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId): JsonResponse
+    public function sendEmailTemplateChatMessage(Request $request, string $emailTemplateId, AiAgentService $ai, BrevoService $brevo, N8nService $n8n): JsonResponse
     {
         $validated = $request->validate([
             'content' => 'required|string',
@@ -76,11 +76,7 @@ class AiChatController extends Controller
                 return $this->notFoundResponse('Email template not found');
             }
 
-            $result = DB::transaction(function () use ($request, $emailTemplate, $emailTemplateId, $userPrompt) {
-                $ai = new AiAgentService();
-                $brevo = new BrevoService();
-                $n8n = new N8nService();
-
+            $result = DB::transaction(function () use ($request, $emailTemplate, $emailTemplateId, $userPrompt, $ai, $brevo, $n8n) {
                 // create user message
                 $userAiChat = new AiChat(['content' => $userPrompt]);
                 $userAiChat->sender = 'user';
@@ -277,7 +273,7 @@ class AiChatController extends Controller
      *     @OA\Response(response=500, description="Server error")
      * )
      */
-    public function sendScreenChatMessage(Request $request, string $screenId): JsonResponse
+    public function sendScreenChatMessage(Request $request, string $screenId, AiAgentService $ai, FigmaService $figma): JsonResponse
     {
         $validated = $request->validate([
             'content' => 'required|string',
@@ -290,7 +286,6 @@ class AiChatController extends Controller
 
         $userMsg = $validated['content'];
 
-        $figmaCacheKey = "figma_frame_data_{$screenId}";
 
         try {
             $screen = Screen::find($screenId);
@@ -298,9 +293,8 @@ class AiChatController extends Controller
                 return $this->notFoundResponse('Screen not found');
             }
 
-            $result = DB::transaction(function () use ($request, $screen, $screenId, $userMsg, $accessToken, $figmaCacheKey) {
-                $ai = new AiAgentService();
-                $figma = new FigmaService();
+            $result = DB::transaction(function () use ($request, $screen, $screenId, $userMsg, $accessToken, $ai, $figma) {
+                $figmaCacheKey = "figma_frame_data_{$screenId}";
 
                 // create user message
                 $chatMsg = new AiChat([
@@ -486,7 +480,7 @@ class AiChatController extends Controller
                 return $this->forbiddenResponse('You are not authorized to update this message');
             }
 
-            $chatMsg->updateOrFail($validated['content']);
+            $chatMsg->updateOrFail($validated);
 
             return $this->responseJson($chatMsg->fresh(), 'Chat message updated');
         } catch (\Throwable $th) {

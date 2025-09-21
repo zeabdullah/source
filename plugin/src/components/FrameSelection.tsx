@@ -35,7 +35,7 @@ export function FrameSelection({ project, selectedFrames, onBack }: FrameSelecti
 
         try {
             await api.post(
-                `/projects/${project.id}/screens/export`,
+                `/projects/${project.id}/screens/import`,
                 {
                     frame_ids: selectedFrames.map(f => f.id),
                     figma_file_key: fileKey,
