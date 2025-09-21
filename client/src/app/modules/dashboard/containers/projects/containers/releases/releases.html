@@ -22,7 +22,11 @@
 } @else {
     <section class="grid grid-cols-1 gap-6">
         @for (release of releases(); track release.id) {
-            <app-release-card [release]="release" />
+            <app-release-card
+                [release]="release"
+                [projectId]="projectId()"
+                (releaseDeleted)="onReleaseDeleted()"
+            />
         } @empty {
             <app-empty-state
                 icon="pi-list-check"

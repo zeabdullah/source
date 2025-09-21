@@ -5,6 +5,7 @@ import {
     signal,
     OnInit,
     DestroyRef,
+    computed,
 } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
@@ -12,6 +13,7 @@ import { catchError, of } from 'rxjs'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { Button } from 'primeng/button'
 import { Toast } from 'primeng/toast'
+import { ConfirmationService } from 'primeng/api'
 import { ReleaseCard } from '../../components/release-card/release-card'
 import { NewReleaseDialog } from '../../components/new-release-dialog/new-release-dialog'
 import { ReleaseData } from '../../shared/interfaces/release.interface'
@@ -22,6 +24,7 @@ import { EmptyState } from '~/shared/components/empty-state/empty-state'
 @Component({
     selector: 'app-releases',
     imports: [Button, ReleaseCard, NewReleaseDialog, Toast, EmptyState, ProgressSpinner],
+    providers: [ConfirmationService],
     templateUrl: './releases.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -34,16 +37,11 @@ export class Releases implements OnInit {
     showNewReleaseDialog = signal(false)
     releases = signal<ReleaseData[]>([])
     isLoading = signal(true)
-    projectId = signal<string>('')
+
+    projectId = computed(() => String(this.route.snapshot.parent?.paramMap.get('projectId')))
 
     ngOnInit() {
-        this.route.parent?.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
-            const projectId = params.get('projectId')
-            if (projectId) {
-                this.projectId.set(projectId)
-                this.loadReleases()
-            }
-        })
+        this.loadReleases()
     }
 
     loadReleases() {
@@ -80,5 +78,9 @@ export class Releases implements OnInit {
 
     onDialogVisibleChange(visible: boolean) {
         this.showNewReleaseDialog.set(visible)
+    }
+
+    onReleaseDeleted() {
+        this.loadReleases()
     }
 }
