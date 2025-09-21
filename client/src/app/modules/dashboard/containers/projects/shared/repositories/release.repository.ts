@@ -8,6 +8,8 @@ export interface CreateReleaseRequest {
     version: string
     description?: string
     tags?: string
+    screens?: number[]
+    emails?: number[]
 }
 
 @Injectable({ providedIn: 'root' })

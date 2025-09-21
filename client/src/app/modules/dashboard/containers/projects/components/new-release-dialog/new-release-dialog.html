@@ -2,14 +2,16 @@
     [visible]="visible()"
     (onHide)="onHide()"
     [modal]="true"
+    [closable]="false"
     [draggable]="false"
     [resizable]="false"
+    styleClass="w-full max-w-2xl"
 >
     <ng-template #header>
-        <h3 class="text-h3 font-bold text-gray-900">Create a new release</h3>
+        <h3 class="text-h3 font-bold">Create a new release</h3>
     </ng-template>
 
-    <p class="mb-6 max-w-[480px] text-button/normal text-gray-500">
+    <p class="mb-5 text-button/normal text-gray-500">
         Save a snapshot of your project's current screens, flows, and campaigns to track changes
         over time.
     </p>
@@ -59,36 +61,19 @@
         </div>
 
         <div class="flex flex-col gap-1.5">
-            <label for="compare" class="text-label-text font-semibold">Compare</label>
-            <div class="flex flex-col gap-1">
-                <p-select
-                    formControlName="compare"
-                    id="compare"
-                    name="compare"
-                    [options]="compareOptions"
-                    placeholder="Select a previous release"
-                    appendTo="body"
-                    fluid
-                />
-                <p-message severity="secondary" variant="simple">
-                    Select a previous release to compare against.
-                </p-message>
-            </div>
-        </div>
-
-        <div class="flex flex-col gap-1.5">
             <label for="screens" class="text-label-text font-semibold">Screens</label>
             <div class="flex flex-col gap-1">
                 <p-multiselect
                     formControlName="screens"
                     id="screens"
                     name="screens"
-                    [options]="screenOptions"
+                    [options]="screenOptions()"
                     placeholder="Select screens..."
                     display="chip"
                     appendTo="body"
                     fluid
                     showClear
+                    [loading]="isLoadingScreens()"
                 />
             </div>
         </div>
@@ -100,12 +85,13 @@
                     formControlName="emails"
                     id="emails"
                     name="emails"
-                    [options]="emailOptions"
+                    [options]="emailOptions()"
                     placeholder="Select emails..."
                     display="chip"
                     appendTo="body"
                     fluid
                     showClear
+                    [loading]="isLoadingEmailTemplates()"
                 />
             </div>
         </div>
