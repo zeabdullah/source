@@ -5,9 +5,9 @@
         <h1 class="mb-14 text-center text-h2 font-bold tracking-tight">Log in to your account</h1>
 
         @if (errorMessage()) {
-        <div class="mb-4">
-            <p-message severity="error">{{ errorMessage() }}</p-message>
-        </div>
+            <div class="mb-4">
+                <p-message severity="error">{{ errorMessage() }}</p-message>
+            </div>
         }
 
         <form class="mb-8 space-y-8" [formGroup]="loginForm" (ngSubmit)="login()">
@@ -22,10 +22,14 @@
                         name="email"
                         class="w-full"
                         placeholder="john@example.com"
-                        [invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+                        [invalid]="
+                            loginForm.get('email')?.invalid && loginForm.get('email')?.touched
+                        "
                     />
                     @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
-                    <p-message severity="error" variant="simple">Must be a valid email.</p-message>
+                        <p-message severity="error" variant="simple">
+                            Must be a valid email.
+                        </p-message>
                     }
                 </div>
                 <div class="flex flex-col gap-1">
@@ -37,10 +41,14 @@
                         type="password"
                         name="password"
                         class="w-full"
-                        [invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+                        [invalid]="
+                            loginForm.get('password')?.invalid && loginForm.get('password')?.touched
+                        "
                     />
                     @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-                    <p-message severity="error" variant="simple">Password is required.</p-message>
+                        <p-message severity="error" variant="simple">
+                            Password is required.
+                        </p-message>
                     }
                 </div>
 

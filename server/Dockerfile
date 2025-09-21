@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
+    libicu-dev \
     libzip-dev \
     zip \
     unzip \
@@ -26,6 +27,9 @@ RUN docker-php-ext-install -j$(nproc) \
     pdo_pgsql \
     exif \
     zip \
+    intl \
+    mbstring \
+    pcntl \
     bcmath
 
 # Enable Apache mod_rewrite

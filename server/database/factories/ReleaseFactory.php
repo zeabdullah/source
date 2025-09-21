@@ -17,7 +17,9 @@ class ReleaseFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'version' => $this->faker->semver(),
+            'description' => $this->faker->optional()->sentence(),
+            'tags' => $this->faker->optional()->words(3, true),
         ];
     }
 }

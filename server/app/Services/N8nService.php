@@ -30,20 +30,4 @@ class N8nService
 
         return $response['image'];
     }
-
-    public function generateAgentResponseForEmailTemplate(string $prompt, string $emailTemplateId)
-    {
-        $url = env('N8N_URL') . '/webhook/chat-email-template';
-
-        // Creates a new agent response, which also creates a new chat message with the AI as the
-        $response = Http::withBasicAuth($this->username, $this->password)
-            ->timeout(180)
-            ->post($url, [
-                'prompt' => $prompt,
-                'email_template_id' => $emailTemplateId,
-            ])
-            ->json();
-
-        return $response['payload']['content'];
-    }
 }

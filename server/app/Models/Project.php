@@ -33,6 +33,8 @@ class Project extends Model
         'owner_id',
         'name',
         'description',
+        'created_at',
+        'updated_at'
     ];
 
     /**
@@ -77,7 +79,7 @@ class Project extends Model
         );
     }
 
-    public function releases(): HasMany
+    public function releases()
     {
         return $this->hasMany(Release::class);
     }
@@ -87,8 +89,13 @@ class Project extends Model
         return $this->hasMany(Screen::class);
     }
 
-    public function emailTemplates(): HasMany
+    public function emailTemplates()
     {
         return $this->hasMany(EmailTemplate::class);
+    }
+
+    public function audits()
+    {
+        return $this->hasMany(Audit::class);
     }
 }

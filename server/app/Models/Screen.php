@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\FigmaService;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,8 +14,9 @@ class Screen extends Model
     use HasFactory;
 
     protected $fillable = [
-        'section_name',
         'project_id',
+        'section_name',
+        'figma_node_name',
         'figma_svg_url',
         'figma_node_id',
         'figma_file_key',
@@ -26,6 +28,7 @@ class Screen extends Model
         'project_id',
         'section_name',
         'data',
+        'figma_node_name',
         'figma_svg_url',
         'figma_node_id',
         'figma_file_key',
@@ -58,6 +61,18 @@ class Screen extends Model
         return $this->morphMany(Comment::class, 'commentable');
     }
 
+    public function audits()
+    {
+        return $this->belongsToMany(Audit::class, 'audit_screens')
+            ->withPivot('sequence_order')
+            ->orderBy('audit_screens.sequence_order');
+    }
+
+    public function releases()
+    {
+        return $this->morphToMany(Release::class, 'releasable');
+    }
+
     /**
      * Scope to search screens by description and section name
      */
@@ -86,7 +101,15 @@ class Screen extends Model
      */
     public function hasFigmaData(): bool
     {
-        return isset($this->figma_node_id);
+        return isset($this->figma_node_id) && !empty($this->data);
+    }
+
+    /**
+     * Check if screen has valid Figma node ID
+     */
+    public function hasValidFigmaNodeId(): bool
+    {
+        return !empty($this->figma_node_id) && !empty($this->figma_file_key);
     }
 
     /**
@@ -99,6 +122,78 @@ class Screen extends Model
         }
 
         return "https://www.figma.com/file/{$this->project->figma_file_key}/?node-id={$this->figma_node_id}";
+    }
+
+    public function serializeForAudit(): string
+    {
+        $detailedData = $this->getDetailedFigmaNodeData();
+
+        if (!$detailedData) {
+            return "Screen: {$this->figma_node_name}\nNo detailed Figma data available for flow analysis.";
+        }
+
+        return json_encode($detailedData);
+    }
+
+    public function getDetailedFigmaNodeData(): ?array
+    {
+        if (!$this->hasValidFigmaNodeId()) {
+            return null;
+        }
+
+        $owner = $this->project->owner;
+        if (!$owner || !$owner->figma_access_token) {
+            return null;
+        }
+
+        $figmaService = new FigmaService();
+        return $figmaService->validateAndGetNodeData(
+            $this->figma_node_id,
+            $this->figma_file_key,
+            $owner->figma_access_token,
+            4
+        );
+    }
+
+    /**
+     * Manually sync Figma data for this screen
+     */
+    public function syncFigmaData(): bool
+    {
+        if (!$this->hasValidFigmaNodeId()) {
+            return false;
+        }
+
+        $owner = $this->project->owner;
+        if (!$owner || !$owner->figma_access_token) {
+            return false;
+        }
+
+        return $this->syncFigmaDataWithToken($owner->figma_access_token);
+    }
+
+    /**
+     * Sync Figma data with provided access token
+     */
+    public function syncFigmaDataWithToken(string $figmaAccessToken): bool
+    {
+        if (!$this->hasValidFigmaNodeId()) {
+            return false;
+        }
+
+        $figmaService = new FigmaService();
+        $nodeData = $figmaService->validateAndGetNodeData(
+            $this->figma_node_id,
+            $this->figma_file_key,
+            $figmaAccessToken
+        );
+
+        if ($nodeData) {
+            $this->update(['data' => $nodeData['document'], 'figma_node_name' => $nodeData['name']]);
+            return true;
+        }
+
+        return false;
     }
 }
 

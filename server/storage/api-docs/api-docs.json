@@ -1,0 +1,3595 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Source API",
+        "description": "API for Source - Figma Design Audit Platform",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api",
+            "description": "Local development server"
+        }
+    ],
+    "paths": {
+        "/email-templates/{emailTemplateId}/chats": {
+            "get": {
+                "tags": [
+                    "AI Chat"
+                ],
+                "summary": "Get email template chat",
+                "description": "Get all chat messages for an email template",
+                "operationId": "3a15606412275e4cf9e99f6fda2f64dc",
+                "parameters": [
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of chat messages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/AiChat"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "AI Chat"
+                ],
+                "summary": "Send email template chat message",
+                "description": "Send a chat message to AI for an email template and get AI response",
+                "operationId": "d8b8ef532109008d63c7dac8a703a217",
+                "parameters": [
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Please improve this email template"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Chat message sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "$ref": "#/components/schemas/AiChat"
+                                        },
+                                        "ai": {
+                                            "$ref": "#/components/schemas/AiChat"
+                                        },
+                                        "template_updated": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "brevo_updated": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "thumbnail_updated": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/screens/{screenId}/chats": {
+            "get": {
+                "tags": [
+                    "AI Chat"
+                ],
+                "summary": "Get screen chat",
+                "description": "Get all chat messages for a screen",
+                "operationId": "67ae57f25f6a184461a2a2457ec22014",
+                "parameters": [
+                    {
+                        "name": "screenId",
+                        "in": "path",
+                        "description": "Screen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of chat messages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/AiChat"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Screen not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "AI Chat"
+                ],
+                "summary": "Send screen chat message",
+                "description": "Send a chat message to AI for a screen and get AI response",
+                "operationId": "c6d9c4111db9b422fca07b649454c2a3",
+                "parameters": [
+                    {
+                        "name": "screenId",
+                        "in": "path",
+                        "description": "Screen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Please analyze this screen design"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Chat message sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "$ref": "#/components/schemas/AiChat"
+                                        },
+                                        "ai": {
+                                            "$ref": "#/components/schemas/AiChat"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Figma access token required"
+                    },
+                    "404": {
+                        "description": "Screen not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/chats/{chatId}": {
+            "put": {
+                "tags": [
+                    "AI Chat"
+                ],
+                "summary": "Update chat message",
+                "description": "Update a chat message by its ID (user messages only)",
+                "operationId": "150c7aca20d76ca393d96a31f01eee79",
+                "parameters": [
+                    {
+                        "name": "chatId",
+                        "in": "path",
+                        "description": "Chat message ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Updated message content"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Chat message updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AiChat"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Not authorized to update this message"
+                    },
+                    "404": {
+                        "description": "Chat message not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "AI Chat"
+                ],
+                "summary": "Delete chat message",
+                "description": "Delete a chat message by its ID (user messages only)",
+                "operationId": "5154e8a6d07e0aa157b93049613d4cb5",
+                "parameters": [
+                    {
+                        "name": "chatId",
+                        "in": "path",
+                        "description": "Chat message ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Chat message deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AiChat"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Not authorized to delete this message"
+                    },
+                    "404": {
+                        "description": "Chat message not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/audits": {
+            "get": {
+                "tags": [
+                    "Audits"
+                ],
+                "summary": "Get project audits",
+                "description": "Get all audits for a specific project",
+                "operationId": "bb7e9d542b7468b34363a1a69b0eecc5",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of audits",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Audit"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Audits"
+                ],
+                "summary": "Create audit",
+                "description": "Create a new audit for a project",
+                "operationId": "46885db90f8ab2b57a1d050ac0d5b4ee",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "User Flow Audit"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 2000,
+                                        "example": "Audit description",
+                                        "nullable": true
+                                    },
+                                    "screen_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "maxItems": 7,
+                                        "minItems": 2,
+                                        "example": [
+                                            1,
+                                            2,
+                                            3
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Audit created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Audit"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/audits/{auditId}": {
+            "get": {
+                "tags": [
+                    "Audits"
+                ],
+                "summary": "Get audit details",
+                "description": "Get details of a specific audit",
+                "operationId": "24682caa89b18755fa6d0b44f5e0fd74",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "auditId",
+                        "in": "path",
+                        "description": "Audit ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Audit details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Audit"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Audit not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Audits"
+                ],
+                "summary": "Update audit",
+                "description": "Update an existing audit",
+                "operationId": "de664685beb13c13652f07a91675b14b",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "auditId",
+                        "in": "path",
+                        "description": "Audit ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Updated Audit Name"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 2000,
+                                        "example": "Updated description",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Audit updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Audit"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Audits"
+                ],
+                "summary": "Delete audit",
+                "description": "Delete an audit",
+                "operationId": "0c3d9e94cc612917f7088de42be8fbc1",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "auditId",
+                        "in": "path",
+                        "description": "Audit ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Audit deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Audit"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Audit not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/audits/{auditId}/execute": {
+            "post": {
+                "tags": [
+                    "Audits"
+                ],
+                "summary": "Execute audit",
+                "description": "Start AI analysis for an audit",
+                "operationId": "ebb2b19d3fbd22997a7ecd8419bf70df",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "auditId",
+                        "in": "path",
+                        "description": "Audit ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Audit processing started",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Audit"
+                                }
+                            }
+                        }
+                    },
+                    "202": {
+                        "description": "Audit is already being processed"
+                    },
+                    "404": {
+                        "description": "Audit not found"
+                    },
+                    "409": {
+                        "description": "Audit has already been completed"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/audits/{auditId}/status": {
+            "get": {
+                "tags": [
+                    "Audits"
+                ],
+                "summary": "Get audit status",
+                "description": "Get the current status of an audit",
+                "operationId": "136caf8fc1cb523b40bbc31c91ec25ce",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "auditId",
+                        "in": "path",
+                        "description": "Audit ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Audit status",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "pending",
+                                                "processing",
+                                                "completed",
+                                                "failed"
+                                            ],
+                                            "example": "processing"
+                                        },
+                                        "overall_score": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 85.5,
+                                            "nullable": true
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-01-01T00:00:00.000000Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-01-01T00:00:00.000000Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Audit not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/screens/{screenId}/comments": {
+            "get": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Get screen comments",
+                "description": "Get all comments for a specific screen",
+                "operationId": "1ca3946e92d6584bf7f755d422806d4c",
+                "parameters": [
+                    {
+                        "name": "screenId",
+                        "in": "path",
+                        "description": "Screen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of screen comments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Comment"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Screen not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Create screen comment",
+                "description": "Create a new comment for a specific screen",
+                "operationId": "1829b094f088354f863a5c1411e714d3",
+                "parameters": [
+                    {
+                        "name": "screenId",
+                        "in": "path",
+                        "description": "Screen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "example": "This is a comment about the screen"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Comment created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Comment"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/email-templates/{emailTemplateId}/comments": {
+            "get": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Get email template comments",
+                "description": "Get all comments for a specific email template",
+                "operationId": "ce557b6d3c339900f7172a83a74bb0d0",
+                "parameters": [
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of email template comments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Comment"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Create email template comment",
+                "description": "Create a new comment for a specific email template",
+                "operationId": "5a317ddce59f5f4267d698114fb99241",
+                "parameters": [
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "example": "This is a comment about the email template"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Comment created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Comment"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/comments/{commentId}": {
+            "get": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Get comment by ID",
+                "description": "Get a specific comment by its ID",
+                "operationId": "75ba55bf85be18bb94dd4324aea32b4c",
+                "parameters": [
+                    {
+                        "name": "commentId",
+                        "in": "path",
+                        "description": "Comment ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comment data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Comment"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Comment not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Update comment",
+                "description": "Update a comment by its ID",
+                "operationId": "ba4f728c0ac4f5d3ca09bf1f5e97ffd6",
+                "parameters": [
+                    {
+                        "name": "commentId",
+                        "in": "path",
+                        "description": "Comment ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Updated comment content"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Comment updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Comment"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Comment not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Delete comment",
+                "description": "Delete a comment by its ID",
+                "operationId": "ae1a3f95278fb7c94f96e5fc64c495cf",
+                "parameters": [
+                    {
+                        "name": "commentId",
+                        "in": "path",
+                        "description": "Comment ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comment deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Comment"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Comment not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/plugin/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Plugin login",
+                "description": "Authenticate plugin with email and password",
+                "operationId": "ee17a58670c7b550a76fbfc51eead4c6",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AcceptJson"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ContentTypeJson"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "1|abc123..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+        "/plugin/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Plugin logout",
+                "description": "Logout plugin and revoke current access token",
+                "operationId": "b43645daad704aac4bc410baac28294b",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AcceptJson"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ContentTypeJson"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Logged out successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "User login",
+                "description": "Authenticate user with email and password",
+                "operationId": "8996919397379915d415b58ad0c83846",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AcceptJson"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ContentTypeJson"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        },
+                                        "token": {
+                                            "description": "Only returned for API requests",
+                                            "type": "string",
+                                            "example": "1|abc123..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "User registration",
+                "description": "Register a new user account",
+                "operationId": "384ac579d904822bfb3571a2688a3c79",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AcceptJson"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ContentTypeJson"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "minLength": 8,
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    },
+                                    "avatar_url": {
+                                        "type": "string",
+                                        "format": "url",
+                                        "example": "https://example.com/avatar.jpg",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Registration successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        },
+                                        "token": {
+                                            "description": "Only returned for API requests",
+                                            "type": "string",
+                                            "example": "1|abc123..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "User logout",
+                "description": "Logout user and revoke current access token",
+                "operationId": "9d1297eac38fe037da627ef6601adb5b",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AcceptJson"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ContentTypeJson"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Logged out successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get current user",
+                "description": "Get the currently authenticated user",
+                "operationId": "d73910b0085e20326b6f135e9bebbb32",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AcceptJson"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Current user data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/email-templates": {
+            "get": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "Get project email templates",
+                "description": "Get all email templates for a project",
+                "operationId": "27e4d8b77bc60443529bdccdd9aa82da",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of email templates",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/EmailTemplate"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/email-templates/{emailTemplateId}": {
+            "get": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "Get email template by ID",
+                "description": "Get a specific email template by its ID",
+                "operationId": "4658b1d3952aec2ee0af7be093b94279",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email template data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailTemplate"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "Update email template",
+                "description": "Update an email template by its ID",
+                "operationId": "ab091b63eac394fbe5c1071fc92bac58",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "section_name": {
+                                        "type": "string",
+                                        "example": "Updated Template Name",
+                                        "nullable": true
+                                    },
+                                    "html": {
+                                        "type": "string",
+                                        "example": "<html>Updated content</html>",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Email template updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailTemplate"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "Delete email template",
+                "description": "Delete an email template by its ID",
+                "operationId": "8b41f1f4e4a472e67b580c93c5811e0a",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email template deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailTemplate"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/email-templates/import-brevo": {
+            "post": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "Import Brevo template",
+                "description": "Import an email template from Brevo",
+                "operationId": "58eeb58931209fa44d74e2f1fe83eb90",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "brevo_template_id": {
+                                        "type": "integer",
+                                        "example": 123
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Template imported successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailTemplate"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Brevo API token not configured"
+                    },
+                    "404": {
+                        "description": "Template not found in Brevo"
+                    },
+                    "409": {
+                        "description": "Template already imported"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/email-templates/{emailTemplateId}/sync-brevo": {
+            "post": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "Sync email template with Brevo",
+                "description": "Sync local email template with the latest data from Brevo",
+                "operationId": "1e4448ec8b63c7214880a4916b6e6f17",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Template synced with Brevo successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailTemplate"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Email template is not linked to Brevo"
+                    },
+                    "403": {
+                        "description": "Brevo API token not configured"
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/email-templates/{emailTemplateId}/update-brevo": {
+            "put": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "Update email template in Brevo",
+                "description": "Update the email template in Brevo with local changes",
+                "operationId": "70b956c4edb22df8c60caae6687d903e",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "emailTemplateId",
+                        "in": "path",
+                        "description": "Email template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "html_content": {
+                                        "type": "string",
+                                        "example": "<html>Updated content</html>"
+                                    },
+                                    "template_name": {
+                                        "type": "string",
+                                        "example": "Updated Template Name",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Template updated in Brevo successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailTemplate"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Email template is not linked to Brevo"
+                    },
+                    "403": {
+                        "description": "Brevo API token not configured"
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/brevo-templates": {
+            "get": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "Get Brevo templates",
+                "description": "Get all templates from user's Brevo account",
+                "operationId": "c1dc6d65e301d13135cf136fc930c908",
+                "responses": {
+                    "200": {
+                        "description": "List of Brevo templates",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/BrevoTemplate"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Brevo API token not configured"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get user's projects",
+                "description": "Get all projects owned by the authenticated user",
+                "operationId": "bbfe70d965b465ee74dd2b54b0b56fac",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search projects by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "my project"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of user's projects",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Project"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Create a new project",
+                "description": "Create a new project for the authenticated user",
+                "operationId": "bbedaf99fdf7c04e06af983784ab8958",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "My New Project"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 1500,
+                                        "example": "Project description",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Project created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Project"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get project by ID",
+                "description": "Get a specific project by ID (owner only)",
+                "operationId": "dcdb304e795e9c19e3b93272254e62de",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Project"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Update project",
+                "description": "Update a project by ID (owner only)",
+                "operationId": "bd856f6816fe67c3a1b1e91f764d08b8",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Updated Project Name"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 1500,
+                                        "example": "Updated description",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Project updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Project"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Delete project",
+                "description": "Delete a project by ID (owner only)",
+                "operationId": "3066c11adcdec5c8cd4c50f048315fa9",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Project"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/releases": {
+            "get": {
+                "tags": [
+                    "Releases"
+                ],
+                "summary": "Get project releases",
+                "description": "Get all releases for a project",
+                "operationId": "7cc9950cc5d6b37bc856b466cdced794",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of project releases",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Release"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Releases"
+                ],
+                "summary": "Create release",
+                "description": "Create a new release for a project",
+                "operationId": "74b891a1193be9349953d2bdc72cda18",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "version": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "1.0.0"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 1500,
+                                        "example": "Initial release with core features",
+                                        "nullable": true
+                                    },
+                                    "tags": {
+                                        "type": "string",
+                                        "maxLength": 500,
+                                        "example": "stable production",
+                                        "nullable": true
+                                    },
+                                    "screen_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2,
+                                            3
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "email_template_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2
+                                        ],
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Release created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Release"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/releases/{releaseId}": {
+            "get": {
+                "tags": [
+                    "Releases"
+                ],
+                "summary": "Get release by ID",
+                "description": "Get a specific release by its ID",
+                "operationId": "eb7d61c09a466766ee9bd5aefa6afe24",
+                "parameters": [
+                    {
+                        "name": "releaseId",
+                        "in": "path",
+                        "description": "Release ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Release data with relationships",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Release"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Release not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Releases"
+                ],
+                "summary": "Update release",
+                "description": "Update a release by its ID",
+                "operationId": "95f26c74428f7369fea5756f4473f3d7",
+                "parameters": [
+                    {
+                        "name": "releaseId",
+                        "in": "path",
+                        "description": "Release ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "version": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "1.1.0"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 2500,
+                                        "example": "Updated release with bug fixes",
+                                        "nullable": true
+                                    },
+                                    "tags": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "hotfix",
+                                            "production"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "screen_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            3,
+                                            5
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "email_template_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            2,
+                                            4
+                                        ],
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Release updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Release"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Release not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Releases"
+                ],
+                "summary": "Delete release",
+                "description": "Delete a release by its ID",
+                "operationId": "c8264169d7d405b400da37b015ec11cd",
+                "parameters": [
+                    {
+                        "name": "releaseId",
+                        "in": "path",
+                        "description": "Release ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Release deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Release"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Release not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/screens/import": {
+            "post": {
+                "tags": [
+                    "Screens"
+                ],
+                "summary": "Import screens from Figma",
+                "description": "Import multiple Figma frames as screens for a project",
+                "operationId": "3275d012ef6e21e1a87478a01cec9096",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "frame_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "1:23",
+                                            "1:24"
+                                        ]
+                                    },
+                                    "figma_access_token": {
+                                        "type": "string",
+                                        "example": "figd_abc123..."
+                                    },
+                                    "figma_file_key": {
+                                        "type": "string",
+                                        "example": "abc123def456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Screens imported successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Screen"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/screens": {
+            "get": {
+                "tags": [
+                    "Screens"
+                ],
+                "summary": "Get project screens",
+                "description": "Get all screens for a project with optional search",
+                "operationId": "ca560b90875ce3ccfa1d2c9d1012852b",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search screens by name or description",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "login"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of project screens",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Screen"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{projectId}/screens/{screenId}": {
+            "get": {
+                "tags": [
+                    "Screens"
+                ],
+                "summary": "Get screen by ID",
+                "description": "Get a specific screen by its ID",
+                "operationId": "533fc8d111634a8b1cd641e336e82cca",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "screenId",
+                        "in": "path",
+                        "description": "Screen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Screen data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Screen"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Screen not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Screens"
+                ],
+                "summary": "Update screen",
+                "description": "Update a screen by its ID",
+                "operationId": "517a8d1e6943b5faf0ac2097963e441c",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "screenId",
+                        "in": "path",
+                        "description": "Screen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "section_name": {
+                                        "type": "string",
+                                        "example": "Updated Screen Name",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Screen updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Screen"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Screen not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Screens"
+                ],
+                "summary": "Delete screen",
+                "description": "Delete a screen by its ID",
+                "operationId": "92a44433e6d3764d2292fd502c05b261",
+                "parameters": [
+                    {
+                        "name": "projectId",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "screenId",
+                        "in": "path",
+                        "description": "Screen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Screen deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Screen"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Screen not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/users/{userId}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get a user by ID",
+                "description": "Retrieve user information by user ID",
+                "operationId": "5bded334be396a445bfcba8281c39415",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "The ID of the user to get",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "int": {
+                                "summary": "An int value.",
+                                "value": "1"
+                            },
+                            "uuid": {
+                                "summary": "An UUID value.",
+                                "value": "0006faf6-7a61-426c-9034-579f2cfcfa83"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/profile": {
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update own profile",
+                "description": "Update the authenticated user's profile information",
+                "operationId": "6ad17556ce98dd886a660d0dfd5058ae",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255,
+                                        "example": "user@example.com"
+                                    },
+                                    "avatar_url": {
+                                        "type": "string",
+                                        "format": "url",
+                                        "example": "https://example.com/avatar.jpg",
+                                        "nullable": true
+                                    },
+                                    "figma_access_token": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "brevo_api_token": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/profile/figma-token": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Store Figma access token",
+                "description": "Store Figma access token for the authenticated user",
+                "operationId": "50f55f1633f655757d34c46615083a24",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "figma_access_token": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "example": "figd_abc123..."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Figma access token stored successfully"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Remove Figma access token",
+                "description": "Remove Figma access token from the authenticated user's profile",
+                "operationId": "33189c891e69fbf1052ebea26f0a7c24",
+                "responses": {
+                    "200": {
+                        "description": "Figma access token removed successfully"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/profile/brevo-token": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Store Brevo API token",
+                "description": "Store Brevo API token for the authenticated user",
+                "operationId": "816abbdaf3a6c15ee30e1e7a589aabb1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "brevo_api_token": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "example": "xkeys-abc123..."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Brevo API token stored successfully"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Remove Brevo API token",
+                "description": "Remove Brevo API token from the authenticated user's profile",
+                "operationId": "e0b9b0b9ad6ff59eab8cee13f2e33ec2",
+                "responses": {
+                    "200": {
+                        "description": "Brevo API token removed successfully"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "user@example.com"
+                    },
+                    "avatar_url": {
+                        "type": "string",
+                        "format": "url",
+                        "example": "https://example.com/avatar.jpg",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "Audit": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "project_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "User Flow Audit"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Audit description",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "processing",
+                            "completed",
+                            "failed"
+                        ],
+                        "example": "pending"
+                    },
+                    "overall_score": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 85.5,
+                        "nullable": true
+                    },
+                    "results": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    },
+                    "screens": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "EmailTemplate": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "project_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "section_name": {
+                        "type": "string",
+                        "example": "Welcome Email"
+                    },
+                    "campaign_id": {
+                        "type": "integer",
+                        "example": 123,
+                        "nullable": true
+                    },
+                    "brevo_template_id": {
+                        "type": "integer",
+                        "example": 456,
+                        "nullable": true
+                    },
+                    "html_content": {
+                        "type": "string",
+                        "example": "<html>...</html>",
+                        "nullable": true
+                    },
+                    "thumbnail_url": {
+                        "type": "string",
+                        "format": "url",
+                        "example": "https://example.com/thumb.jpg",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "BrevoTemplate": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Welcome Email Template"
+                    },
+                    "subject": {
+                        "type": "string",
+                        "example": "Welcome to our platform"
+                    },
+                    "htmlContent": {
+                        "type": "string",
+                        "example": "<html>...</html>"
+                    },
+                    "sender": {
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "example": "Company Name"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "isActive": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    },
+                    "modifiedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "Project": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "owner_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "My Project"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Project description",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "Comment": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "content": {
+                        "type": "string",
+                        "example": "This is a comment"
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "commentable_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "commentable_type": {
+                        "type": "string",
+                        "example": "App\\\\Models\\\\Screen"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    }
+                },
+                "type": "object"
+            },
+            "AiChat": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "content": {
+                        "type": "string",
+                        "example": "AI generated response"
+                    },
+                    "sender": {
+                        "type": "string",
+                        "enum": [
+                            "user",
+                            "ai"
+                        ],
+                        "example": "ai"
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1,
+                        "nullable": true
+                    },
+                    "commentable_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "commentable_type": {
+                        "type": "string",
+                        "example": "App\\\\Models\\\\Screen"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "Screen": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "project_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "section_name": {
+                        "type": "string",
+                        "example": "Login Screen",
+                        "nullable": true
+                    },
+                    "figma_node_id": {
+                        "type": "string",
+                        "example": "1:23",
+                        "nullable": true
+                    },
+                    "figma_file_key": {
+                        "type": "string",
+                        "example": "abc123def456",
+                        "nullable": true
+                    },
+                    "figma_svg_url": {
+                        "type": "string",
+                        "format": "url",
+                        "example": "https://figma.com/svg/...",
+                        "nullable": true
+                    },
+                    "figma_node_name": {
+                        "type": "string",
+                        "example": "Login",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "User login screen",
+                        "nullable": true
+                    },
+                    "data": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "Release": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "project_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Version 1.0"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Initial release",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "draft",
+                            "published",
+                            "archived"
+                        ],
+                        "example": "draft"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "parameters": {
+            "AcceptJson": {
+                "name": "Accept",
+                "in": "header",
+                "description": "Accept JSON response",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "default": "application/json"
+                }
+            },
+            "ContentTypeJson": {
+                "name": "Content-Type",
+                "in": "header",
+                "description": "Content type for JSON requests",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "default": "application/json"
+                }
+            }
+        },
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "AI Chat",
+            "description": "AI chat management endpoints for screens and email templates"
+        },
+        {
+            "name": "Audits",
+            "description": "Audit management and execution endpoints"
+        },
+        {
+            "name": "Comments",
+            "description": "Comment management endpoints for screens and email templates"
+        },
+        {
+            "name": "Auth",
+            "description": "Authentication endpoints for users and plugin"
+        },
+        {
+            "name": "Email Templates",
+            "description": "Email template management and Brevo integration"
+        },
+        {
+            "name": "Projects",
+            "description": "Project management endpoints"
+        },
+        {
+            "name": "Releases",
+            "description": "Release management endpoints for projects"
+        },
+        {
+            "name": "Screens",
+            "description": "Screen management endpoints for projects"
+        },
+        {
+            "name": "Users",
+            "description": "User management and profile endpoints"
+        }
+    ]
+}

@@ -6,7 +6,7 @@ services:
             context: ./client
             dockerfile: Dockerfile
         ports:
-            - '4200:4000'
+            - '4000:4000'
         environment:
             NODE_ENV: ${CLIENT_NODE_ENV:-production}
             BASE_URL: ${CLIENT_BASE_URL:-http://source-server:80/api}
