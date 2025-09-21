@@ -2,6 +2,20 @@ FROM node:22.18-alpine3.22
 
 WORKDIR /app
 
+# Install Chrome for testing
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+# Set Chrome binary path
+ENV CHROME_BIN=/usr/bin/chromium-browser
+ENV CHROME_PATH=/usr/bin/chromium-browser
+
 RUN npm install -g pnpm
 
 COPY package.json pnpm-lock.yaml ./

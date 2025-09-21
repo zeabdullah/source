@@ -32,7 +32,7 @@ jobs:
               run: docker compose -f docker-compose.yaml config -q
 
     build-images:
-        name: Build Docker images (no push)
+        name: Build Docker images
         needs: validate-compose
         runs-on: ubuntu-latest
         strategy:
