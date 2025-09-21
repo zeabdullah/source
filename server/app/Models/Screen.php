@@ -68,6 +68,11 @@ class Screen extends Model
             ->orderBy('audit_screens.sequence_order');
     }
 
+    public function releases()
+    {
+        return $this->morphToMany(Release::class, 'releasable');
+    }
+
     /**
      * Scope to search screens by description and section name
      */

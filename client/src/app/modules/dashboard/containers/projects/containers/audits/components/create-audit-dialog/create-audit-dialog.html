@@ -7,12 +7,13 @@
     styleClass="w-full max-w-2xl"
 >
     <ng-template #header>
-        <h3 class="text-h3 font-bold text-gray-900">Create New Audit</h3>
+        <h3 class="text-h3 font-bold">Create New Audit</h3>
     </ng-template>
 
-    <p class="mb-8 max-w-[480px] text-caption/normal text-gray-700">
+    <p class="mb-5 max-w-[480px] text-caption/normal text-gray-700">
         Analyze design consistency across your screen flows by selecting 2-7 screens to audit.
     </p>
+
     <form [formGroup]="auditForm" class="flex flex-col gap-6">
         <div class="flex flex-col gap-1.5">
             <label class="text-label-text font-semibold" for="name">Audit Name*</label>

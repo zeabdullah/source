@@ -10,6 +10,4 @@ export interface ScreenData {
     description: string | null
     created_at: string
     updated_at: string
-    // device?: string
-    // release?: string
 }
