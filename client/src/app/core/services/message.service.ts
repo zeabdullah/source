@@ -17,6 +17,9 @@ export const defaultLife = {
     contrast: 3000,
 } as const satisfies Record<MessageOptions['severity'], number>
 
+/**
+ * A wrapper around the PrimeNG MessageService for more concise usage
+ */
 @Injectable({ providedIn: 'root' })
 export class MessageService {
     private messageService = inject(PrimeNGMessageService)

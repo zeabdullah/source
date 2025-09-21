@@ -125,7 +125,8 @@
                 icon="pi pi-check"
                 iconPos="right"
                 (onClick)="createRelease()"
-                [disabled]="!dialogForm.valid"
+                [disabled]="!dialogForm.valid || isCreating()"
+                [loading]="isCreating()"
                 size="large"
             />
         </div>

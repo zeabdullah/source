@@ -82,7 +82,7 @@ class ReleaseController extends Controller
             }
 
             return $this->responseJson(
-                $release->load(['screens', 'emailTemplates']),
+                $release->fresh(),
                 'Created successfully',
                 201
             );
@@ -126,7 +126,6 @@ class ReleaseController extends Controller
             }
 
             $releases = $project->releases()
-                ->with(['screens', 'emailTemplates'])
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -162,7 +161,7 @@ class ReleaseController extends Controller
     public function getReleaseById(Request $request, string $releaseId)
     {
         try {
-            $release = Release::with(['screens', 'emailTemplates', 'project'])
+            $release = Release::with(['project'])
                 ->find($releaseId);
             if (!$release) {
                 return $this->notFoundResponse('Release not found');
@@ -237,7 +236,7 @@ class ReleaseController extends Controller
                 $release->emailTemplates()->sync($validated['email_template_ids']);
             }
 
-            return $this->responseJson($release->load(['screens', 'emailTemplates']), 'Updated successfully');
+            return $this->responseJson($release->fresh(), 'Updated successfully');
         } catch (\Throwable $e) {
             return $this->serverErrorResponse(message: 'Failed to update Release: ' . $e->getMessage());
         }

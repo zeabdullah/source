@@ -4,12 +4,12 @@
         <p class="text-base leading-6">{{ release().description }}</p>
     </div>
 
-    @if (release().tags.length) {
+    @if (tags().length) {
         <div class="flex items-center gap-2 text-caption">
             <i class="pi pi-tag text-[16px] text-gray-700"></i>
-            @for (tag of release().tags; track tag) {
+            @for (tag of tags(); track tag) {
                 <p-chip
-                    [label]="tag"
+                    [label]="tag | titlecase"
                     class="rounded-full bg-brand-100 px-2 py-1.5 text-xs font-semibold text-brand-700"
                 />
             }
@@ -22,12 +22,12 @@
         <div class="flex flex-wrap items-center gap-4">
             <div class="flex items-center gap-1.5">
                 <i class="pi pi-desktop text-caption"></i>
-                <span>{{ release().screensCount }} screens</span>
+                <span>{{ screensCount() }} screens</span>
             </div>
 
             <div class="flex items-center gap-1.5">
                 <i class="pi pi-envelope text-caption"></i>
-                <span class="">{{ release().emailsCount }} Emails</span>
+                <span class="">{{ emailsCount() }} Emails</span>
             </div>
         </div>
 

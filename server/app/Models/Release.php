@@ -35,6 +35,8 @@ class Release extends Model
         'tags' => null,
     ];
 
+    protected $with = ['screens', 'emailTemplates'];
+
     public function project()
     {
         return $this->belongsTo(Project::class);

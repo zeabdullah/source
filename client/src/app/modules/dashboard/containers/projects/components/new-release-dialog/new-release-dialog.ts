@@ -1,5 +1,15 @@
-import { ChangeDetectionStrategy, Component, input, output, inject } from '@angular/core'
+import {
+    ChangeDetectionStrategy,
+    Component,
+    input,
+    output,
+    inject,
+    signal,
+    DestroyRef,
+} from '@angular/core'
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { catchError, of } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { Button } from 'primeng/button'
 import { Dialog } from 'primeng/dialog'
@@ -8,8 +18,10 @@ import { InputText } from 'primeng/inputtext'
 import { Textarea } from 'primeng/textarea'
 import { Message } from 'primeng/message'
 import { MultiSelect } from 'primeng/multiselect'
-import { Release } from '../../shared/interfaces/release.interface'
+import { ReleaseData } from '../../shared/interfaces/release.interface'
 import { AutoComplete } from 'primeng/autocomplete'
+import { ReleaseRepository } from '../../shared/repositories/release.repository'
+import { MessageService } from '~/core/services/message.service'
 
 @Component({
     selector: 'app-new-release-dialog',
@@ -30,10 +42,16 @@ import { AutoComplete } from 'primeng/autocomplete'
 })
 export class NewReleaseDialog {
     fb = inject(NonNullableFormBuilder)
+    releaseRepository = inject(ReleaseRepository)
+    messageService = inject(MessageService)
+    destroyRef = inject(DestroyRef)
 
     visible = input<boolean>(false)
+    projectId = input<string>('')
     visibleChange = output<boolean>()
-    onNewRelease = output<Release>()
+    onNewRelease = output<ReleaseData>()
+
+    isCreating = signal(false)
 
     compareOptions = [
         { label: '1.2.0', value: '1.2.0' },
@@ -64,20 +82,38 @@ export class NewReleaseDialog {
     }
 
     createRelease() {
-        if (!this.dialogForm.valid) {
+        if (!this.dialogForm.valid || !this.projectId()) {
             return
         }
 
-        const newRelease: Release = {
+        this.isCreating.set(true)
+
+        const releaseData = {
             version: this.dialogForm.value.version!,
-            description: this.dialogForm.value.description!,
-            tags: this.dialogForm.value.tags ?? [],
-            screensCount: this.dialogForm.value.screens?.length ?? 0,
-            emailsCount: this.dialogForm.value.emails?.length ?? 0,
-            created_at: new Date().toISOString(),
+            description: this.dialogForm.value.description || undefined,
+            tags: this.dialogForm.value.tags?.join(', ') || undefined,
         }
 
-        this.onNewRelease.emit(newRelease)
-        this.onHide()
+        this.releaseRepository
+            .createRelease(this.projectId(), releaseData)
+            .pipe(
+                takeUntilDestroyed(this.destroyRef),
+                catchError(err => {
+                    this.messageService.error(
+                        'Error',
+                        `Failed to create release. ${err.error?.message || err.message}`,
+                    )
+                    this.isCreating.set(false)
+                    return of(null)
+                }),
+            )
+            .subscribe(response => {
+                this.isCreating.set(false)
+                if (response?.payload) {
+                    this.onNewRelease.emit(response.payload)
+                    this.dialogForm.reset()
+                    this.onHide()
+                }
+            })
     }
 }
