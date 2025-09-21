@@ -46,7 +46,7 @@ You can find [Source's ER Diagram here](https://app.eraser.io/workspace/8FQjCJxk
 
 ### Task Management
 
--   I utilized **Linear** for task management, ensuring a structured workflow from task creation to completion. Tasks are assigned, tracked, and moved through typical stages (`Todo`, `In Progress`, `Review`, and `Done`), which greatly helped in managing and prioritizing work on the project.
+-   I utilized **Linear** for task management, ensuring a structured workflow from task creation to completion. Tasks are assigned, tracked, and moved through typical stages (`Backlog`, `Todo`, `In Progress`, `In Review`, and `Done`), which greatly helped me in manage and prioritize my work on the project.
 
 | Linear: Issues Board                            | Linear: Issue Details (Closed)                     |
 | ----------------------------------------------- | -------------------------------------------------- |
@@ -85,7 +85,7 @@ You can find [Source's ER Diagram here](https://app.eraser.io/workspace/8FQjCJxk
 
 <!-- Development & Testing -->
 <img src="./readme/title6.svg"/>
-
+****
 ### Tech Stack
 
 -   **Angular** with **PrimeNG** for frontend web UI
