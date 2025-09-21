@@ -57,11 +57,21 @@ You can find [Source's ER Diagram here](https://app.eraser.io/workspace/8FQjCJxk
 <!-- Development & Testing -->
 <img src="./readme/title6.svg"/>
 
-### Snippets
+### Some Snippets
 
-| Services                                | Validation                            | Testing                               |
-| --------------------------------------- | ------------------------------------- | ------------------------------------- |
-| ![Landing](./readme/demo/1440x1024.png) | ![fsdaf](./readme/demo/1440x1024.png) | ![fsdaf](./readme/demo/1440x1024.png) |
+#### AI
+
+| Figma AI Service                                       | Figma AI System Instruction                              |
+| ------------------------------------------------------ | -------------------------------------------------------- |
+| ![AI Service](./readme/backend/generateFigmaReply.png) | ![fsdaf](./readme/backend/getFigmaSystemInstruction.png) |
+
+#### Tests
+
+| Tests                                             |                                                   |
+| ------------------------------------------------- | ------------------------------------------------- |
+| ![Test Suite 1](./readme/backend/tests/test1.png) | ![Test Suite 2](./readme/backend/tests/test1.png) |
+|                                                   |                                                   |
+| ![Test Suite 3](./readme/backend/tests/test1.png) | ![Test Suite 4](./readme/backend/tests/test1.png) |
 
 ### Tech Stack
 
