@@ -57,6 +57,12 @@ You can find [Source's ER Diagram here](https://app.eraser.io/workspace/8FQjCJxk
 <!-- Development & Testing -->
 <img src="./readme/title6.svg"/>
 
+### Snippets
+
+| Services                                | Validation                            | Testing                               |
+| --------------------------------------- | ------------------------------------- | ------------------------------------- |
+| ![Landing](./readme/demo/1440x1024.png) | ![fsdaf](./readme/demo/1440x1024.png) | ![fsdaf](./readme/demo/1440x1024.png) |
+
 ### Tech Stack
 
 -   **Angular** with **PrimeNG** for frontend web UI

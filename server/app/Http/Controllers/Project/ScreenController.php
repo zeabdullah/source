@@ -20,9 +20,9 @@ class ScreenController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/projects/{projectId}/screens/export",
-     *     summary="Export screens from Figma",
-     *     description="Export multiple Figma frames as screens for a project",
+     *     path="/projects/{projectId}/screens/import",
+     *     summary="Import screens from Figma",
+     *     description="Import multiple Figma frames as screens for a project",
      *     tags={"Screens"},
      *     security={{"sanctum": {}}},
      *     @OA\Parameter(
@@ -42,7 +42,7 @@ class ScreenController extends Controller
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Screens exported successfully",
+     *         description="Screens imported successfully",
      *         @OA\JsonContent(
      *             type="array",
      *             @OA\Items(ref="#/components/schemas/Screen")
@@ -52,7 +52,7 @@ class ScreenController extends Controller
      *     @OA\Response(response=500, description="Server error")
      * )
      */
-    public function exportScreens(Request $request, string $projectId, FigmaService $figmaService): JsonResponse
+    public function importScreens(Request $request, string $projectId, FigmaService $figmaService): JsonResponse
     {
         $validated = $request->validate([
             'frame_ids' => 'required|array|min:1',
@@ -90,9 +90,9 @@ class ScreenController extends Controller
 
                 return $screen;
             });
-            return $this->responseJson($createdScreens, 'Frames exported as screens successfully', 201);
+            return $this->responseJson($createdScreens, 'Frames imported as screens successfully', 201);
         } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: "Failed to export screens from Figma: " . $th->getMessage());
+            return $this->serverErrorResponse(message: "Failed to import screens from Figma: " . $th->getMessage());
         }
     }
 

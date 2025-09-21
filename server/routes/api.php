@@ -25,7 +25,6 @@ Route::prefix('plugin')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     // Users
-    Route::get('/users/{userId}', [UserController::class, 'getUserById']);
     Route::put('/profile', [UserController::class, 'updateOwnProfile']);
     Route::post('/profile/figma-token', [UserController::class, 'storeFigmaToken']);
     Route::post('/profile/brevo-token', [UserController::class, 'storeBrevoApiToken']);
@@ -51,7 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Screens (per project)
         Route::middleware('is_owner')->group(function () {
-            Route::post('/{projectId}/screens/export', [ScreenController::class, 'exportScreens']);
+            Route::post('/{projectId}/screens/import', [ScreenController::class, 'importScreens']);
             Route::get('/{projectId}/screens', [ScreenController::class, 'getProjectScreens']);
             Route::get('/{projectId}/screens/{screenId}', [ScreenController::class, 'getScreenById']);
             Route::put('/{projectId}/screens/{screenId}', [ScreenController::class, 'updateScreenById']);

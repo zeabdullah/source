@@ -220,14 +220,14 @@ class UserController extends Controller
      */
     public function updateOwnProfile(Request $request): JsonResponse
     {
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|unique:users,email,' . $request->user()->id,
+            'avatar_url' => 'sometimes|nullable|url',
+            'figma_access_token' => 'sometimes|nullable|string|min:1',
+            'brevo_api_token' => 'sometimes|nullable|string|min:1',
+        ]);
         try {
-            $validated = $request->validate([
-                'name' => 'sometimes|string|max:255',
-                'email' => 'sometimes|email|unique:users,email,' . $request->user()->id,
-                'avatar_url' => 'sometimes|nullable|url',
-                'figma_access_token' => 'sometimes|nullable|string|min:1',
-                'brevo_api_token' => 'sometimes|nullable|string|min:1',
-            ]);
 
             $user = $request->user();
             $user->update($validated);
@@ -258,10 +258,10 @@ class UserController extends Controller
      */
     public function storeFigmaToken(Request $request): JsonResponse
     {
+        $validated = $request->validate([
+            'figma_access_token' => 'required|string|min:1',
+        ]);
         try {
-            $validated = $request->validate([
-                'figma_access_token' => 'required|string|min:1',
-            ]);
 
             $user = $request->user();
             $user->figma_access_token = $validated['figma_access_token'];
@@ -293,14 +293,14 @@ class UserController extends Controller
      */
     public function storeBrevoApiToken(Request $request): JsonResponse
     {
+        $validated = $request->validate([
+            'brevo_api_token' => 'required|string|min:1',
+        ]);
         try {
-            $validated = $request->validate([
-                'brevo_api_token' => 'required|string|min:1',
-            ]);
 
             $user = $request->user();
             $user->brevo_api_token = $validated['brevo_api_token'];
-            $user->save();
+            $user->saveOrFail();
 
             return $this->responseJson(message: 'Brevo API token stored successfully');
         } catch (\Throwable $th) {

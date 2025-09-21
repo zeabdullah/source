@@ -2249,8 +2249,24 @@
                     }
                 ],
                 "responses": {
-                    "501": {
-                        "description": "Not implemented"
+                    "200": {
+                        "description": "List of project releases",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Release"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    },
+                    "500": {
+                        "description": "Server error"
                     }
                 },
                 "security": [
@@ -2284,13 +2300,44 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "name": {
+                                    "version": {
                                         "type": "string",
-                                        "example": "Version 1.0"
+                                        "maxLength": 255,
+                                        "example": "1.0.0"
                                     },
                                     "description": {
                                         "type": "string",
-                                        "example": "Initial release",
+                                        "maxLength": 1500,
+                                        "example": "Initial release with core features",
+                                        "nullable": true
+                                    },
+                                    "tags": {
+                                        "type": "string",
+                                        "maxLength": 500,
+                                        "example": "stable production",
+                                        "nullable": true
+                                    },
+                                    "screen_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2,
+                                            3
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "email_template_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2
+                                        ],
                                         "nullable": true
                                     }
                                 },
@@ -2300,8 +2347,24 @@
                     }
                 },
                 "responses": {
-                    "501": {
-                        "description": "Not implemented"
+                    "201": {
+                        "description": "Release created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Release"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
                     }
                 },
                 "security": [
@@ -2332,8 +2395,21 @@
                     }
                 ],
                 "responses": {
-                    "501": {
-                        "description": "Not implemented"
+                    "200": {
+                        "description": "Release data with relationships",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Release"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Release not found"
+                    },
+                    "500": {
+                        "description": "Server error"
                     }
                 },
                 "security": [
@@ -2367,23 +2443,50 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "name": {
+                                    "version": {
                                         "type": "string",
-                                        "example": "Updated Release Name"
+                                        "maxLength": 255,
+                                        "example": "1.1.0"
                                     },
                                     "description": {
                                         "type": "string",
-                                        "example": "Updated description",
+                                        "maxLength": 2500,
+                                        "example": "Updated release with bug fixes",
                                         "nullable": true
                                     },
-                                    "status": {
-                                        "type": "string",
-                                        "enum": [
-                                            "draft",
-                                            "published",
-                                            "archived"
+                                    "tags": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "hotfix",
+                                            "production"
                                         ],
-                                        "example": "published"
+                                        "nullable": true
+                                    },
+                                    "screen_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            3,
+                                            5
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "email_template_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            2,
+                                            4
+                                        ],
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -2392,8 +2495,24 @@
                     }
                 },
                 "responses": {
-                    "501": {
-                        "description": "Not implemented"
+                    "200": {
+                        "description": "Release updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Release"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Release not found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
                     }
                 },
                 "security": [
@@ -2422,8 +2541,21 @@
                     }
                 ],
                 "responses": {
-                    "501": {
-                        "description": "Not implemented"
+                    "200": {
+                        "description": "Release deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Release"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Release not found"
+                    },
+                    "500": {
+                        "description": "Server error"
                     }
                 },
                 "security": [
@@ -2433,14 +2565,14 @@
                 ]
             }
         },
-        "/projects/{projectId}/screens/export": {
+        "/projects/{projectId}/screens/import": {
             "post": {
                 "tags": [
                     "Screens"
                 ],
-                "summary": "Export screens from Figma",
-                "description": "Export multiple Figma frames as screens for a project",
-                "operationId": "15ee6851baa72e5a8733f5133d6628d5",
+                "summary": "Import screens from Figma",
+                "description": "Import multiple Figma frames as screens for a project",
+                "operationId": "3275d012ef6e21e1a87478a01cec9096",
                 "parameters": [
                     {
                         "name": "projectId",
@@ -2485,7 +2617,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Screens exported successfully",
+                        "description": "Screens imported successfully",
                         "content": {
                             "application/json": {
                                 "schema": {

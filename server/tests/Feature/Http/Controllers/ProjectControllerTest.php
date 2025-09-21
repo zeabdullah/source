@@ -33,9 +33,6 @@ describe('createProject', function () {
                     'owner_id',
                     'name',
                     'description',
-                    'figma_file_key',
-                    'figma_file_name',
-                    'figma_last_synced',
                 ]
             ])
             ->assertJson([
@@ -109,9 +106,6 @@ describe('getMyProjects', function () {
                         'owner_id',
                         'name',
                         'description',
-                        'figma_file_key',
-                        'figma_file_name',
-                        'figma_last_synced',
                     ]
                 ],
             ])
