@@ -16,20 +16,23 @@ Route::group([], function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
+    Route::prefix('plugin')->group(function () {
+        Route::post('/login', [AuthController::class, 'pluginLogin']);
+        Route::post('/logout', [AuthController::class, 'pluginLogout'])->middleware('auth:sanctum');
+    });
 });
 
-Route::prefix('plugin')->group(function () {
-    Route::post('/login', [AuthController::class, 'pluginLogin']);
-    Route::post('/logout', [AuthController::class, 'pluginLogout'])->middleware('auth:sanctum');
-});
 
 Route::middleware('auth:sanctum')->group(function () {
     // Users
-    Route::put('/profile', [UserController::class, 'updateOwnProfile']);
-    Route::post('/profile/figma-token', [UserController::class, 'storeFigmaToken']);
-    Route::post('/profile/brevo-token', [UserController::class, 'storeBrevoApiToken']);
-    Route::delete('/profile/figma-token', [UserController::class, 'removeFigmaToken']);
-    Route::delete('/profile/brevo-token', [UserController::class, 'removeBrevoApiToken']);
+    Route::prefix('profile')->group(function () {
+        Route::put('/', [UserController::class, 'updateOwnProfile']);
+        Route::post('/figma-token', [UserController::class, 'storeFigmaToken']);
+        Route::post('/brevo-token', [UserController::class, 'storeBrevoApiToken']);
+        Route::delete('/figma-token', [UserController::class, 'removeFigmaToken']);
+        Route::delete('/brevo-token', [UserController::class, 'removeBrevoApiToken']);
+    });
 
     // Brevo Templates (general)
     Route::get('/brevo-templates', [EmailTemplateController::class, 'getBrevoTemplates']);

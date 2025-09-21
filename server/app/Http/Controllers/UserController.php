@@ -156,43 +156,6 @@ use Illuminate\Http\Request;
 class UserController extends Controller
 {
     /**
-     * @OA\Get(
-     *     path="/users/{userId}",
-     *     summary="Get a user by ID",
-     *     description="Retrieve user information by user ID",
-     *     tags={"Users"},
-     *     @OA\Parameter(
-     *         name="userId",
-     *         in="path",
-     *         description="The ID of the user to get",
-     *         required=true,
-     *         @OA\Schema(type="string"),
-     *         @OA\Examples(example="int", value="1", summary="An int value."),
-     *         @OA\Examples(example="uuid", value="0006faf6-7a61-426c-9034-579f2cfcfa83", summary="An UUID value."),
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="User data retrieved successfully",
-     *         @OA\JsonContent(ref="#/components/schemas/User")
-     *     ),
-     *     @OA\Response(response=404, description="User not found")
-     * )
-     */
-    public function getUserById(string $userId): JsonResponse
-    {
-        try {
-            $user = User::find($userId);
-            if (!$user) {
-                return $this->notFoundResponse('User not found');
-            }
-
-            return $this->responseJson($user);
-        } catch (\Throwable $th) {
-            return $this->serverErrorResponse(message: 'Failed to fetch user: ' . $th->getMessage());
-        }
-    }
-
-    /**
      * @OA\Put(
      *     path="/profile",
      *     summary="Update own profile",
