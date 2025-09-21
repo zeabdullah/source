@@ -58,6 +58,11 @@ class EmailTemplate extends Model
         return $this->morphMany(Comment::class, 'commentable');
     }
 
+    public function releases()
+    {
+        return $this->morphToMany(Release::class, 'releasable');
+    }
+
     /**
      * Scope to search email templates by section name
      */

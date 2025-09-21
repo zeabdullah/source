@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Project;
 
 use App\Http\Controllers\Controller;
+use App\Models\Project;
+use App\Models\Release;
 use Illuminate\Http\Request;
 
 /**
@@ -30,19 +32,63 @@ class ReleaseController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="name", type="string", example="Version 1.0"),
-     *             @OA\Property(property="description", type="string", nullable=true, example="Initial release")
+     *             @OA\Property(property="version", type="string", maxLength=255, example="1.0.0"),
+     *             @OA\Property(property="description", type="string", maxLength=1500, nullable=true, example="Initial release with core features"),
+     *             @OA\Property(property="tags", type="string", maxLength=500, nullable=true, example="stable production"),
+     *             @OA\Property(property="screen_ids", type="array", nullable=true, @OA\Items(type="integer"), example={1, 2, 3}),
+     *             @OA\Property(property="email_template_ids", type="array", nullable=true, @OA\Items(type="integer"), example={1, 2})
      *         )
      *     ),
      *     @OA\Response(
-     *         response=501,
-     *         description="Not implemented"
-     *     )
+     *         response=201,
+     *         description="Release created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Release")
+     *     ),
+     *     @OA\Response(response=404, description="Project not found"),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
      * )
      */
     public function createRelease(Request $request, string $projectId)
     {
-        return $this->notImplementedResponse();
+        $validated = $request->validate([
+            'version' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1500',
+            'tags' => 'nullable|string|max:500',
+            'screen_ids' => 'nullable|array',
+            'screen_ids.*' => 'exists:screens,id',
+            'email_template_ids' => 'nullable|array',
+            'email_template_ids.*' => 'exists:email_templates,id',
+        ]);
+
+
+        try {
+            $project = Project::find($projectId);
+            if (!$project) {
+                return $this->notFoundResponse('Project not found');
+            }
+
+            $release = new Release($validated);
+            $release->project_id = $project->id;
+
+            $release->saveOrFail();
+
+            // Attach screens and email templates
+            if (!empty($validated['screen_ids'])) {
+                $release->screens()->attach($validated['screen_ids']);
+            }
+            if (!empty($validated['email_template_ids'])) {
+                $release->emailTemplates()->attach($validated['email_template_ids']);
+            }
+
+            return $this->responseJson(
+                $release->load(['screens', 'emailTemplates']),
+                'Created successfully',
+                201
+            );
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to create Release: ' . $th->getMessage());
+        }
     }
 
     /**
@@ -60,14 +106,34 @@ class ReleaseController extends Controller
      *         @OA\Schema(type="string", example="1")
      *     ),
      *     @OA\Response(
-     *         response=501,
-     *         description="Not implemented"
-     *     )
+     *         response=200,
+     *         description="List of project releases",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Release")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Project not found"),
+     *     @OA\Response(response=500, description="Server error")
      * )
      */
     public function getProjectReleases(Request $request, string $projectId)
     {
-        return $this->notImplementedResponse();
+        try {
+            $project = Project::find($projectId);
+            if (!$project) {
+                return $this->notFoundResponse('Project not found');
+            }
+
+            $releases = $project->releases()
+                ->with(['screens', 'emailTemplates'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return $this->responseJson($releases);
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to get project releases: ' . $th->getMessage());
+        }
     }
 
     /**
@@ -85,14 +151,27 @@ class ReleaseController extends Controller
      *         @OA\Schema(type="string", example="1")
      *     ),
      *     @OA\Response(
-     *         response=501,
-     *         description="Not implemented"
-     *     )
+     *         response=200,
+     *         description="Release data with relationships",
+     *         @OA\JsonContent(ref="#/components/schemas/Release")
+     *     ),
+     *     @OA\Response(response=404, description="Release not found"),
+     *     @OA\Response(response=500, description="Server error")
      * )
      */
     public function getReleaseById(Request $request, string $releaseId)
     {
-        return $this->notImplementedResponse();
+        try {
+            $release = Release::with(['screens', 'emailTemplates', 'project'])
+                ->find($releaseId);
+            if (!$release) {
+                return $this->notFoundResponse('Release not found');
+            }
+
+            return $this->responseJson($release);
+        } catch (\Throwable $th) {
+            return $this->serverErrorResponse(message: 'Failed to get release: ' . $th->getMessage());
+        }
     }
 
     /**
@@ -112,20 +191,57 @@ class ReleaseController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="name", type="string", example="Updated Release Name"),
-     *             @OA\Property(property="description", type="string", nullable=true, example="Updated description"),
-     *             @OA\Property(property="status", type="string", enum={"draft", "published", "archived"}, example="published")
+     *             @OA\Property(property="version", type="string", maxLength=255, example="1.1.0"),
+     *             @OA\Property(property="description", type="string", maxLength=2500, nullable=true, example="Updated release with bug fixes"),
+     *             @OA\Property(property="tags", type="array", nullable=true, @OA\Items(type="string"), example={"hotfix", "production"}),
+     *             @OA\Property(property="screen_ids", type="array", nullable=true, @OA\Items(type="integer"), example={1, 3, 5}),
+     *             @OA\Property(property="email_template_ids", type="array", nullable=true, @OA\Items(type="integer"), example={2, 4})
      *         )
      *     ),
      *     @OA\Response(
-     *         response=501,
-     *         description="Not implemented"
-     *     )
+     *         response=200,
+     *         description="Release updated successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Release")
+     *     ),
+     *     @OA\Response(response=404, description="Release not found"),
+     *     @OA\Response(response=422, description="Validation errors"),
+     *     @OA\Response(response=500, description="Server error")
      * )
      */
     public function updateReleaseById(Request $request, string $releaseId)
     {
-        return $this->notImplementedResponse();
+        $validated = $request->validate([
+            'version' => 'required|string|max:255',
+            'description' => 'nullable|string|max:2500',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string|max:255',
+            'screen_ids' => 'nullable|array',
+            'screen_ids.*' => 'exists:screens,id',
+            'email_template_ids' => 'nullable|array',
+            'email_template_ids.*' => 'exists:email_templates,id',
+        ]);
+
+        try {
+            $release = Release::find($releaseId);
+            if (!$release) {
+                return $this->notFoundResponse('Release not found');
+            }
+
+            $release->updateOrFail(collect($validated)->except(['screen_ids', 'email_template_ids'])->toArray());
+
+            // Update relationships if provided
+            if (isset($validated['screen_ids'])) {
+                $release->screens()->sync($validated['screen_ids']);
+            }
+            if (isset($validated['email_template_ids'])) {
+                $release->emailTemplates()->sync($validated['email_template_ids']);
+            }
+
+            return $this->responseJson($release->load(['screens', 'emailTemplates']), 'Updated successfully');
+        } catch (\Throwable $e) {
+            return $this->serverErrorResponse(message: 'Failed to update Release: ' . $e->getMessage());
+        }
+
     }
 
     /**
@@ -143,13 +259,28 @@ class ReleaseController extends Controller
      *         @OA\Schema(type="string", example="1")
      *     ),
      *     @OA\Response(
-     *         response=501,
-     *         description="Not implemented"
-     *     )
+     *         response=200,
+     *         description="Release deleted successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Release")
+     *     ),
+     *     @OA\Response(response=404, description="Release not found"),
+     *     @OA\Response(response=500, description="Server error")
      * )
      */
     public function deleteReleaseById(Request $request, string $releaseId)
     {
-        return $this->notImplementedResponse();
+
+        try {
+            $release = Release::find($releaseId);
+            if (!$release) {
+                return $this->notFoundResponse('Release not found');
+            }
+
+            $release->deleteOrFail();
+
+            return $this->responseJson($release, 'Release deleted');
+        } catch (\Throwable $e) {
+            return $this->serverErrorResponse(message: 'Failed to delete Release: ' . $e->getMessage());
+        }
     }
 }
