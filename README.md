@@ -7,7 +7,7 @@
 
 > **Source is the hub for your product team's assets.**
 >
-> It is the _Source_ of truth for all of what your users see in a product. Source allows you to bring your app's flows, marketing assets, releases, and design assets under an AI-powered workspace for seamless collaboration, hand-off, and auditing.
+> It is the **_Source_ of truth** for all of what your users see in a product. Source allows you to bring your app's flows, marketing assets, releases, and design assets under an AI-powered workspace for seamless collaboration, hand-off, and auditing.
 
 <br><br>
 
@@ -19,6 +19,9 @@
 Thanks to [Eraser's](https://eraser.io) simple yet powerful diagrams as code feature, it has helped me quickly map out and revise my database schemas progressively.
 
 You can find [Source's ER Diagram here](https://app.eraser.io/workspace/8FQjCJxkMfRbnclguIwf?origin=share&elements=S5rvZyZoHdEj9nQ0_fGEnQ).
+
+> [!NOTE]
+> Requires an **Eraser** account to view.
 
 <a href="https://app.eraser.io/workspace/8FQjCJxkMfRbnclguIwf?origin=share&elements=S5rvZyZoHdEj9nQ0_fGEnQ" title="Source ERD"><img src='./readme/db/eraser1.svg' alt="Source ERD" /></a>
 
@@ -41,37 +44,47 @@ You can find [Source's ER Diagram here](https://app.eraser.io/workspace/8FQjCJxk
 
 -   Source integrates with popular tools that you already use, like **Figma** and **Brevo**, to help you seamlessly work on what's familiar and effective, all while syncing your work.
 
+### Task Management
+
+-   I utilized **Linear** for task management, ensuring a structured workflow from task creation to completion. Tasks are assigned, tracked, and moved through typical stages (`Todo`, `In Progress`, `Review`, and `Done`), which greatly helped in managing and prioritizing work on the project.
+
+| Linear: Issues Board                            | Linear: Issue Details (Closed)                     |
+| ----------------------------------------------- | -------------------------------------------------- |
+| ![AI Service](./readme/linear/linear-board.png) | ![fsdaf](./readme/linear/linear-issue-details.png) |
+
 <br><br>
 
 <!-- Demo -->
 <img src="./readme/title5.svg"/>
 
-### Admin Screens (Web)
+### App Screens (Web)
 
-| Login screen                            | Register screen                       |
-| --------------------------------------- | ------------------------------------- |
-| ![Landing](./readme/demo/1440x1024.png) | ![fsdaf](./readme/demo/1440x1024.png) |
+| Landing screen                                                      | Landing Screen #2                                                   |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| ![Landing](./readme/frontend/landing/landing1.png)                  | ![Landing 2](./readme/frontend/landing/landing2.png)                |
+| Login                                                               | Register                                                            |
+|                                                                     |                                                                     |
+| ![Login](./readme/frontend/auth/login.png)                          | ![Register](./readme/frontend/auth/register.png)                    |
+| Projects (Dashboard index)                                          | Account Settings                                                    |
+|                                                                     |                                                                     |
+| ![Projects index](./readme/frontend/projects/projects.png)          | ![Account Settings](./readme/frontend/account/account-settings.png) |
+| Screens                                                             | Screen Details (w/ Comments)                                        |
+|                                                                     |                                                                     |
+| ![Screens List](./readme/frontend/screens/screens2.png)             | ![Screen Details](./readme/frontend/screens/screens1.png)           |
+| Screen Details (w/ AI typing)                                       | Screen Details (w/ AI responded)                                    |
+|                                                                     |                                                                     |
+| ![Screen details ](./readme/frontend/screens/screens-ai-typing.png) | ![Screend details](./readme/frontend/screens/screens-ai-ready.png)  |
+| Releases List                                                       | Releases (New)                                                      |
+|                                                                     |                                                                     |
+| ![Releases](./readme/frontend/releases/release-list.png)            | ![Releases](./readme/frontend/releases/releasedialog.png)           |
+| Audits List (Processing)                                            | Audits Details                                                      |
+|                                                                     |                                                                     |
+| ![Audits](./readme/frontend/audits/audit-processing.png)            | ![Audits](./readme/frontend/audits/audit-details.png)               |
 
 <br><br>
 
 <!-- Development & Testing -->
 <img src="./readme/title6.svg"/>
-
-### Some Snippets
-
-#### AI
-
-| Figma AI Service                                       | Figma AI System Instruction                              |
-| ------------------------------------------------------ | -------------------------------------------------------- |
-| ![AI Service](./readme/backend/generateFigmaReply.png) | ![fsdaf](./readme/backend/getFigmaSystemInstruction.png) |
-
-#### Tests
-
-| Tests                                             |                                                   |
-| ------------------------------------------------- | ------------------------------------------------- |
-| ![Test Suite 1](./readme/backend/tests/test1.png) | ![Test Suite 2](./readme/backend/tests/test1.png) |
-|                                                   |                                                   |
-| ![Test Suite 3](./readme/backend/tests/test1.png) | ![Test Suite 4](./readme/backend/tests/test1.png) |
 
 ### Tech Stack
 
@@ -84,6 +97,17 @@ You can find [Source's ER Diagram here](https://app.eraser.io/workspace/8FQjCJxk
 -   **Gemini API** for AI features
 -   **n8n** for workflow automation and integrations
 
+### Some Code Snippets
+
+| Figma AI Service                                       | Figma AI System Instruction                              |
+| ------------------------------------------------------ | -------------------------------------------------------- |
+| ![AI Service](./readme/backend/generateFigmaReply.png) | ![fsdaf](./readme/backend/getFigmaSystemInstruction.png) |
+| Tests                                                  |                                                          |
+|                                                        |                                                          |
+| ![Test Suite 1](./readme/backend/tests/test1.png)      | ![Test Suite 2](./readme/backend/tests/test1.png)        |
+|                                                        |                                                          |
+| ![Test Suite 3](./readme/backend/tests/test1.png)      | ![Test Suite 4](./readme/backend/tests/test1.png)        |
+
 ### Local Installation
 
 #### Prerequisites
@@ -91,7 +115,7 @@ You can find [Source's ER Diagram here](https://app.eraser.io/workspace/8FQjCJxk
 Before setting up the development environment, ensure you have the following installed:
 
 -   [**Node.js**](https://nodejs.org/) (v22.17.0 or higher)
--   **pnpm** (v10 or higher) - Install with `npm install -g pnpm`
+-   [**pnpm**](https://pnpm.io) (v10 or higher) - Install with `npm install -g pnpm`
 -   [**PHP**](https://www.php.net/downloads) (v8.3 or higher) and **Composer**
 -   **[Docker](https://www.docker.com) & Docker Compose**
 -   [**PostgreSQL**](<(https://www.postgresql.org/download/)>) (v17.6 or higher)
@@ -120,9 +144,9 @@ cd server && php artisan key:generate
 
 1. **Start all services with Docker**
 
-    ```bash
-    docker compose up -d
-    ```
+```bash
+docker compose up -d
+```
 
 This first step will boot up all services: frontend, backend, n8n, and database.
 
@@ -206,8 +230,16 @@ cd client && pnpm test
 <!-- Deployment -->
 <img src="./readme/title7.svg"/>
 
-| Postman API 1                           | Postman API 2                         | Postman API 3                         |
-| --------------------------------------- | ------------------------------------- | ------------------------------------- |
-| ![Landing](./readme/demo/1440x1024.png) | ![fsdaf](./readme/demo/1440x1024.png) | ![fsdaf](./readme/demo/1440x1024.png) |
+<br>
+
+In addition to unit tests for the app, I tested my API endpoints using **Hoppscotch**.
+
+> The following screenshots are taken with [**Hoppscotch**](https://hoppscotch.io/), a powerful API testing app similar to **Postman**.
+
+| API: Create Project                         | API: Get My Projects                       | API: Import Brevo Email Template                 |
+| ------------------------------------------- | ------------------------------------------ | ------------------------------------------------ |
+| ![Landing](./readme/api/create-project.png) | ![fsdaf](./readme/api/get-my-projects.png) | ![fsdaf](./readme/api/import-brevo-template.png) |
+
+The project also includes an API documentation endpoint generated by **OpenAPI** and **Laravel**. You can find that documentation under `http://localhost:8000/api/documentation`.
 
 <br><br>
