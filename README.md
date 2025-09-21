@@ -16,7 +16,7 @@
 
 ### Add Title Here
 
-- To be decided on later on.
+-   To be decided on later on.
 
 <br><br>
 
@@ -25,7 +25,7 @@
 
 ### Add Title Here
 
-- List the sexy features.
+-   List the sexy features.
 
 <br><br>
 
@@ -38,13 +38,11 @@
 | --------------------------------------- | ------------------------------------- | ------------------------------------- |
 | ![Landing](./readme/demo/1440x1024.png) | ![fsdaf](./readme/demo/1440x1024.png) | ![fsdaf](./readme/demo/1440x1024.png) |
 
-
 ### Admin Screens (Web)
 
 | Login screen                            | Register screen                       |
 | --------------------------------------- | ------------------------------------- |
 | ![Landing](./readme/demo/1440x1024.png) | ![fsdaf](./readme/demo/1440x1024.png) |
-
 
 <br><br>
 
@@ -53,11 +51,9 @@
 
 ### Add Title Here
 
-
-| Services                            | Validation                       | Testing                        |
+| Services                                | Validation                            | Testing                               |
 | --------------------------------------- | ------------------------------------- | ------------------------------------- |
 | ![Landing](./readme/demo/1440x1024.png) | ![fsdaf](./readme/demo/1440x1024.png) | ![fsdaf](./readme/demo/1440x1024.png) |
-
 
 <br><br>
 
@@ -66,10 +62,9 @@
 
 ### Add Title Here
 
-- Description here.
+-   Description here.
 
-
-| Postman API 1                            | Postman API 2                       | Postman API 3                        |
+| Postman API 1                           | Postman API 2                         | Postman API 3                         |
 | --------------------------------------- | ------------------------------------- | ------------------------------------- |
 | ![Landing](./readme/demo/1440x1024.png) | ![fsdaf](./readme/demo/1440x1024.png) | ![fsdaf](./readme/demo/1440x1024.png) |
 

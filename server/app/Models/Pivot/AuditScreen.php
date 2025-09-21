@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Pivot;
 
+use App\Models\Audit;
+use App\Models\Screen;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class AuditScreen extends Pivot
