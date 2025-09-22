@@ -9,7 +9,7 @@ import {
     signal,
     DestroyRef,
 } from '@angular/core'
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
 import { Dialog } from 'primeng/dialog'
 import { Button } from 'primeng/button'
 import { InputText } from 'primeng/inputtext'
@@ -23,7 +23,6 @@ import { AuditRepository } from '~/modules/dashboard/containers/projects/contain
 import { ScreenData } from '~/modules/dashboard/containers/projects/shared/interfaces/screen.interface'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
-import { CreateAuditRequest } from '../../shared/interfaces/audit.interface'
 
 @Component({
     selector: 'app-create-audit-dialog',
@@ -34,7 +33,7 @@ import { CreateAuditRequest } from '../../shared/interfaces/audit.interface'
 })
 export class CreateAuditDialog implements OnInit {
     private auditRepository = inject(AuditRepository)
-    private fb = inject(FormBuilder)
+    private fb = inject(NonNullableFormBuilder)
     private message = inject(MessageService)
     private http = inject(HttpClient)
     destroyRef = inject(DestroyRef)
@@ -49,10 +48,13 @@ export class CreateAuditDialog implements OnInit {
     private isLoading = signal(false)
     private isSubmitting = signal(false)
 
-    auditForm: FormGroup = this.fb.group({
-        name: ['', [Validators.required, Validators.maxLength(255)]],
-        description: [''],
-        screen_ids: [[], [Validators.required, Validators.minLength(2), Validators.maxLength(7)]],
+    auditForm = this.fb.group({
+        name: this.fb.control('', [Validators.required, Validators.maxLength(255)]),
+        description: this.fb.control(''),
+        screen_ids: this.fb.control<number[]>(
+            [],
+            [Validators.required, Validators.minLength(2), Validators.maxLength(7)],
+        ),
     })
 
     screensList = this.screens.asReadonly()
@@ -114,10 +116,10 @@ export class CreateAuditDialog implements OnInit {
         }
 
         this.isSubmitting.set(true)
-        const formData = this.auditForm.value as CreateAuditRequest
+        const formValue = this.auditForm.getRawValue()
 
         this.auditRepository
-            .createAudit(this.projectId(), formData)
+            .createAudit(this.projectId(), formValue)
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
                 catchError(err => {

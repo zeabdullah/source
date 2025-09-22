@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '
 import { Router, RouterLink } from '@angular/router'
 import { AuthService } from '~/core/services/auth.service'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { MessageService } from '~/core/services/message.service'
 
 @Component({
     selector: 'app-navbar',
@@ -12,6 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 export class Navbar implements OnInit {
     protected authService = inject(AuthService)
     protected router = inject(Router)
+    protected message = inject(MessageService)
     protected destroyRef = inject(DestroyRef)
 
     protected isAuthenticated = this.authService.isAuthenticated.asReadonly()
@@ -23,12 +25,18 @@ export class Navbar implements OnInit {
             .subscribe()
     }
 
-    logout() {
+    logoutAndGoHome() {
         this.authService
             .logout()
             .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(() => {
-                this.router.navigate(['/'])
+            .subscribe({
+                next: async () => {
+                    await this.router.navigate(['/'])
+                },
+                error: err => {
+                    console.error('error logging out:', err)
+                    this.message.error('Oops', 'Failed to log out.')
+                },
             })
     }
 }

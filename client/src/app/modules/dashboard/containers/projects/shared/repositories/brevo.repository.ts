@@ -26,12 +26,9 @@ export class BrevoRepository {
         projectId: string,
         brevoTemplateId: string,
     ): Observable<ImportBrevoTemplateResponse> {
-        const formData = new FormData()
-        formData.append('brevo_template_id', brevoTemplateId)
-
         return this.http.post<ImportBrevoTemplateResponse>(
             `/api/projects/${projectId}/email-templates/import-brevo`,
-            formData,
+            { brevo_template_id: brevoTemplateId },
         )
     }
 

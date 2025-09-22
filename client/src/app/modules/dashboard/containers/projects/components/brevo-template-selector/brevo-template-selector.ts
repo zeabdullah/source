@@ -158,7 +158,6 @@ export class BrevoTemplateSelector {
                 .pipe(takeUntilDestroyed(this.destroyRef))
                 .subscribe({
                     next: response => {
-                        this.message.success('Success', 'Successfully imported template!')
                         this.templatesImported.emit([response.payload!])
                         this.onVisibleChange(false)
                     },
@@ -186,10 +185,6 @@ export class BrevoTemplateSelector {
                     }),
                 )
                 .subscribe(response => {
-                    this.message.success(
-                        'Success',
-                        `Successfully imported ${response.payload?.length ?? 0} templates!`,
-                    )
                     this.templatesImported.emit(response.payload ?? [])
                     this.onVisibleChange(false)
                 })

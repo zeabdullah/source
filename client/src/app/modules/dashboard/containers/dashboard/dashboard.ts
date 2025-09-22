@@ -47,4 +47,19 @@ export class Dashboard implements OnInit {
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe()
     }
+
+    logoutAndGoHome() {
+        this.authService
+            .logout()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: async () => {
+                    await this.router.navigate(['/'])
+                },
+                error: err => {
+                    alert('something wrong happened')
+                    console.log(err)
+                },
+            })
+    }
 }

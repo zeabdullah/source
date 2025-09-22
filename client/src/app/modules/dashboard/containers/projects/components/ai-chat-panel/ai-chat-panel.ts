@@ -8,7 +8,7 @@ import {
     DestroyRef,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpErrorResponse } from '@angular/common/http'
 import { catchError, of } from 'rxjs'
 import { Button } from 'primeng/button'
 import { InputText } from 'primeng/inputtext'
@@ -20,6 +20,7 @@ import { AiChatMessageData } from '../../shared/interfaces/ai-chat-message-data.
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { MessageService } from '~/core/services/message.service'
+import { AiChatRepository } from '../../shared/repositories/ai-chat.respository'
 
 @Component({
     selector: 'app-ai-chat-panel',
@@ -29,8 +30,9 @@ import { MessageService } from '~/core/services/message.service'
     host: { class: 'h-full' },
 })
 export class AiChatPanel implements OnInit {
-    http = inject(HttpClient)
-    message = inject(MessageService)
+    protected http = inject(HttpClient)
+    protected message = inject(MessageService)
+    protected aiChatRepository = inject(AiChatRepository)
     destroyRef = inject(DestroyRef)
 
     emailTemplateId = input<number | undefined>()
@@ -49,7 +51,7 @@ export class AiChatPanel implements OnInit {
         return this.emailTemplateId() ?? this.screenId() ?? 0
     }
 
-    get chatType(): string {
+    get chatType() {
         return this.emailTemplateId() ? 'email-templates' : 'screens'
     }
 
@@ -57,14 +59,11 @@ export class AiChatPanel implements OnInit {
         if (!this.chatId) return
 
         this.isLoading.set(true)
-        this.http
-            .get<LaravelApiResponse<AiChatMessageData[]>>(
-                `/api/${this.chatType}/${encodeURIComponent(this.chatId)}/chats`,
-            )
+        this.aiChatRepository
+            .getChatMessages(this.chatType, this.chatId)
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
-                catchError(err => {
-                    console.warn('Failed to load chat messages:', err)
+                catchError((err: HttpErrorResponse) => {
                     this.message.error(
                         'Error',
                         `Failed to load chat. ${err.error?.message || err.message}`,
@@ -84,10 +83,10 @@ export class AiChatPanel implements OnInit {
             return
         }
 
-        // Add user message immediately
+        // Add user message immediately (optimistic ui)
         const userMessage: AiChatMessageData = {
             id: Date.now(),
-            user_id: 1,
+            user_id: 1, // placeholder
             content: messageContent,
             sender: 'user',
             created_at: new Date().toISOString(),
@@ -98,36 +97,18 @@ export class AiChatPanel implements OnInit {
         this.newMessage.set('')
         this.isWaitingForAiResponse.set(true)
 
-        const formData = new FormData()
-        formData.set('content', messageContent)
-
-        // For email templates, set update_template to true to enable AI template updates
-        if (this.chatType === 'email-templates') {
-            formData.set('update_template', '1')
-        }
-
-        this.http
-            .post<
-                LaravelApiResponse<{
-                    user: AiChatMessageData
-                    ai: { content: string }
-                    template_updated?: boolean
-                }>
-            >(`/api/${this.chatType}/${encodeURIComponent(this.chatId)}/chats`, formData)
+        this.aiChatRepository
+            .sendMessage(this.chatType, this.chatId, {
+                content: messageContent,
+                update_template: this.chatType === 'email-templates',
+            })
             .pipe(
-                catchError(err => {
-                    console.warn('Failed to send message:', err)
+                catchError((err: HttpErrorResponse) => {
                     this.message.error(
                         'Error',
                         `Failed to send message. ${err.error?.message || err.message}`,
                     )
-                    return of<
-                        LaravelApiResponse<{
-                            user: AiChatMessageData
-                            ai: { content: string }
-                            template_updated?: boolean
-                        }>
-                    >({
+                    return of<LaravelApiResponse<null>>({
                         message: '',
                         payload: null,
                     })
@@ -137,12 +118,12 @@ export class AiChatPanel implements OnInit {
                 if (response.payload) {
                     // Add AI message
                     const aiMessage: AiChatMessageData = {
-                        id: Date.now() + 1,
+                        id: response.payload.ai.id,
                         user_id: null,
-                        content: response.payload!.ai.content,
+                        content: response.payload.ai.content,
                         sender: 'ai',
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString(),
+                        created_at: response.payload.ai.created_at,
+                        updated_at: response.payload.ai.updated_at,
                     }
                     this.messages.update(messages => [...messages, aiMessage])
 

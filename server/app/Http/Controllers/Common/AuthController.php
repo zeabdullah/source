@@ -181,7 +181,6 @@ class AuthController extends Controller
         }
 
         $payload = [];
-        // $user = auth()->user();
 
         if ($request->hasSession()) {
             $request->session()->regenerate();

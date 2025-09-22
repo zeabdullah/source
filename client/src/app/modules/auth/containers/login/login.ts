@@ -8,6 +8,7 @@ import { AuthService } from '~/core/services/auth.service'
 import { Logo } from '~/shared/components/logo/logo'
 import { InputText } from 'primeng/inputtext'
 import { Button } from 'primeng/button'
+import { AuthRepository } from '~/core/repositories/auth.repository'
 
 @Component({
     selector: 'app-login',
@@ -18,6 +19,7 @@ import { Button } from 'primeng/button'
 export class Login implements OnInit {
     protected fb = inject(NonNullableFormBuilder)
     protected authService = inject(AuthService)
+    protected authRepository = inject(AuthRepository)
     protected router = inject(Router)
 
     protected isLoading = signal(false)
@@ -40,17 +42,19 @@ export class Login implements OnInit {
         this.isLoading.set(true)
         this.errorMessage.set(null)
 
-        const formData = new FormData()
-        formData.append('email', this.loginForm.get('email')?.value || '')
-        formData.append('password', this.loginForm.get('password')?.value || '')
+        const formValue = this.loginForm.getRawValue()
 
-        this.authService.login(formData).subscribe({
-            next: ({ success, errorMessage }) => {
+        this.authRepository.login(formValue).subscribe({
+            next: async resp => {
                 this.isLoading.set(false)
-                if (success) {
-                    this.router.navigate(['/dashboard'])
+                if (resp.ok && resp.body?.payload?.user) {
+                    this.authService.user.set(resp.body.payload.user)
+                    this.authService.isAuthenticated.set(true)
+
+                    await this.router.navigate(['/dashboard'])
                 } else {
-                    this.errorMessage.set(errorMessage || 'Login failed. Please try again.')
+                    const message = resp.body?.message || 'Login failed. Please try again.'
+                    this.errorMessage.set(message)
                 }
             },
             error: (err: HttpErrorResponse) => {

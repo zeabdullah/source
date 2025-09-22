@@ -8,10 +8,13 @@ import {
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { HttpErrorResponse } from '@angular/common/http'
+import { catchError } from 'rxjs/operators'
+import { of } from 'rxjs'
 import { Message } from 'primeng/message'
 import { Button } from 'primeng/button'
 import { InputText } from 'primeng/inputtext'
 import { AuthService } from '~/core/services/auth.service'
+import { AuthRepository } from '~/core/repositories/auth.repository'
 
 @Component({
     selector: 'app-register-form',
@@ -22,6 +25,7 @@ import { AuthService } from '~/core/services/auth.service'
 export class RegisterForm {
     protected fb = inject(NonNullableFormBuilder)
     protected authService = inject(AuthService)
+    protected authRepository = inject(AuthRepository)
     protected router = inject(Router)
 
     protected isLoading = signal(false)
@@ -58,32 +62,38 @@ export class RegisterForm {
         this.isLoading.set(true)
         this.errorMessage.set(null)
 
-        const formData = new FormData()
-        formData.append('name', this.registerFb.get('name')?.value || '')
-        formData.append('email', this.registerFb.get('email')?.value || '')
-        formData.append('password', this.registerFb.get('password')?.value || '')
-        formData.append(
-            'password_confirmation',
-            this.registerFb.get('password_confirmation')?.value || '',
-        )
+        const formValue = this.registerFb.getRawValue()
 
-        this.authService.register(formData).subscribe({
-            next: ({ success, errorMessage }) => {
+        this.authRepository
+            .register(formValue)
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    const errMsg =
+                        (err.error?.message as string) ||
+                        (typeof err.error === 'string' ? err.error : null) ||
+                        'Registration failed. Please try again.'
+
+                    this.errorMessage.set(errMsg)
+                    this.isLoading.set(false)
+                    return of(null)
+                }),
+            )
+            .subscribe(async resp => {
                 this.isLoading.set(false)
-                if (success) {
-                    this.router.navigate(['/dashboard'])
-                } else {
-                    this.errorMessage.set(errorMessage || 'Registration failed. Please try again.')
+
+                if (!resp) {
+                    return
                 }
-            },
-            error: (err: HttpErrorResponse) => {
-                this.isLoading.set(false)
-                const errMsg =
-                    (err.error?.message as string) ||
-                    (typeof err.error === 'string' ? err.error : null) ||
-                    'Registration failed. Please try again.'
-                this.errorMessage.set(errMsg)
-            },
-        })
+
+                if (!(resp.ok && resp.body?.payload?.user)) {
+                    const message = resp.body?.message || 'Registration failed. Please try again.'
+                    this.errorMessage.set(message)
+                    return
+                }
+
+                this.authService.user.set(resp.body.payload.user)
+                this.authService.isAuthenticated.set(true)
+                await this.router.navigate(['/dashboard'])
+            })
     }
 }

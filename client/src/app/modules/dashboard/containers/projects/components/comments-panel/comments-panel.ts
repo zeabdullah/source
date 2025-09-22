@@ -63,7 +63,6 @@ export class CommentsPanel implements OnInit {
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
                 catchError(err => {
-                    console.warn('Failed to load comments:', err)
                     this.message.error(
                         'Error',
                         `Failed to load comments. ${err.error?.message || err.message}`,
@@ -84,13 +83,11 @@ export class CommentsPanel implements OnInit {
         }
 
         this.isSubmitting.set(true)
-        const formData = new FormData()
-        formData.set('content', commentContent)
 
         this.http
             .post<LaravelApiResponse<CommentData>>(
                 `/api/${this.commentType}/${this.commentId}/comments`,
-                formData,
+                { content: commentContent },
             )
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
