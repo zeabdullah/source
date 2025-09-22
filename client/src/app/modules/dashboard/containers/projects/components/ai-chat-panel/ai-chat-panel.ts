@@ -15,7 +15,6 @@ import { InputText } from 'primeng/inputtext'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { AiChatMessage } from '../ai-chat-message/ai-chat-message'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
-import { Toast } from 'primeng/toast'
 import { AiChatMessageData } from '../../shared/interfaces/ai-chat-message-data.interface'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
@@ -24,7 +23,7 @@ import { AiChatRepository } from '../../shared/repositories/ai-chat.respository'
 
 @Component({
     selector: 'app-ai-chat-panel',
-    imports: [FormsModule, InputText, Button, ProgressSpinner, AiChatMessage, Toast, EmptyState],
+    imports: [FormsModule, InputText, Button, ProgressSpinner, AiChatMessage, EmptyState],
     templateUrl: './ai-chat-panel.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: { class: 'h-full' },

@@ -15,6 +15,7 @@ import { Avatar } from 'primeng/avatar'
 import { Toolbar } from 'primeng/toolbar'
 import { Popover } from 'primeng/popover'
 import { AuthService } from '~/core/services/auth.service'
+import { MessageService } from '~/core/services/message.service'
 
 @Component({
     selector: 'app-dashboard',
@@ -23,11 +24,12 @@ import { AuthService } from '~/core/services/auth.service'
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard implements OnInit {
-    destroyRef = inject(DestroyRef)
     protected router = inject(Router)
     protected activatedRoute = inject(ActivatedRoute)
     protected authService = inject(AuthService)
+    protected message = inject(MessageService)
     protected isInsideProject = signal(false)
+    destroyRef = inject(DestroyRef)
 
     protected user = this.authService.getUser()
 
@@ -57,8 +59,11 @@ export class Dashboard implements OnInit {
                     await this.router.navigate(['/'])
                 },
                 error: err => {
-                    alert('something wrong happened')
-                    console.log(err)
+                    console.warn(err)
+                    this.message.error(
+                        'Oops!',
+                        "Something wrong happened and we couldn't log you out normally",
+                    )
                 },
             })
     }

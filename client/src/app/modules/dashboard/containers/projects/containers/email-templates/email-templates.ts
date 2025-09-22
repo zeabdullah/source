@@ -10,7 +10,6 @@ import { FormsModule } from '@angular/forms'
 import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute } from '@angular/router'
 import { catchError, of } from 'rxjs'
-import { Toast } from 'primeng/toast'
 import { Button } from 'primeng/button'
 import { Drawer } from 'primeng/drawer'
 import { Select } from 'primeng/select'
@@ -35,7 +34,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
         Drawer,
         Select,
         TabsModule,
-        Toast,
         ProgressSpinner,
         ExpandedImage,
         EmptyState,

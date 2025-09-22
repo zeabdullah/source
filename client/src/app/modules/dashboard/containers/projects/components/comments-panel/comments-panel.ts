@@ -92,7 +92,6 @@ export class CommentsPanel implements OnInit {
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
                 catchError(err => {
-                    console.warn('Failed to send comment:', err)
                     this.message.error(
                         'Error',
                         `Failed to send comment. ${err.error?.message || err.message}`,

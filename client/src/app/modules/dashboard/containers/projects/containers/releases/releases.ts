@@ -12,7 +12,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { catchError, of } from 'rxjs'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { Button } from 'primeng/button'
-import { Toast } from 'primeng/toast'
 import { ReleaseCard } from '../../components/release-card/release-card'
 import { NewReleaseDialog } from '../../components/new-release-dialog/new-release-dialog'
 import { ReleaseData } from '../../shared/interfaces/release.interface'
@@ -23,15 +22,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog'
 
 @Component({
     selector: 'app-releases',
-    imports: [
-        Button,
-        ReleaseCard,
-        NewReleaseDialog,
-        Toast,
-        EmptyState,
-        ProgressSpinner,
-        ConfirmDialog,
-    ],
+    imports: [Button, ReleaseCard, NewReleaseDialog, EmptyState, ProgressSpinner, ConfirmDialog],
     templateUrl: './releases.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

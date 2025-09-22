@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router'
+import { Toast } from 'primeng/toast'
 
 @Component({
     selector: 'app-project-layout',
-    imports: [RouterOutlet, RouterLink, RouterLinkActive],
+    imports: [RouterOutlet, RouterLink, RouterLinkActive, Toast],
     templateUrl: './project-layout.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {

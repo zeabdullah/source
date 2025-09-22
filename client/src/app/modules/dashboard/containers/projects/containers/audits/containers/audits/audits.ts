@@ -11,7 +11,6 @@ import {
 import { ActivatedRoute } from '@angular/router'
 import { Button } from 'primeng/button'
 import { ProgressSpinner } from 'primeng/progressspinner'
-import { Toast } from 'primeng/toast'
 import { catchError, finalize, interval, of, Subscription, switchMap, takeWhile } from 'rxjs'
 import { AuditRepository } from '~/modules/dashboard/containers/projects/containers/audits/shared/repositories/audit.repository'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
@@ -28,7 +27,6 @@ import { ConfirmDialog } from 'primeng/confirmdialog'
     imports: [
         Button,
         ProgressSpinner,
-        Toast,
         AuditCard,
         CreateAuditDialog,
         EmptyState,
@@ -73,9 +71,11 @@ export class Audits implements OnInit, OnDestroy {
             .getAudits(this.projectId())
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
-                catchError(error => {
-                    console.error('Failed to load audits:', error)
-                    this.message.error('Error', 'Failed to load audits. Please try again.')
+                catchError(err => {
+                    this.message.error(
+                        'Error',
+                        `Failed to load audits. ${err.error?.message || err.message}`,
+                    )
                     return of({ message: '', payload: [] })
                 }),
                 finalize(() => this.isLoading.set(false)),

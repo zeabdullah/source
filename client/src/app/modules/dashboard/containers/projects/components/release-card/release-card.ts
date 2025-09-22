@@ -97,7 +97,6 @@ export class ReleaseCard {
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
                 catchError(err => {
-                    console.error('Failed to delete release:', err)
                     this.message.error(
                         'Error',
                         `Failed to delete release: ${err.error?.message || err.message}`,
