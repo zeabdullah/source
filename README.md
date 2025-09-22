@@ -7,7 +7,7 @@
 
 > **Source is the hub for your product team's assets.**
 >
-> It is the **_Source_ of truth** for all of what your users see in a product. Source allows you to bring your app's flows, marketing assets, releases, and design assets under an AI-powered workspace for seamless collaboration, hand-off, and auditing.
+> It is the **_Source_ of truth** for all of what your users see in a digital/software product. Source allows you to bring your app's flows, marketing assets, releases, and design assets under an AI-powered workspace for seamless collaboration, hand-off, and auditing.
 
 <br><br>
 
@@ -19,9 +19,6 @@
 Thanks to [Eraser's](https://eraser.io) simple yet powerful diagrams as code feature, it has helped me quickly map out and revise my database schemas progressively.
 
 You can find [Source's ER Diagram here](https://app.eraser.io/workspace/8FQjCJxkMfRbnclguIwf?origin=share&elements=S5rvZyZoHdEj9nQ0_fGEnQ).
-
-> [!NOTE]
-> Requires an **Eraser** account to view.
 
 <a href="https://app.eraser.io/workspace/8FQjCJxkMfRbnclguIwf?origin=share&elements=S5rvZyZoHdEj9nQ0_fGEnQ" title="Source ERD"><img src='./readme/db/eraser1.svg' alt="Source ERD" /></a>
 
@@ -85,7 +82,7 @@ You can find [Source's ER Diagram here](https://app.eraser.io/workspace/8FQjCJxk
 
 <!-- Development & Testing -->
 <img src="./readme/title6.svg"/>
-****
+
 ### Tech Stack
 
 -   **Angular** with **PrimeNG** for frontend web UI
@@ -99,14 +96,14 @@ You can find [Source's ER Diagram here](https://app.eraser.io/workspace/8FQjCJxk
 
 ### Some Code Snippets
 
-| Figma AI Service                                       | Figma AI System Instruction                              |
-| ------------------------------------------------------ | -------------------------------------------------------- |
-| ![AI Service](./readme/backend/generateFigmaReply.png) | ![fsdaf](./readme/backend/getFigmaSystemInstruction.png) |
-| Tests                                                  |                                                          |
-|                                                        |                                                          |
-| ![Test Suite 1](./readme/backend/tests/test1.png)      | ![Test Suite 2](./readme/backend/tests/test1.png)        |
-|                                                        |                                                          |
-| ![Test Suite 3](./readme/backend/tests/test1.png)      | ![Test Suite 4](./readme/backend/tests/test1.png)        |
+| Figma AI Service                                       | Figma AI System Instruction                                              |
+| ------------------------------------------------------ | ------------------------------------------------------------------------ |
+| ![AI Service](./readme/backend/generateFigmaReply.png) | ![AI System Instruction](./readme/backend/getFigmaSystemInstruction.png) |
+| Tests                                                  |                                                                          |
+|                                                        |                                                                          |
+| ![Test Suite 1](./readme/backend/tests/test1.png)      | ![Test Suite 2](./readme/backend/tests/test2.png)                        |
+|                                                        |                                                                          |
+| ![Test Suite 3](./readme/backend/tests/test3.png)      | ![Test Suite 4](./readme/backend/tests/test4.png)                        |
 
 ### Local Installation
 
@@ -129,7 +126,7 @@ git clone <repository-url>
 cd source
 ```
 
-1. **Set up environment variables**
+2. **Set up environment variables**
 
 ```bash
 # 1. Copy environment files
@@ -137,12 +134,9 @@ cp .env.example .env # Root env for everything other than Laravel
 cp server/.env.example server/.env # env for Laravel
 
 # 2. Fill in .env variables
-
-# 3. Generate Laravel app key
-cd server && php artisan key:generate
 ```
 
-1. **Start all services with Docker**
+3. **Start all services with Docker**
 
 ```bash
 docker compose up -d
@@ -150,23 +144,22 @@ docker compose up -d
 
 This first step will boot up all services: frontend, backend, n8n, and database.
 
-2. **Run database migrations inside backend container**
+4. **Run Initialization script inside `server/` directory**
 
 ```bash
 # 1. Run the needed services
 docker compose up -d
 
-# 2. Use locally provided script
-# Basically runs `php artisan migrate` inside the `server` container
-cd ./server/run-migrations-docker.sh
+# 2. Use locally provided init script
+./server/bootstrap-docker.sh
 
 ```
 
-1. **Access the applications**
-    - **Frontend (Angular)**: http://localhost:4200
-    - **Backend (Laravel)**: http://localhost:8000
-        - Since it's only API routes, use http://localhost:8000/api
-    - **n8n**: http://localhost:5678
+5. **Access the applications**
+    - **Frontend (Angular)**: `http://localhost:4200`
+    - **Backend (Laravel)**: `http://localhost:8000`
+        - Since it's only API routes, use `http://localhost:8000/api`
+    - **n8n**: `http://localhost:5678`
     - **PostgreSQL**: localhost:5432
 
 #### Figma Plugin Setup (no Docker)
@@ -185,6 +178,14 @@ pnpm build
 # Watch for changes during development
 pnpm watch
 ```
+
+#### Installing the Figma Plugin inside Figma
+
+For adding your development plugin to Figma:
+
+1. In the **Figma desktop app**, open a Figma document.
+2. Search for and `run Import plugin from manifest…` or `Import widget from manifest…` via the Quick Actions search bar.
+3. Select the `manifest.json` file that was generated by the build script.
 
 #### Environment Configuration
 
@@ -227,21 +228,23 @@ cd client && pnpm test
 
 <br><br>
 
-<!-- API Testing -->
-<img src="./readme/title7.1.svg"/>
+<!-- Deployment -->
+<img src="./readme/title7.svg"/>
 
-<br>
+### Deployment
+
+### API Development & Testing
 
 In addition to unit tests for the app, I tested my API endpoints using **Hoppscotch**.
 
 > The following screenshots are taken with [**Hoppscotch**](https://hoppscotch.io/), a powerful API testing app similar to **Postman**.
 
-| API: Create Project                         | API: Get My Projects                       | API: Import Brevo Email Template                 |
-| ------------------------------------------- | ------------------------------------------ | ------------------------------------------------ |
-| ![Landing](./readme/api/create-project.png) | ![fsdaf](./readme/api/get-my-projects.png) | ![fsdaf](./readme/api/import-brevo-template.png) |
+| API: Create Project                                    | API: Get My Projects                                  | API: Import Brevo Email Template                                     |
+| ------------------------------------------------------ | ----------------------------------------------------- | -------------------------------------------------------------------- |
+| ![Create Project API](./readme/api/create-project.png) | ![Get Projects API](./readme/api/get-my-projects.png) | ![Import Brevo Template API](./readme/api/import-brevo-template.png) |
 
-### API Documentation
+#### API Documentation
 
-The project also includes an API documentation endpoint generated by **OpenAPI** and **Laravel**. You can find that documentation under `http://localhost:8000/api/documentation`.
+The project also includes an API documentation endpoint generated by **OpenAPI** and **Laravel**.
 
-<br><br>
+You can find that documentation at `http://localhost:8000/api/documentation`.
