@@ -1,0 +1,210 @@
+{
+  "name": "HTML to Thumbnail Image",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bba99a1c-ecdc-4369-9db1-487c264f2f7a",
+              "leftValue": "={{ $('Trigger: Request HTML to image').item.json.body.html }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "a5430e9c-1058-4da7-b8b3-9e31e50c63db",
+      "name": "Validate query params"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"message\": \"value\",\n  \"fields\": [\"html\"],\n  \"payload\": null\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        672,
+        96
+      ],
+      "id": "a005d0ad-bffa-444f-8c48-3008c92bea55",
+      "name": "Invalid params response"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0019a7cd-5b2f-41d8-ae60-5348736bc025",
+              "name": "BROWSERLESS_API_KEY",
+              "value": "<insert_key_here>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "3de30d7d-169a-4279-9d1c-dc0ba427c690",
+      "name": "Set Browserless API key"
+    },
+    {
+      "parameters": {
+        "operation": "runCustomScript",
+        "scriptCode": "=const htmlContent = {{JSON.stringify($('Trigger: Request HTML to image').item.json.body.html)}} || \"<h1>No HTML provided</h1>\";\n\nawait $page.setViewport({ width: 600, height: 800 });\n\nawait $page.setContent(htmlContent);\n\nconst screenshot = await $page.screenshot({ type: \"png\", encoding: \"base64\" });\n\nreturn [{ image: screenshot }];\n ",
+        "options": {
+          "browserWSEndpoint": "=wss://production-sfo.browserless.io?token={{ $json.BROWSERLESS_API_KEY }}",
+          "pageCaching": true
+        }
+      },
+      "type": "n8n-nodes-puppeteer.puppeteer",
+      "typeVersion": 1,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "f4d4c21b-d995-4fc1-a483-5570897470c4",
+      "name": "Convert HTML to base64 image"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-thumbnail-from-html",
+        "authentication": "basicAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7366ff95-8e59-417c-9bca-33b32ff2e343",
+      "name": "Trigger: Request HTML to image",
+      "webhookId": "5e4098ec-c56f-4688-a21c-065415cbb0e5",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "xrvdXIE9dHD1TEyn",
+          "name": "N8n's own auth for its webhooks"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        896,
+        -96
+      ],
+      "id": "2d600ed3-6d18-4446-a4f0-b51f577712e6",
+      "name": "Done"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Validate query params": {
+      "main": [
+        [
+          {
+            "node": "Convert HTML to base64 image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid params response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Browserless API key": {
+      "main": [
+        [
+          {
+            "node": "Validate query params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger: Request HTML to image": {
+      "main": [
+        [
+          {
+            "node": "Set Browserless API key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert HTML to base64 image": {
+      "main": [
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "80a59f73-9ead-4d9e-b895-9471ce3fe6e2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2973286f35bb6f021301cd18e1006322715186f7eb2f4e60dc11993a08ae015a"
+  },
+  "id": "HprJYAujOpCL83MG",
+  "tags": [
+    {
+      "createdAt": "2025-09-15T18:46:03.462Z",
+      "updatedAt": "2025-09-15T18:46:03.462Z",
+      "id": "1zph10VL7j1tlVG8",
+      "name": "HTML"
+    },
+    {
+      "createdAt": "2025-09-15T01:17:30.024Z",
+      "updatedAt": "2025-09-15T01:17:30.024Z",
+      "id": "Z6IdSM93ffT3rsrQ",
+      "name": "MailChimp"
+    }
+  ]
+}
