@@ -29,9 +29,9 @@ import { EmptyState } from '~/shared/components/empty-state/empty-state'
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Releases implements OnInit {
-    route = inject(ActivatedRoute)
-    message = inject(MessageService)
-    releaseRepository = inject(ReleaseRepository)
+    private route = inject(ActivatedRoute)
+    private message = inject(MessageService)
+    private releaseRepository = inject(ReleaseRepository)
     destroyRef = inject(DestroyRef)
 
     showNewReleaseDialog = signal(false)

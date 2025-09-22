@@ -15,7 +15,7 @@ import { Textarea } from 'primeng/textarea'
 import { Message } from 'primeng/message'
 import { Toast } from 'primeng/toast'
 import { ProgressSpinner } from 'primeng/progressspinner'
-import { HttpClient } from '@angular/common/http'
+import { HttpErrorResponse } from '@angular/common/http'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 import { catchError, of } from 'rxjs'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
@@ -23,14 +23,8 @@ import { AuthService } from '~/core/services/auth.service'
 import { MessageService } from '~/core/services/message.service'
 import { ProjectCard } from '../../components/project-card/project-card'
 import { NgClass } from '@angular/common'
-
-interface Project {
-    id: number
-    name: string
-    description: string | null
-    created_at: string
-    updated_at: string
-}
+import { ProjectData } from '../../shared/interfaces/project-data.interface'
+import { ProjectRepository } from '../../shared/repositories/project.repository'
 
 @Component({
     selector: 'app-projects',
@@ -52,16 +46,16 @@ interface Project {
     host: { class: 'grow' },
 })
 export class Projects implements OnInit {
-    authService = inject(AuthService)
-    fb = inject(NonNullableFormBuilder)
-    http = inject(HttpClient)
-    message = inject(MessageService)
+    private authService = inject(AuthService)
+    private message = inject(MessageService)
+    private projectRepository = inject(ProjectRepository)
+    private fb = inject(NonNullableFormBuilder)
     destroyRef = inject(DestroyRef)
 
     user = this.authService.getUser()
     showDialog = false
 
-    projects = signal<Project[]>([])
+    projects = signal<ProjectData[]>([])
     isLoading = signal<boolean>(true)
 
     projectForm = this.fb.group({
@@ -79,19 +73,20 @@ export class Projects implements OnInit {
 
     loadProjects() {
         this.isLoading.set(true)
-        this.http
-            .get<LaravelApiResponse<Project[]>>('/api/projects')
+
+        this.projectRepository
+            .getProjects()
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
-                catchError(err => {
+                catchError((err: HttpErrorResponse) => {
                     this.message.error(
                         'Error',
                         `Failed to load projects. ${err.error?.message || err.message}`,
                     )
-                    return of<LaravelApiResponse<Project[]>>({ message: '', payload: [] })
+                    return of<LaravelApiResponse<ProjectData[]>>({ message: '', payload: [] })
                 }),
             )
-            .subscribe(response => {
+            .subscribe((response: LaravelApiResponse<ProjectData[]>) => {
                 this.projects.set(response.payload || [])
                 this.isLoading.set(false)
             })
@@ -102,25 +97,21 @@ export class Projects implements OnInit {
             return
         }
 
-        const formData = new FormData()
-        formData.append('name', this.projectForm.value.name as string)
-        formData.append('description', this.projectForm.value.description || '')
+        const formValue = this.projectForm.getRawValue()
 
-        this.http
-            .post<LaravelApiResponse<Project>>('/api/projects', {
-                name: this.projectForm.value.name as string,
-            })
+        this.projectRepository
+            .createProject(formValue)
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
-                catchError(err => {
+                catchError((err: HttpErrorResponse) => {
                     this.message.error(
                         'Error',
                         `Failed to create project. ${err.error?.message || err.message}`,
                     )
-                    return of<LaravelApiResponse<Project>>({ message: '', payload: null })
+                    return of<LaravelApiResponse<ProjectData>>({ message: '', payload: null })
                 }),
             )
-            .subscribe(response => {
+            .subscribe((response: LaravelApiResponse<ProjectData>) => {
                 if (response.payload) {
                     this.projects.update(projects => [...projects, response.payload!])
                     this.projectForm.reset()

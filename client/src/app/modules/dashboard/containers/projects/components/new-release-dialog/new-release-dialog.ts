@@ -43,11 +43,11 @@ import { EmailTemplate } from '../../shared/interfaces/email.interface'
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewReleaseDialog {
-    fb = inject(NonNullableFormBuilder)
-    releaseRepository = inject(ReleaseRepository)
-    screenRepository = inject(ScreenRepository)
-    emailTemplateRepository = inject(EmailTemplateRepository)
-    message = inject(MessageService)
+    private fb = inject(NonNullableFormBuilder)
+    private releaseRepository = inject(ReleaseRepository)
+    private screenRepository = inject(ScreenRepository)
+    private emailTemplateRepository = inject(EmailTemplateRepository)
+    private message = inject(MessageService)
     destroyRef = inject(DestroyRef)
 
     visible = input<boolean>(false)
