@@ -18,7 +18,7 @@ export class FeaturesSection {
         {
             title: 'Effortless Edits',
             description:
-                "Do changes directly to connected tools like Figma & Mailchimp, with AI's help",
+                "Do changes directly to connected tools like Figma & Brevo, with AI's help",
             illustrationSrc: '/ud-dnd.svg',
         },
         {

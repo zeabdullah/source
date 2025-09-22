@@ -1,16 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
-import { Router } from '@angular/router'
+import { ChangeDetectionStrategy, Component } from '@angular/core'
+import { RouterLink } from '@angular/router'
 
 @Component({
     selector: 'app-cta-section',
     templateUrl: './cta-section.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [],
+    imports: [RouterLink],
 })
-export class CtaSection {
-    private router = inject(Router)
-
-    protected onGetStarted(): void {
-        this.router.navigate(['/register'])
-    }
-}
+export class CtaSection {}

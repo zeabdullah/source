@@ -13,7 +13,7 @@ export class FaqSection {
     protected faqs = [
         {
             question: 'What tools can I connect?',
-            answer: "Source integrates with popular design and marketing tools including Figma, Sketch, Adobe XD, Mailchimp, HubSpot, and many more. We're constantly adding new integrations.",
+            answer: "Source integrates with popular design and marketing tools including Figma and Brevo, with support coming to many more. We're constantly working on adding new integrations.",
         },
         {
             question: 'How does the AI actually help?',
@@ -25,11 +25,7 @@ export class FaqSection {
         },
         {
             question: 'Does it work for marketing teams too?',
-            answer: 'Definitely. We unify marketing assets like emails, ads, and notifications alongside product UI flows.',
-        },
-        {
-            question: 'How much does it cost?',
-            answer: 'We offer flexible pricing plans starting from free for small teams. Contact us for enterprise pricing and custom solutions.',
+            answer: 'Definitely! We unify marketing assets like emails, ads, alongside product UI flows.',
         },
     ]
 
