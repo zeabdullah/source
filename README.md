@@ -164,6 +164,8 @@ docker compose up -d
 
 #### Figma Plugin Setup (no Docker)
 
+This Figma plugin is powered by [**Preact**](https://preactjs.com/), a super-lightweight, fast alternative to **React**.
+
 Since the docker setup does not handle running the Figma plugin, it must be launched **locally** to work.
 
 ```bash
