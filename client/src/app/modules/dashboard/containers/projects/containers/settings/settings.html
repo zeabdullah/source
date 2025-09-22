@@ -1,1 +1,35 @@
-<p>settings works!</p>
+<form
+    [formGroup]="basicInfoForm"
+    (ngSubmit)="saveBasicInfo()"
+    class="flex max-w-4xl flex-col gap-4"
+>
+    <div class="field flex flex-col gap-2">
+        <label for="name" class="font-semibold">Name</label>
+        <input pInputText type="text" id="name" formControlName="name" fluid />
+    </div>
+
+    <div class="field flex flex-col gap-2">
+        <label for="description" class="font-semibold">Description</label>
+        <textarea
+            pTextarea
+            formControlName="description"
+            id="description"
+            name="description"
+            placeholder="Describe the project..."
+            [rows]="9"
+            class="resize-none"
+            fluid
+        ></textarea>
+    </div>
+
+    <p-button
+        label="Save changes"
+        icon="pi pi-check"
+        type="submit"
+        size="large"
+        [disabled]="basicInfoForm.invalid || basicInfoForm.pristine || basicInfoForm.disabled"
+        [loading]="isSubmitting()"
+    />
+</form>
+
+<p-toast position="bottom-right" />

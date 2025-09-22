@@ -14,7 +14,6 @@ import { MessageService } from '~/core/services/message.service'
 @Component({
     selector: 'app-account',
     imports: [ReactiveFormsModule, Card, InputText, Button, Message, Toast, ConfirmPopup],
-    providers: [ConfirmationService],
     templateUrl: './account.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: { class: 'grow' },

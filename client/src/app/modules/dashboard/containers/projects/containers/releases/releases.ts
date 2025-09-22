@@ -13,7 +13,6 @@ import { catchError, of } from 'rxjs'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { Button } from 'primeng/button'
 import { Toast } from 'primeng/toast'
-import { ConfirmationService } from 'primeng/api'
 import { ReleaseCard } from '../../components/release-card/release-card'
 import { NewReleaseDialog } from '../../components/new-release-dialog/new-release-dialog'
 import { ReleaseData } from '../../shared/interfaces/release.interface'
@@ -33,7 +32,6 @@ import { ConfirmDialog } from 'primeng/confirmdialog'
         ProgressSpinner,
         ConfirmDialog,
     ],
-    providers: [ConfirmationService],
     templateUrl: './releases.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
