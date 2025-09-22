@@ -108,12 +108,10 @@ class AuthController extends Controller
      */
     public function login(Request $request): JsonResponse
     {
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
         ]);
-
-        $credentials = $request->only('email', 'password');
 
         if (!auth()->attempt($credentials)) {
             return $this->unauthorizedResponse('Invalid credentials');
@@ -169,8 +167,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'avatar_url' => 'nullable|url',
         ]);
-
-        $payload = [];
+        $credentials = $request->only(['email', 'password']);
 
         $user = User::create([
             'name' => $validated['name'],
@@ -178,13 +175,20 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
             'avatar_url' => $validated['avatar_url'] ?? null,
         ]);
-        $payload['user'] = $user;
+
+        if (!auth()->attempt($credentials)) {
+            return $this->unauthorizedResponse('Invalid credentials');
+        }
+
+        $payload = [];
+        // $user = auth()->user();
 
         if ($request->hasSession()) {
             $request->session()->regenerate();
         } else {
             $payload['token'] = $user->createToken('auth_token')->plainTextToken;
         }
+        $payload['user'] = $user;
 
         return $this->responseJson($payload, 'Registration successful', 201);
     }
@@ -205,6 +209,8 @@ class AuthController extends Controller
     {
         if ($request->hasSession()) {
             auth()->guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
         } else {
             $request->user()->currentAccessToken()?->delete();
 
