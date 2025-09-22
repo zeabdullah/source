@@ -8,9 +8,6 @@ import {
 } from '@angular/core'
 import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
-import { InputIcon } from 'primeng/inputicon'
-import { IconField } from 'primeng/iconfield'
-import { InputText } from 'primeng/inputtext'
 import { Avatar } from 'primeng/avatar'
 import { Toolbar } from 'primeng/toolbar'
 import { Popover } from 'primeng/popover'
@@ -19,7 +16,7 @@ import { MessageService } from '~/core/services/message.service'
 
 @Component({
     selector: 'app-dashboard',
-    imports: [InputIcon, IconField, InputText, Toolbar, Avatar, Popover, RouterOutlet, RouterLink],
+    imports: [Toolbar, Avatar, Popover, RouterOutlet, RouterLink],
     templateUrl: './dashboard.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

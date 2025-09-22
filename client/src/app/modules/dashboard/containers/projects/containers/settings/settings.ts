@@ -17,11 +17,10 @@ import { ProjectData } from '../../shared/interfaces/project-data.interface'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 import { MessageService } from '~/core/services/message.service'
 import { Textarea } from 'primeng/textarea'
-import { Toast } from 'primeng/toast'
 
 @Component({
     selector: 'app-settings',
-    imports: [ReactiveFormsModule, InputText, Button, Textarea, Toast],
+    imports: [ReactiveFormsModule, InputText, Button, Textarea],
     templateUrl: './settings.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

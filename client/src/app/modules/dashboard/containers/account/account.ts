@@ -97,9 +97,11 @@ export class Account {
             rejectButtonProps: {
                 severity: 'secondary',
                 outlined: true,
+                label: 'Cancel',
             },
             acceptButtonProps: {
                 severity: 'danger',
+                label: 'Delete',
             },
             accept: () => {
                 this.deleteFigmaToken()
@@ -115,9 +117,11 @@ export class Account {
             rejectButtonProps: {
                 severity: 'secondary',
                 outlined: true,
+                label: 'Cancel',
             },
             acceptButtonProps: {
                 severity: 'danger',
+                label: 'Delete',
             },
             accept: () => {
                 this.deleteBrevoToken()
