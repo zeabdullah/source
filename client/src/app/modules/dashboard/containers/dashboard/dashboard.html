@@ -8,13 +8,6 @@
                 <img src="/source-logo-brand.svg" alt="Source Logo" class="h-12" alt="Source" />
             </ng-template>
 
-            <ng-template #center>
-                <p-iconfield iconPosition="left">
-                    <p-inputicon class="pi pi-search" />
-                    <input pInputText type="text" name="search" placeholder="Search" />
-                </p-iconfield>
-            </ng-template>
-
             <ng-template #end>
                 <button class="flex items-center gap-2" (click)="popover.toggle($event)">
                     <p-avatar
@@ -31,6 +24,7 @@
                         <a
                             class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-gray-700 transition-colors hover:bg-gray-100"
                             routerLink="/dashboard/account"
+                            (click)="popover.hide()"
                         >
                             <i class="pi pi-user"></i>
                             Account Settings
@@ -38,6 +32,7 @@
                         <a
                             class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-gray-700 transition-colors hover:bg-gray-100"
                             routerLink="/dashboard/projects"
+                            (click)="popover.hide()"
                         >
                             <i class="pi pi-arrow-left"></i>
                             Back to projects

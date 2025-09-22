@@ -13,10 +13,24 @@ import { CommentsPanel } from '../../components/comments-panel/comments-panel'
 import { AiChatPanel } from '../../components/ai-chat-panel/ai-chat-panel'
 import { LaravelApiResponse } from '~/shared/interfaces/laravel-api-response.interface'
 import { ExpandedImage } from '~/shared/components/expanded-image/expanded-image'
+import { EmptyState } from '~/shared/components/empty-state/empty-state'
+import { ButtonModule } from 'primeng/button'
+import { ProgressSpinner } from 'primeng/progressspinner'
 
 @Component({
     selector: 'app-screens',
-    imports: [Select, Drawer, FormsModule, TabsModule, ExpandedImage, CommentsPanel, AiChatPanel],
+    imports: [
+        Select,
+        Drawer,
+        FormsModule,
+        TabsModule,
+        ButtonModule,
+        ProgressSpinner,
+        ExpandedImage,
+        CommentsPanel,
+        AiChatPanel,
+        EmptyState,
+    ],
     templateUrl: './screens.html',
     styles: `
         ::ng-deep .p-drawer-content {

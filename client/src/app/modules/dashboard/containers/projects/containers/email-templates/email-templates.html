@@ -86,19 +86,6 @@
             <div class="flex items-center justify-center py-8">
                 <p-progress-spinner ariaLabel="loading" strokeWidth="4" />
             </div>
-        } @else if (emailTemplatesBySection().length === 0) {
-            <app-empty-state
-                icon="pi-envelope"
-                title="No email templates yet"
-                subtitle="Import your email templates from Brevo to get started."
-            >
-                <p-button
-                    icon="pi pi-download"
-                    label="Import from Brevo"
-                    size="large"
-                    (onClick)="openBrevoTemplateSelector()"
-                />
-            </app-empty-state>
         } @else {
             <div class="space-y-12">
                 @for (section of emailTemplatesBySection(); track section.sectionName) {
@@ -127,6 +114,19 @@
                             }
                         </div>
                     </section>
+                } @empty {
+                    <app-empty-state
+                        icon="pi-envelope"
+                        title="No email templates yet"
+                        subtitle="Import your email templates from Brevo to get started."
+                    >
+                        <p-button
+                            icon="pi pi-download"
+                            label="Import from Brevo"
+                            size="large"
+                            (onClick)="openBrevoTemplateSelector()"
+                        />
+                    </app-empty-state>
                 }
             </div>
         }
