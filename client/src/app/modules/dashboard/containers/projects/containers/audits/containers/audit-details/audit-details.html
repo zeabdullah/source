@@ -9,27 +9,29 @@
             />
         </div>
     } @else if (audit) {
-        <header class="mb-8">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-h1 font-extrabold tracking-tighter">{{ audit.name }}</h1>
-                    @if (audit.description) {
-                        <p class="text-body/normal text-gray-600 mt-2">{{ audit.description }}</p>
-                    }
-                </div>
-                <div class="flex items-center gap-3">
-                    <p-tag [value]="statusLabel()" [severity]="statusSeverity()" />
-                    @if (audit.overall_score !== null) {
-                        <div class="text-right">
-                            <div class="text-h3 font-bold text-gray-900">
-                                {{ audit.overall_score }}/10
-                            </div>
-                            <div class="text-sm text-gray-500">Overall Score</div>
+        <header class="mb-12 flex items-start justify-between">
+            <hgroup>
+                <h1 class="text-h1 font-extrabold tracking-tighter">{{ audit.name }}</h1>
+                @if (audit.description) {
+                    <p class="text-body mt-12 max-w-prose text-gray-700">
+                        {{ audit.description }}
+                    </p>
+                }
+            </hgroup>
+            <div class="flex items-center gap-3">
+                <p-tag [value]="statusLabel()" [severity]="statusSeverity()" />
+                @if (audit.overall_score !== null) {
+                    <div class="text-right">
+                        <div class="text-h3 font-bold text-gray-900">
+                            {{ audit.overall_score }}/10
                         </div>
-                    }
-                </div>
+                        <div class="text-sm text-gray-500">Overall Score</div>
+                    </div>
+                }
             </div>
         </header>
+
+        <h2 class="mb-8 text-h2 font-bold tracking-tight">Findings</h2>
 
         @if (audit.status === 'completed' && audit.results) {
             <div class="space-y-8">
