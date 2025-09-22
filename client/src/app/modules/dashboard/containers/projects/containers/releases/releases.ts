@@ -20,10 +20,19 @@ import { ReleaseData } from '../../shared/interfaces/release.interface'
 import { ReleaseRepository } from '../../shared/repositories/release.repository'
 import { MessageService } from '~/core/services/message.service'
 import { EmptyState } from '~/shared/components/empty-state/empty-state'
+import { ConfirmDialog } from 'primeng/confirmdialog'
 
 @Component({
     selector: 'app-releases',
-    imports: [Button, ReleaseCard, NewReleaseDialog, Toast, EmptyState, ProgressSpinner],
+    imports: [
+        Button,
+        ReleaseCard,
+        NewReleaseDialog,
+        Toast,
+        EmptyState,
+        ProgressSpinner,
+        ConfirmDialog,
+    ],
     providers: [ConfirmationService],
     templateUrl: './releases.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

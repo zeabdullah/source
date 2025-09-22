@@ -12,7 +12,6 @@ import { Button } from 'primeng/button'
 import { Tag } from 'primeng/tag'
 import { Menu } from 'primeng/menu'
 import { MenuItem } from 'primeng/api'
-import { ConfirmDialog } from 'primeng/confirmdialog'
 import { ProgressSpinner } from 'primeng/progressspinner'
 import { DatePipe } from '@angular/common'
 import { ConfirmationService } from 'primeng/api'
@@ -24,8 +23,7 @@ import { AuditData } from '../../shared/interfaces/audit.interface'
 
 @Component({
     selector: 'app-audit-card',
-    imports: [Button, Tag, Menu, ConfirmDialog, ProgressSpinner, DatePipe],
-    providers: [ConfirmationService],
+    imports: [Button, Tag, Menu, ProgressSpinner, DatePipe],
     templateUrl: './audit-card.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: { class: 'block' },
@@ -130,6 +128,12 @@ export class AuditCard {
             message: 'Are you sure you want to delete this audit? This action cannot be undone.',
             header: 'Confirm Delete',
             icon: 'pi pi-exclamation-triangle',
+            rejectButtonProps: {
+                outlined: true,
+                severity: 'secondary',
+                label: 'Cancel',
+            },
+            acceptButtonProps: { severity: 'danger', label: 'Delete' },
             accept: () => this.deleteAudit(),
         })
     }

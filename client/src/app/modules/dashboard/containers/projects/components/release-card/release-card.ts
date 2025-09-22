@@ -11,7 +11,6 @@ import { Chip } from 'primeng/chip'
 import { Button } from 'primeng/button'
 import { Menu } from 'primeng/menu'
 import { MenuItem } from 'primeng/api'
-import { ConfirmDialog } from 'primeng/confirmdialog'
 import { ConfirmationService } from 'primeng/api'
 import { ReleaseData } from '../../shared/interfaces/release.interface'
 import { DatePipe, TitleCasePipe } from '@angular/common'
@@ -22,7 +21,7 @@ import { catchError, of } from 'rxjs'
 
 @Component({
     selector: 'app-release-card',
-    imports: [Chip, DatePipe, TitleCasePipe, Button, Menu, ConfirmDialog],
+    imports: [Chip, DatePipe, TitleCasePipe, Button, Menu],
     templateUrl: './release-card.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: { class: 'block' },
@@ -82,6 +81,12 @@ export class ReleaseCard {
             message: 'Are you sure you want to delete this release? This action cannot be undone.',
             header: 'Confirm Delete',
             icon: 'pi pi-exclamation-triangle',
+            rejectButtonProps: {
+                outlined: true,
+                severity: 'secondary',
+                label: 'Cancel',
+            },
+            acceptButtonProps: { severity: 'danger', label: 'Delete' },
             accept: () => this.deleteRelease(),
         })
     }

@@ -9,7 +9,7 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { provideRouter } from '@angular/router'
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
 import { provideMarkdown } from 'ngx-markdown'
-import { MessageService as PrimeNGMessageService } from 'primeng/api'
+import { ConfirmationService, MessageService as PrimeNGMessageService } from 'primeng/api'
 import { providePrimeNG } from 'primeng/config'
 import { baseInterceptor } from './shared/interceptors/base.interceptor'
 import { routes } from './app.routes'
@@ -36,6 +36,6 @@ export const appConfig: ApplicationConfig = {
                 },
             },
         }),
-        makeEnvironmentProviders([PrimeNGMessageService]),
+        makeEnvironmentProviders([PrimeNGMessageService, ConfirmationService]),
     ],
 }

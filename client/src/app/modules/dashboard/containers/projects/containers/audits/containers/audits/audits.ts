@@ -21,10 +21,20 @@ import { MessageService } from '~/core/services/message.service'
 import { AuditCard } from '../../components/audit-card/audit-card'
 import { CreateAuditDialog } from '../../components/create-audit-dialog/create-audit-dialog'
 import { AuditData } from '../../shared/interfaces/audit.interface'
+import { ConfirmDialog } from 'primeng/confirmdialog'
 
 @Component({
     selector: 'app-audits',
-    imports: [Button, ProgressSpinner, Toast, AuditCard, CreateAuditDialog, EmptyState, NgClass],
+    imports: [
+        Button,
+        ProgressSpinner,
+        Toast,
+        AuditCard,
+        CreateAuditDialog,
+        EmptyState,
+        NgClass,
+        ConfirmDialog,
+    ],
     templateUrl: './audits.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: { class: 'flex flex-1 flex-col' },

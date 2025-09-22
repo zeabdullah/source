@@ -18,7 +18,7 @@
 
     @if (tags().length) {
         <div class="flex items-center gap-2 text-caption">
-            <i class="pi pi-tag text-[16px] text-gray-700"></i>
+            <i class="pi pi-tag text-gray-7-00 text-[16px]"></i>
             @for (tag of tags(); track tag) {
                 <p-chip
                     [label]="tag | titlecase"
@@ -49,5 +49,3 @@
         </div>
     </footer>
 </div>
-
-<p-confirmdialog />
