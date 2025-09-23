@@ -73,27 +73,27 @@ Below is a detailed chart of how the different components powering Source commun
 
 ### App Screens (Web)
 
-| Landing screen                                                      | Landing Screen #2                                                   |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| ![Landing](./readme/frontend/landing/landing1.png)                  | ![Landing 2](./readme/frontend/landing/landing2.png)                |
-| Login                                                               | Register                                                            |
-|                                                                     |                                                                     |
-| ![Login](./readme/frontend/auth/login.png)                          | ![Register](./readme/frontend/auth/register.png)                    |
-| Projects (Dashboard index)                                          | Account Settings                                                    |
-|                                                                     |                                                                     |
-| ![Projects index](./readme/frontend/projects/projects.png)          | ![Account Settings](./readme/frontend/account/account-settings.png) |
-| Screens                                                             | Screen Details (w/ Comments)                                        |
-|                                                                     |                                                                     |
-| ![Screens List](./readme/frontend/screens/screens2.png)             | ![Screen Details](./readme/frontend/screens/screens1.png)           |
-| Screen Details (w/ AI typing)                                       | Screen Details (w/ AI responded)                                    |
-|                                                                     |                                                                     |
-| ![Screen details ](./readme/frontend/screens/screens-ai-typing.png) | ![Screend details](./readme/frontend/screens/screens-ai-ready.png)  |
-| Releases List                                                       | Releases (New)                                                      |
-|                                                                     |                                                                     |
-| ![Releases](./readme/frontend/releases/release-list.png)            | ![Releases](./readme/frontend/releases/releasedialog.png)           |
-| Audits List (Processing)                                            | Audits Details                                                      |
-|                                                                     |                                                                     |
-| ![Audits](./readme/frontend/audits/audit-processing.png)            | ![Audits](./readme/frontend/audits/audit-details.png)               |
+| App quick walkthrough                                               | Importing screens from Figma                                       |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| ![App walkthrough](./readme/gifs/app-walkthrough.gif)               | ![Figma importing](./readme/gifs/app-figma-demo.gif)               |
+| Login                                                               | Register                                                           |
+|                                                                     |                                                                    |
+| ![Login](./readme/frontend/auth/login.png)                          | ![Register](./readme/frontend/auth/register.png)                   |
+| Screen AI Chats                                                     | Screen Comments                                                    |
+|                                                                     |                                                                    |
+| ![Screen AI Chats](./readme/gifs/screen-aichat.gif)                 | ![Screen Comments](./readme/gifs/screen-comment.gif)               |
+| Screens                                                             | Screen Details (w/ Comments)                                       |
+|                                                                     |                                                                    |
+| ![Screens List](./readme/frontend/screens/screens2.png)             | ![Screen Details](./readme/frontend/screens/screens1.png)          |
+| Screen Details (w/ AI typing)                                       | Screen Details (w/ AI responded)                                   |
+|                                                                     |                                                                    |
+| ![Screen details ](./readme/frontend/screens/screens-ai-typing.png) | ![Screend details](./readme/frontend/screens/screens-ai-ready.png) |
+| Releases List                                                       | Releases (New)                                                     |
+|                                                                     |                                                                    |
+| ![Releases](./readme/frontend/releases/release-list.png)            | ![Releases](./readme/frontend/releases/releasedialog.png)          |
+| Audits List (Processing)                                            | Audits Details                                                     |
+|                                                                     |                                                                    |
+| ![Audits](./readme/frontend/audits/audit-processing.png)            | ![Audits](./readme/frontend/audits/audit-details.png)              |
 
 <br><br>
 
